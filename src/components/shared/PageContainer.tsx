@@ -6,11 +6,7 @@ interface PageContainerProps {
 }
 
 export function PageContainer({ children, className = "" }: PageContainerProps) {
-  return (
-    <div className={`page-container py-lg ${className}`}>
-      {children}
-    </div>
-  );
+  return <div className={`page-container py-lg ${className}`}>{children}</div>;
 }
 
 interface SectionHeaderProps {

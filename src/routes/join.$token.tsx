@@ -3,7 +3,11 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
-import { validateInvitationToken, claimInvitation, type InvitationLookup } from "@/lib/invitations.functions";
+import {
+  validateInvitationToken,
+  claimInvitation,
+  type InvitationLookup,
+} from "@/lib/invitations.functions";
 
 export const Route = createFileRoute("/join/$token")({
   ssr: false,
@@ -26,7 +30,9 @@ function JoinPage() {
     void (async () => {
       try {
         localStorage.setItem("pending_invite_token", token);
-      } catch {/* ignore */}
+      } catch {
+        /* ignore */
+      }
       const [res, sess] = await Promise.all([
         validate({ data: { token } as never }).catch(() => null),
         supabase.auth.getUser(),
@@ -43,7 +49,9 @@ function JoinPage() {
       const { interviewId } = await claim({ data: { token } as never });
       try {
         localStorage.removeItem("pending_invite_token");
-      } catch {/* ignore */}
+      } catch {
+        /* ignore */
+      }
       navigate({ to: "/candidate/prepare", search: { interviewId } as never });
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Could not join interview");
@@ -79,8 +87,12 @@ function JoinPage() {
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-indigo-100 text-indigo-700 text-2xl mb-2">
             🎤
           </div>
-          <h1 className="text-2xl font-semibold text-slate-900">You're invited to an AI Interview</h1>
-          <p className="text-slate-600">For: <span className="font-medium text-slate-900">{iv.role}</span></p>
+          <h1 className="text-2xl font-semibold text-slate-900">
+            You're invited to an AI Interview
+          </h1>
+          <p className="text-slate-600">
+            For: <span className="font-medium text-slate-900">{iv.role}</span>
+          </p>
         </div>
 
         <div className="grid grid-cols-2 gap-3 text-sm">
@@ -92,14 +104,16 @@ function JoinPage() {
         </div>
 
         {lookup.windowState === "cancelled" && (
-          <Banner tone="error">This interview was cancelled. Please reach out to your recruiter.</Banner>
+          <Banner tone="error">
+            This interview was cancelled. Please reach out to your recruiter.
+          </Banner>
         )}
         {lookup.windowState === "closed" && (
-          <Banner tone="error">The interview window has closed. Please contact your recruiter to reschedule.</Banner>
+          <Banner tone="error">
+            The interview window has closed. Please contact your recruiter to reschedule.
+          </Banner>
         )}
-        {lookup.windowState === "too_early" && iv.scheduledAt && (
-          <Countdown to={iv.scheduledAt} />
-        )}
+        {lookup.windowState === "too_early" && iv.scheduledAt && <Countdown to={iv.scheduledAt} />}
 
         {err && <Banner tone="error">{err}</Banner>}
 
@@ -107,7 +121,8 @@ function JoinPage() {
           {!signedIn ? (
             <div className="space-y-3">
               <p className="text-sm text-slate-600 text-center">
-                Sign in with <span className="font-medium">{lookup.email}</span> to join your interview.
+                Sign in with <span className="font-medium">{lookup.email}</span> to join your
+                interview.
               </p>
               <div className="flex flex-col gap-2">
                 <Link
@@ -133,10 +148,16 @@ function JoinPage() {
             <button
               type="button"
               onClick={doClaim}
-              disabled={busy || lookup.windowState === "cancelled" || lookup.windowState === "closed"}
+              disabled={
+                busy || lookup.windowState === "cancelled" || lookup.windowState === "closed"
+              }
               className="w-full px-4 py-3 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 disabled:opacity-50"
             >
-              {busy ? "Joining…" : lookup.windowState === "too_early" ? "Reserve my spot" : "Join interview"}
+              {busy
+                ? "Joining…"
+                : lookup.windowState === "too_early"
+                  ? "Reserve my spot"
+                  : "Join interview"}
             </button>
           )}
         </div>
@@ -145,7 +166,15 @@ function JoinPage() {
   );
 }
 
-function Tile({ label, value, className = "" }: { label: string; value: string; className?: string }) {
+function Tile({
+  label,
+  value,
+  className = "",
+}: {
+  label: string;
+  value: string;
+  className?: string;
+}) {
   return (
     <div className={`bg-slate-50 rounded-lg p-3 ${className}`}>
       <p className="text-xs uppercase tracking-wide text-slate-500">{label}</p>
@@ -156,7 +185,9 @@ function Tile({ label, value, className = "" }: { label: string; value: string; 
 
 function Banner({ tone, children }: { tone: "error" | "info"; children: React.ReactNode }) {
   const cls =
-    tone === "error" ? "bg-red-50 text-red-800 border-red-200" : "bg-blue-50 text-blue-800 border-blue-200";
+    tone === "error"
+      ? "bg-red-50 text-red-800 border-red-200"
+      : "bg-blue-50 text-blue-800 border-blue-200";
   return <div className={`rounded-lg border px-3 py-2 text-sm ${cls}`}>{children}</div>;
 }
 
@@ -173,7 +204,10 @@ function Countdown({ to }: { to: string }) {
   const s = Math.floor((diff % 60_000) / 1000);
   return (
     <div className="rounded-lg border border-amber-200 bg-amber-50 text-amber-900 px-3 py-2 text-sm text-center">
-      Interview opens in <span className="font-semibold tabular-nums">{d}d {h}h {m}m {s}s</span>
+      Interview opens in{" "}
+      <span className="font-semibold tabular-nums">
+        {d}d {h}h {m}m {s}s
+      </span>
     </div>
   );
 }

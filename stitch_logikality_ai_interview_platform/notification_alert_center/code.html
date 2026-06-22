@@ -1,442 +1,655 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Logikality AI - Notification Center</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Logikality AI - Notification Center</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
       tailwind.config = {
         darkMode: "class",
         theme: {
           extend: {
-            "colors": {
-                    "primary-fixed-dim": "#c3c0ff",
-                    "inverse-on-surface": "#eaf1ff",
-                    "tertiary-fixed-dim": "#ffb695",
-                    "on-tertiary-fixed": "#351000",
-                    "surface-container-high": "#dce9ff",
-                    "on-primary": "#ffffff",
-                    "primary": "#3525cd",
-                    "secondary-container": "#57dffe",
-                    "background": "#f8f9ff",
-                    "primary-fixed": "#e2dfff",
-                    "on-surface": "#0b1c30",
-                    "on-primary-fixed": "#0f0069",
-                    "surface-container-low": "#eff4ff",
-                    "surface-container": "#e5eeff",
-                    "on-secondary-fixed": "#001f26",
-                    "error-container": "#ffdad6",
-                    "primary-container": "#4f46e5",
-                    "surface-bright": "#f8f9ff",
-                    "on-tertiary-fixed-variant": "#7b2f00",
-                    "outline": "#777587",
-                    "on-surface-variant": "#464555",
-                    "on-secondary-container": "#006172",
-                    "on-primary-fixed-variant": "#3323cc",
-                    "on-background": "#0b1c30",
-                    "inverse-surface": "#213145",
-                    "inverse-primary": "#c3c0ff",
-                    "tertiary": "#7e3000",
-                    "surface-tint": "#4d44e3",
-                    "secondary": "#00687a",
-                    "on-tertiary": "#ffffff",
-                    "on-error-container": "#93000a",
-                    "tertiary-fixed": "#ffdbcc",
-                    "surface-container-highest": "#d3e4fe",
-                    "surface-container-lowest": "#ffffff",
-                    "surface-variant": "#d3e4fe",
-                    "on-error": "#ffffff",
-                    "surface-dim": "#cbdbf5",
-                    "surface": "#f8f9ff",
-                    "outline-variant": "#c7c4d8",
-                    "on-secondary-fixed-variant": "#004e5c",
-                    "error": "#ba1a1a",
-                    "on-secondary": "#ffffff",
-                    "secondary-fixed": "#acedff",
-                    "secondary-fixed-dim": "#4cd7f6",
-                    "on-tertiary-container": "#ffd2be",
-                    "tertiary-container": "#a44100",
-                    "on-primary-container": "#dad7ff"
+            colors: {
+              "primary-fixed-dim": "#c3c0ff",
+              "inverse-on-surface": "#eaf1ff",
+              "tertiary-fixed-dim": "#ffb695",
+              "on-tertiary-fixed": "#351000",
+              "surface-container-high": "#dce9ff",
+              "on-primary": "#ffffff",
+              primary: "#3525cd",
+              "secondary-container": "#57dffe",
+              background: "#f8f9ff",
+              "primary-fixed": "#e2dfff",
+              "on-surface": "#0b1c30",
+              "on-primary-fixed": "#0f0069",
+              "surface-container-low": "#eff4ff",
+              "surface-container": "#e5eeff",
+              "on-secondary-fixed": "#001f26",
+              "error-container": "#ffdad6",
+              "primary-container": "#4f46e5",
+              "surface-bright": "#f8f9ff",
+              "on-tertiary-fixed-variant": "#7b2f00",
+              outline: "#777587",
+              "on-surface-variant": "#464555",
+              "on-secondary-container": "#006172",
+              "on-primary-fixed-variant": "#3323cc",
+              "on-background": "#0b1c30",
+              "inverse-surface": "#213145",
+              "inverse-primary": "#c3c0ff",
+              tertiary: "#7e3000",
+              "surface-tint": "#4d44e3",
+              secondary: "#00687a",
+              "on-tertiary": "#ffffff",
+              "on-error-container": "#93000a",
+              "tertiary-fixed": "#ffdbcc",
+              "surface-container-highest": "#d3e4fe",
+              "surface-container-lowest": "#ffffff",
+              "surface-variant": "#d3e4fe",
+              "on-error": "#ffffff",
+              "surface-dim": "#cbdbf5",
+              surface: "#f8f9ff",
+              "outline-variant": "#c7c4d8",
+              "on-secondary-fixed-variant": "#004e5c",
+              error: "#ba1a1a",
+              "on-secondary": "#ffffff",
+              "secondary-fixed": "#acedff",
+              "secondary-fixed-dim": "#4cd7f6",
+              "on-tertiary-container": "#ffd2be",
+              "tertiary-container": "#a44100",
+              "on-primary-container": "#dad7ff",
             },
-            "borderRadius": {
-                    "DEFAULT": "0.25rem",
-                    "lg": "0.5rem",
-                    "xl": "0.75rem",
-                    "full": "9999px"
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
             },
-            "spacing": {
-                    "md": "16px",
-                    "gutter": "24px",
-                    "container-max": "1440px",
-                    "base": "4px",
-                    "lg": "24px",
-                    "xs": "4px",
-                    "xl": "40px",
-                    "sm": "8px"
+            spacing: {
+              md: "16px",
+              gutter: "24px",
+              "container-max": "1440px",
+              base: "4px",
+              lg: "24px",
+              xs: "4px",
+              xl: "40px",
+              sm: "8px",
             },
-            "fontFamily": {
-                    "headline-lg": [
-                            "Geist"
-                    ],
-                    "display-lg": [
-                            "Geist"
-                    ],
-                    "data-mono": [
-                            "JetBrains Mono"
-                    ],
-                    "label-caps": [
-                            "Inter"
-                    ],
-                    "headline-sm": [
-                            "Geist"
-                    ],
-                    "body-md": [
-                            "Inter"
-                    ],
-                    "headline-md": [
-                            "Geist"
-                    ],
-                    "body-lg": [
-                            "Inter"
-                    ],
-                    "headline-lg-mobile": [
-                            "Geist"
-                    ]
+            fontFamily: {
+              "headline-lg": ["Geist"],
+              "display-lg": ["Geist"],
+              "data-mono": ["JetBrains Mono"],
+              "label-caps": ["Inter"],
+              "headline-sm": ["Geist"],
+              "body-md": ["Inter"],
+              "headline-md": ["Geist"],
+              "body-lg": ["Inter"],
+              "headline-lg-mobile": ["Geist"],
             },
-            "fontSize": {
-                    "headline-lg": [
-                            "32px",
-                            {
-                                    "lineHeight": "1.2",
-                                    "letterSpacing": "-0.02em",
-                                    "fontWeight": "600"
-                            }
-                    ],
-                    "display-lg": [
-                            "48px",
-                            {
-                                    "lineHeight": "1.1",
-                                    "letterSpacing": "-0.04em",
-                                    "fontWeight": "700"
-                            }
-                    ],
-                    "data-mono": [
-                            "13px",
-                            {
-                                    "lineHeight": "1.4",
-                                    "fontWeight": "450"
-                            }
-                    ],
-                    "label-caps": [
-                            "12px",
-                            {
-                                    "lineHeight": "1",
-                                    "letterSpacing": "0.05em",
-                                    "fontWeight": "600"
-                            }
-                    ],
-                    "headline-sm": [
-                            "18px",
-                            {
-                                    "lineHeight": "1.4",
-                                    "fontWeight": "600"
-                            }
-                    ],
-                    "body-md": [
-                            "14px",
-                            {
-                                    "lineHeight": "1.5",
-                                    "fontWeight": "400"
-                            }
-                    ],
-                    "headline-md": [
-                            "24px",
-                            {
-                                    "lineHeight": "1.3",
-                                    "fontWeight": "600"
-                            }
-                    ],
-                    "body-lg": [
-                            "16px",
-                            {
-                                    "lineHeight": "1.6",
-                                    "fontWeight": "400"
-                            }
-                    ],
-                    "headline-lg-mobile": [
-                            "24px",
-                            {
-                                    "lineHeight": "1.2",
-                                    "fontWeight": "600"
-                            }
-                    ]
-            }
-    },
+            fontSize: {
+              "headline-lg": [
+                "32px",
+                {
+                  lineHeight: "1.2",
+                  letterSpacing: "-0.02em",
+                  fontWeight: "600",
+                },
+              ],
+              "display-lg": [
+                "48px",
+                {
+                  lineHeight: "1.1",
+                  letterSpacing: "-0.04em",
+                  fontWeight: "700",
+                },
+              ],
+              "data-mono": [
+                "13px",
+                {
+                  lineHeight: "1.4",
+                  fontWeight: "450",
+                },
+              ],
+              "label-caps": [
+                "12px",
+                {
+                  lineHeight: "1",
+                  letterSpacing: "0.05em",
+                  fontWeight: "600",
+                },
+              ],
+              "headline-sm": [
+                "18px",
+                {
+                  lineHeight: "1.4",
+                  fontWeight: "600",
+                },
+              ],
+              "body-md": [
+                "14px",
+                {
+                  lineHeight: "1.5",
+                  fontWeight: "400",
+                },
+              ],
+              "headline-md": [
+                "24px",
+                {
+                  lineHeight: "1.3",
+                  fontWeight: "600",
+                },
+              ],
+              "body-lg": [
+                "16px",
+                {
+                  lineHeight: "1.6",
+                  fontWeight: "400",
+                },
+              ],
+              "headline-lg-mobile": [
+                "24px",
+                {
+                  lineHeight: "1.2",
+                  fontWeight: "600",
+                },
+              ],
+            },
+          },
         },
-      }
+      };
     </script>
-</head>
-<body class="bg-surface text-on-surface font-body-md min-h-screen">
-<!-- TopAppBar -->
-<header class="fixed top-0 right-0 w-[calc(100%-16rem)] h-16 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md border-b border-outline-variant dark:border-outline flex items-center justify-between px-lg w-full z-40 hidden md:flex">
-<div class="flex items-center gap-lg">
-<span class="font-headline-sm text-headline-sm font-bold text-primary dark:text-inverse-primary">Logikality AI</span>
-<nav class="flex items-center gap-md">
-<a class="text-on-surface-variant hover:text-on-surface transition-colors py-4 text-body-md font-body-md" href="#">Direct Hire</a>
-<a class="text-on-surface-variant hover:text-on-surface transition-colors py-4 text-body-md font-body-md" href="#">Contracting</a>
-<a class="text-on-surface-variant hover:text-on-surface transition-colors py-4 text-body-md font-body-md" href="#">Internal</a>
-</nav>
-</div>
-<div class="flex items-center gap-md">
-<button class="p-2 rounded-full text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-low focus-within:ring-2 focus-within:ring-primary/20">
-<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
-</button>
-<button class="p-2 rounded-full text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-low focus-within:ring-2 focus-within:ring-primary/20">
-<span class="material-symbols-outlined" data-icon="sparkles">colors_spark</span>
-</button>
-<button class="p-2 rounded-full text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-low focus-within:ring-2 focus-within:ring-primary/20">
-<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
-</button>
-</div>
-</header>
-<!-- SideNavBar -->
-<aside class="h-screen w-64 fixed left-0 top-0 border-r border-outline-variant dark:border-outline bg-surface dark:bg-inverse-surface shadow-sm flex flex-col h-full py-md px-md hidden md:flex z-50">
-<div class="mb-xl flex items-center gap-sm px-sm">
-<div class="w-8 h-8 rounded bg-primary text-on-primary flex items-center justify-center font-bold">L</div>
-<div>
-<h1 class="font-headline-md text-headline-md font-bold text-on-surface dark:text-inverse-on-surface">Logikality AI</h1>
-<p class="font-body-md text-body-md text-on-surface-variant text-[10px] uppercase tracking-widest">Enterprise Recruitment</p>
-</div>
-</div>
-<button class="w-full bg-primary text-on-primary py-sm px-md rounded-lg mb-lg font-body-md text-body-md font-semibold hover:bg-surface-tint transition-colors shadow-sm flex items-center justify-center gap-sm">
-<span class="material-symbols-outlined text-[18px]">add</span>
-            New Requisition
+  </head>
+  <body class="bg-surface text-on-surface font-body-md min-h-screen">
+    <!-- TopAppBar -->
+    <header
+      class="fixed top-0 right-0 w-[calc(100%-16rem)] h-16 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md border-b border-outline-variant dark:border-outline flex items-center justify-between px-lg w-full z-40 hidden md:flex"
+    >
+      <div class="flex items-center gap-lg">
+        <span
+          class="font-headline-sm text-headline-sm font-bold text-primary dark:text-inverse-primary"
+          >Logikality AI</span
+        >
+        <nav class="flex items-center gap-md">
+          <a
+            class="text-on-surface-variant hover:text-on-surface transition-colors py-4 text-body-md font-body-md"
+            href="#"
+            >Direct Hire</a
+          >
+          <a
+            class="text-on-surface-variant hover:text-on-surface transition-colors py-4 text-body-md font-body-md"
+            href="#"
+            >Contracting</a
+          >
+          <a
+            class="text-on-surface-variant hover:text-on-surface transition-colors py-4 text-body-md font-body-md"
+            href="#"
+            >Internal</a
+          >
+        </nav>
+      </div>
+      <div class="flex items-center gap-md">
+        <button
+          class="p-2 rounded-full text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-low focus-within:ring-2 focus-within:ring-primary/20"
+        >
+          <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
         </button>
-<nav class="flex-1 flex flex-col gap-xs">
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200 Active: scale-[0.98] transition-transform" href="#">
-<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-<span class="font-body-md text-body-md">Dashboard</span>
-</a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200 Active: scale-[0.98] transition-transform" href="#">
-<span class="material-symbols-outlined" data-icon="group">group</span>
-<span class="font-body-md text-body-md">Candidates</span>
-</a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200 Active: scale-[0.98] transition-transform" href="#">
-<span class="material-symbols-outlined" data-icon="work">work</span>
-<span class="font-body-md text-body-md">Jobs</span>
-</a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200 Active: scale-[0.98] transition-transform" href="#">
-<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
-<span class="font-body-md text-body-md">Pipelines</span>
-</a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200 Active: scale-[0.98] transition-transform" href="#">
-<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
-<span class="font-body-md text-body-md">Analytics</span>
-</a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200 Active: scale-[0.98] transition-transform" href="#">
-<span class="material-symbols-outlined" data-icon="settings">settings</span>
-<span class="font-body-md text-body-md">Settings</span>
-</a>
-</nav>
-<div class="mt-auto border-t border-outline-variant pt-sm">
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200" href="#">
-<span class="material-symbols-outlined" data-icon="help">help</span>
-<span class="font-body-md text-body-md">Help Center</span>
-</a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200" href="#">
-<span class="material-symbols-outlined" data-icon="logout">logout</span>
-<span class="font-body-md text-body-md">Log Out</span>
-</a>
-</div>
-</aside>
-<!-- Main Content -->
-<main class="md:ml-64 pt-16 min-h-screen px-4 md:px-xl py-xl bg-surface-bright pb-32">
-<div class="max-w-container-max mx-auto">
-<!-- Page Header -->
-<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-lg gap-sm">
-<div>
-<h2 class="font-headline-lg text-headline-lg text-on-surface">Notification &amp; Alert Center</h2>
-<p class="font-body-md text-body-md text-on-surface-variant mt-1">Manage your recruitment alerts, AI insights, and system communications.</p>
-</div>
-<div class="flex gap-sm">
-<button class="bg-surface border border-outline-variant text-on-surface px-md py-sm rounded-lg font-body-md text-body-md hover:bg-surface-container-low transition-colors shadow-sm flex items-center gap-xs">
-<span class="material-symbols-outlined text-[18px]">done_all</span> Mark all as read
+        <button
+          class="p-2 rounded-full text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-low focus-within:ring-2 focus-within:ring-primary/20"
+        >
+          <span class="material-symbols-outlined" data-icon="sparkles">colors_spark</span>
+        </button>
+        <button
+          class="p-2 rounded-full text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-low focus-within:ring-2 focus-within:ring-primary/20"
+        >
+          <span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+        </button>
+      </div>
+    </header>
+    <!-- SideNavBar -->
+    <aside
+      class="h-screen w-64 fixed left-0 top-0 border-r border-outline-variant dark:border-outline bg-surface dark:bg-inverse-surface shadow-sm flex flex-col h-full py-md px-md hidden md:flex z-50"
+    >
+      <div class="mb-xl flex items-center gap-sm px-sm">
+        <div
+          class="w-8 h-8 rounded bg-primary text-on-primary flex items-center justify-center font-bold"
+        >
+          L
+        </div>
+        <div>
+          <h1
+            class="font-headline-md text-headline-md font-bold text-on-surface dark:text-inverse-on-surface"
+          >
+            Logikality AI
+          </h1>
+          <p
+            class="font-body-md text-body-md text-on-surface-variant text-[10px] uppercase tracking-widest"
+          >
+            Enterprise Recruitment
+          </p>
+        </div>
+      </div>
+      <button
+        class="w-full bg-primary text-on-primary py-sm px-md rounded-lg mb-lg font-body-md text-body-md font-semibold hover:bg-surface-tint transition-colors shadow-sm flex items-center justify-center gap-sm"
+      >
+        <span class="material-symbols-outlined text-[18px]">add</span>
+        New Requisition
+      </button>
+      <nav class="flex-1 flex flex-col gap-xs">
+        <a
+          class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200 Active: scale-[0.98] transition-transform"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+          <span class="font-body-md text-body-md">Dashboard</span>
+        </a>
+        <a
+          class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200 Active: scale-[0.98] transition-transform"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-icon="group">group</span>
+          <span class="font-body-md text-body-md">Candidates</span>
+        </a>
+        <a
+          class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200 Active: scale-[0.98] transition-transform"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-icon="work">work</span>
+          <span class="font-body-md text-body-md">Jobs</span>
+        </a>
+        <a
+          class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200 Active: scale-[0.98] transition-transform"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+          <span class="font-body-md text-body-md">Pipelines</span>
+        </a>
+        <a
+          class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200 Active: scale-[0.98] transition-transform"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+          <span class="font-body-md text-body-md">Analytics</span>
+        </a>
+        <a
+          class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200 Active: scale-[0.98] transition-transform"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-icon="settings">settings</span>
+          <span class="font-body-md text-body-md">Settings</span>
+        </a>
+      </nav>
+      <div class="mt-auto border-t border-outline-variant pt-sm">
+        <a
+          class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-icon="help">help</span>
+          <span class="font-body-md text-body-md">Help Center</span>
+        </a>
+        <a
+          class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-icon="logout">logout</span>
+          <span class="font-body-md text-body-md">Log Out</span>
+        </a>
+      </div>
+    </aside>
+    <!-- Main Content -->
+    <main class="md:ml-64 pt-16 min-h-screen px-4 md:px-xl py-xl bg-surface-bright pb-32">
+      <div class="max-w-container-max mx-auto">
+        <!-- Page Header -->
+        <div
+          class="flex flex-col md:flex-row justify-between items-start md:items-center mb-lg gap-sm"
+        >
+          <div>
+            <h2 class="font-headline-lg text-headline-lg text-on-surface">
+              Notification &amp; Alert Center
+            </h2>
+            <p class="font-body-md text-body-md text-on-surface-variant mt-1">
+              Manage your recruitment alerts, AI insights, and system communications.
+            </p>
+          </div>
+          <div class="flex gap-sm">
+            <button
+              class="bg-surface border border-outline-variant text-on-surface px-md py-sm rounded-lg font-body-md text-body-md hover:bg-surface-container-low transition-colors shadow-sm flex items-center gap-xs"
+            >
+              <span class="material-symbols-outlined text-[18px]">done_all</span> Mark all as read
+            </button>
+            <button
+              class="bg-surface border border-outline-variant p-sm rounded-lg hover:bg-surface-container-low transition-colors shadow-sm"
+            >
+              <span class="material-symbols-outlined text-[18px]">filter_list</span>
+            </button>
+          </div>
+        </div>
+        <!-- Tabs -->
+        <div class="border-b border-outline-variant mb-lg flex gap-lg">
+          <button
+            class="font-body-md text-body-md text-primary border-b-2 border-primary pb-sm font-semibold"
+          >
+            All Notifications
+          </button>
+          <button
+            class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface pb-sm transition-colors flex items-center gap-xs"
+          >
+            Unread
+            <span class="bg-error text-on-error rounded-full px-2 py-0.5 text-[10px] font-bold"
+              >3</span
+            >
+          </button>
+          <button
+            class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface pb-sm transition-colors"
+          >
+            Archived
+          </button>
+        </div>
+        <!-- Bento Grid Notifications -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+          <!-- Priority AI Insight Column (Wide) -->
+          <div class="md:col-span-8 flex flex-col gap-gutter">
+            <!-- High Priority AI Alert -->
+            <div
+              class="bg-cyan-50 border-l-[3px] border-cyan-500 rounded-xl p-lg shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow"
+            >
+              <div class="flex items-start gap-md">
+                <div
+                  class="w-10 h-10 rounded-full bg-cyan-100 flex items-center justify-center shrink-0"
+                >
+                  <span
+                    class="material-symbols-outlined text-cyan-600"
+                    data-icon="sparkles"
+                    data-weight="fill"
+                    >colors_spark</span
+                  >
+                </div>
+                <div class="flex-1">
+                  <div class="flex justify-between items-start">
+                    <div class="flex items-center gap-sm">
+                      <h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">
+                        Interview Completed &amp; Analyzed
+                      </h3>
+                      <span class="w-2 h-2 rounded-full bg-error animate-pulse"></span>
+                    </div>
+                    <span class="font-data-mono text-data-mono text-on-surface-variant text-[11px]"
+                      >Just now</span
+                    >
+                  </div>
+                  <p class="font-body-md text-body-md text-on-surface-variant mt-sm">
+                    Candidate <strong>Sarah Jenkins</strong> (Senior Frontend Eng) just completed
+                    her technical interview. AI analysis indicates high proficiency in React and
+                    System Design. Ready for technical review.
+                  </p>
+                  <div class="mt-md flex gap-sm">
+                    <button
+                      class="bg-cyan-600 text-white px-md py-sm rounded-lg font-body-md text-body-md hover:bg-cyan-700 transition-colors shadow-sm"
+                    >
+                      View Insights
                     </button>
-<button class="bg-surface border border-outline-variant p-sm rounded-lg hover:bg-surface-container-low transition-colors shadow-sm">
-<span class="material-symbols-outlined text-[18px]">filter_list</span>
-</button>
-</div>
-</div>
-<!-- Tabs -->
-<div class="border-b border-outline-variant mb-lg flex gap-lg">
-<button class="font-body-md text-body-md text-primary border-b-2 border-primary pb-sm font-semibold">All Notifications</button>
-<button class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface pb-sm transition-colors flex items-center gap-xs">
-                    Unread <span class="bg-error text-on-error rounded-full px-2 py-0.5 text-[10px] font-bold">3</span>
-</button>
-<button class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface pb-sm transition-colors">Archived</button>
-</div>
-<!-- Bento Grid Notifications -->
-<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
-<!-- Priority AI Insight Column (Wide) -->
-<div class="md:col-span-8 flex flex-col gap-gutter">
-<!-- High Priority AI Alert -->
-<div class="bg-cyan-50 border-l-[3px] border-cyan-500 rounded-xl p-lg shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-<div class="flex items-start gap-md">
-<div class="w-10 h-10 rounded-full bg-cyan-100 flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-cyan-600" data-icon="sparkles" data-weight="fill">colors_spark</span>
-</div>
-<div class="flex-1">
-<div class="flex justify-between items-start">
-<div class="flex items-center gap-sm">
-<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Interview Completed &amp; Analyzed</h3>
-<span class="w-2 h-2 rounded-full bg-error animate-pulse"></span>
-</div>
-<span class="font-data-mono text-data-mono text-on-surface-variant text-[11px]">Just now</span>
-</div>
-<p class="font-body-md text-body-md text-on-surface-variant mt-sm">Candidate <strong>Sarah Jenkins</strong> (Senior Frontend Eng) just completed her technical interview. AI analysis indicates high proficiency in React and System Design. Ready for technical review.</p>
-<div class="mt-md flex gap-sm">
-<button class="bg-cyan-600 text-white px-md py-sm rounded-lg font-body-md text-body-md hover:bg-cyan-700 transition-colors shadow-sm">View Insights</button>
-<button class="bg-transparent border border-cyan-300 text-cyan-800 px-md py-sm rounded-lg font-body-md text-body-md hover:bg-cyan-100 transition-colors">Move to Offer</button>
-</div>
-</div>
-</div>
-</div>
-<!-- System Action Alert -->
-<div class="bg-surface border border-outline-variant rounded-xl p-lg shadow-sm hover:shadow-md transition-shadow">
-<div class="flex items-start gap-md">
-<div class="w-10 h-10 rounded-full bg-error-container text-on-error-container flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined" data-icon="mail">mail</span>
-</div>
-<div class="flex-1">
-<div class="flex justify-between items-start">
-<div class="flex items-center gap-sm">
-<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Interview Invite Bounced</h3>
-</div>
-<span class="font-data-mono text-data-mono text-on-surface-variant text-[11px]">10m ago</span>
-</div>
-<p class="font-body-md text-body-md text-on-surface-variant mt-sm">The automated invite to <strong>m.roberts@example.com</strong> failed to deliver. Resend integration (Resend API) is active.</p>
-<div class="mt-md flex gap-sm items-center">
-<button class="bg-surface border border-outline-variant px-md py-sm rounded-lg font-body-md text-body-md hover:bg-surface-container-low transition-colors shadow-sm flex items-center gap-xs">
-<span class="material-symbols-outlined text-[16px]">refresh</span> Retry Send
-                                    </button>
-<span class="font-label-caps text-label-caps text-on-surface-variant text-xs flex items-center gap-1">
-<span class="w-1.5 h-1.5 rounded-full bg-green-500 inline-block"></span> API Status: Operational
-                                    </span>
-</div>
-</div>
-</div>
-</div>
-<!-- Standard Notification List -->
-<div class="bg-surface border border-outline-variant rounded-xl overflow-hidden shadow-sm">
-<div class="bg-surface-container-low px-lg py-sm border-b border-outline-variant">
-<h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider text-xs">Earlier Today</h4>
-</div>
-<div class="divide-y divide-outline-variant">
-<div class="p-md hover:bg-surface-container-low transition-colors flex gap-md items-center cursor-pointer group">
-<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center shrink-0 text-on-surface-variant">
-<span class="material-symbols-outlined text-[18px]" data-icon="event">event</span>
-</div>
-<div class="flex-1">
-<p class="font-body-md text-body-md text-on-surface"><strong>David Chen</strong> accepted the final round interview invite for <em>Product Manager</em>.</p>
-<p class="font-data-mono text-data-mono text-on-surface-variant text-[11px] mt-xs">2 hours ago</p>
-</div>
-<button class="opacity-0 group-hover:opacity-100 p-1 text-on-surface-variant hover:text-primary transition-all">
-<span class="material-symbols-outlined text-[18px]">more_vert</span>
-</button>
-</div>
-<div class="p-md hover:bg-surface-container-low transition-colors flex gap-md items-center cursor-pointer group opacity-70">
-<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center shrink-0 text-on-surface-variant">
-<span class="material-symbols-outlined text-[18px]" data-icon="check_circle">check_circle</span>
-</div>
-<div class="flex-1">
-<p class="font-body-md text-body-md text-on-surface">Background check cleared for <strong>Elena Rodriguez</strong>.</p>
-<p class="font-data-mono text-data-mono text-on-surface-variant text-[11px] mt-xs">5 hours ago</p>
-</div>
-<button class="opacity-0 group-hover:opacity-100 p-1 text-on-surface-variant hover:text-primary transition-all">
-<span class="material-symbols-outlined text-[18px]">more_vert</span>
-</button>
-</div>
-</div>
-</div>
-</div>
-<!-- Secondary Context Column (Narrow) -->
-<div class="md:col-span-4 flex flex-col gap-gutter">
-<!-- Notification Settings Widget -->
-<div class="bg-surface border border-outline-variant rounded-xl p-lg shadow-sm">
-<div class="flex items-center gap-sm mb-md border-b border-outline-variant pb-sm">
-<span class="material-symbols-outlined text-on-surface-variant" data-icon="tune">tune</span>
-<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Alert Preferences</h3>
-</div>
-<div class="space-y-md">
-<div class="flex items-center justify-between">
-<div>
-<p class="font-body-md text-body-md text-on-surface font-medium">AI Insights</p>
-<p class="font-label-caps text-label-caps text-on-surface-variant text-xs mt-1">Interview summaries &amp; scorings</p>
-</div>
-<div class="w-10 h-5 bg-primary rounded-full relative cursor-pointer">
-<div class="w-4 h-4 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm"></div>
-</div>
-</div>
-<div class="flex items-center justify-between">
-<div>
-<p class="font-body-md text-body-md text-on-surface font-medium">System Errors</p>
-<p class="font-label-caps text-label-caps text-on-surface-variant text-xs mt-1">Bounces &amp; integration issues</p>
-</div>
-<div class="w-10 h-5 bg-primary rounded-full relative cursor-pointer">
-<div class="w-4 h-4 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm"></div>
-</div>
-</div>
-<div class="flex items-center justify-between">
-<div>
-<p class="font-body-md text-body-md text-on-surface font-medium">Digest Emails</p>
-<p class="font-label-caps text-label-caps text-on-surface-variant text-xs mt-1">Daily summary at 8 AM</p>
-</div>
-<div class="w-10 h-5 bg-surface-container-highest rounded-full relative cursor-pointer border border-outline-variant">
-<div class="w-4 h-4 bg-white rounded-full absolute left-0.5 top-0.5 shadow-sm border border-outline-variant"></div>
-</div>
-</div>
-</div>
-<button class="w-full mt-lg text-primary font-body-md text-body-md text-sm hover:underline">Manage All Settings</button>
-</div>
-<!-- Upcoming Reminders -->
-<div class="bg-surface border border-outline-variant rounded-xl p-lg shadow-sm">
-<div class="flex items-center gap-sm mb-md border-b border-outline-variant pb-sm">
-<span class="material-symbols-outlined text-on-surface-variant" data-icon="schedule">schedule</span>
-<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Scheduled Automated Comms</h3>
-</div>
-<div class="space-y-sm">
-<div class="flex gap-sm p-sm bg-surface-container-low rounded-lg">
-<div class="w-1 bg-secondary rounded-full"></div>
-<div>
-<p class="font-body-md text-body-md text-on-surface text-sm">Follow-up: Design Team</p>
-<p class="font-data-mono text-data-mono text-on-surface-variant text-[10px]">Sending in 2 hours</p>
-</div>
-</div>
-<div class="flex gap-sm p-sm bg-surface-container-low rounded-lg">
-<div class="w-1 bg-outline-variant rounded-full"></div>
-<div>
-<p class="font-body-md text-body-md text-on-surface text-sm">Rejection Batch: Junior QA</p>
-<p class="font-data-mono text-data-mono text-on-surface-variant text-[10px]">Scheduled for EOD</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</main>
-<!-- Footer -->
-<footer class="bg-surface dark:bg-background border-t border-outline-variant dark:border-outline w-full py-md ml-64 w-[calc(100%-16rem)] flex flex-col md:flex-row justify-between items-center px-lg hidden md:flex fixed bottom-0 z-30">
-<div class="font-label-caps text-label-caps text-on-surface-variant">© 2024 Logikality AI. Professional Grade Recruitment.</div>
-<div class="flex items-center gap-md">
-<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors underline-offset-4 hover:underline" href="#">Privacy Policy</a>
-<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors underline-offset-4 hover:underline" href="#">Terms of Service</a>
-<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors underline-offset-4 hover:underline" href="#">Security</a>
-<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors underline-offset-4 hover:underline" href="#">System Status</a>
-</div>
-</footer>
-</body></html>
+                    <button
+                      class="bg-transparent border border-cyan-300 text-cyan-800 px-md py-sm rounded-lg font-body-md text-body-md hover:bg-cyan-100 transition-colors"
+                    >
+                      Move to Offer
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- System Action Alert -->
+            <div
+              class="bg-surface border border-outline-variant rounded-xl p-lg shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div class="flex items-start gap-md">
+                <div
+                  class="w-10 h-10 rounded-full bg-error-container text-on-error-container flex items-center justify-center shrink-0"
+                >
+                  <span class="material-symbols-outlined" data-icon="mail">mail</span>
+                </div>
+                <div class="flex-1">
+                  <div class="flex justify-between items-start">
+                    <div class="flex items-center gap-sm">
+                      <h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">
+                        Interview Invite Bounced
+                      </h3>
+                    </div>
+                    <span class="font-data-mono text-data-mono text-on-surface-variant text-[11px]"
+                      >10m ago</span
+                    >
+                  </div>
+                  <p class="font-body-md text-body-md text-on-surface-variant mt-sm">
+                    The automated invite to <strong>m.roberts@example.com</strong> failed to
+                    deliver. Resend integration (Resend API) is active.
+                  </p>
+                  <div class="mt-md flex gap-sm items-center">
+                    <button
+                      class="bg-surface border border-outline-variant px-md py-sm rounded-lg font-body-md text-body-md hover:bg-surface-container-low transition-colors shadow-sm flex items-center gap-xs"
+                    >
+                      <span class="material-symbols-outlined text-[16px]">refresh</span> Retry Send
+                    </button>
+                    <span
+                      class="font-label-caps text-label-caps text-on-surface-variant text-xs flex items-center gap-1"
+                    >
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-500 inline-block"></span> API
+                      Status: Operational
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Standard Notification List -->
+            <div
+              class="bg-surface border border-outline-variant rounded-xl overflow-hidden shadow-sm"
+            >
+              <div class="bg-surface-container-low px-lg py-sm border-b border-outline-variant">
+                <h4
+                  class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider text-xs"
+                >
+                  Earlier Today
+                </h4>
+              </div>
+              <div class="divide-y divide-outline-variant">
+                <div
+                  class="p-md hover:bg-surface-container-low transition-colors flex gap-md items-center cursor-pointer group"
+                >
+                  <div
+                    class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center shrink-0 text-on-surface-variant"
+                  >
+                    <span class="material-symbols-outlined text-[18px]" data-icon="event"
+                      >event</span
+                    >
+                  </div>
+                  <div class="flex-1">
+                    <p class="font-body-md text-body-md text-on-surface">
+                      <strong>David Chen</strong> accepted the final round interview invite for
+                      <em>Product Manager</em>.
+                    </p>
+                    <p
+                      class="font-data-mono text-data-mono text-on-surface-variant text-[11px] mt-xs"
+                    >
+                      2 hours ago
+                    </p>
+                  </div>
+                  <button
+                    class="opacity-0 group-hover:opacity-100 p-1 text-on-surface-variant hover:text-primary transition-all"
+                  >
+                    <span class="material-symbols-outlined text-[18px]">more_vert</span>
+                  </button>
+                </div>
+                <div
+                  class="p-md hover:bg-surface-container-low transition-colors flex gap-md items-center cursor-pointer group opacity-70"
+                >
+                  <div
+                    class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center shrink-0 text-on-surface-variant"
+                  >
+                    <span class="material-symbols-outlined text-[18px]" data-icon="check_circle"
+                      >check_circle</span
+                    >
+                  </div>
+                  <div class="flex-1">
+                    <p class="font-body-md text-body-md text-on-surface">
+                      Background check cleared for <strong>Elena Rodriguez</strong>.
+                    </p>
+                    <p
+                      class="font-data-mono text-data-mono text-on-surface-variant text-[11px] mt-xs"
+                    >
+                      5 hours ago
+                    </p>
+                  </div>
+                  <button
+                    class="opacity-0 group-hover:opacity-100 p-1 text-on-surface-variant hover:text-primary transition-all"
+                  >
+                    <span class="material-symbols-outlined text-[18px]">more_vert</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Secondary Context Column (Narrow) -->
+          <div class="md:col-span-4 flex flex-col gap-gutter">
+            <!-- Notification Settings Widget -->
+            <div class="bg-surface border border-outline-variant rounded-xl p-lg shadow-sm">
+              <div class="flex items-center gap-sm mb-md border-b border-outline-variant pb-sm">
+                <span class="material-symbols-outlined text-on-surface-variant" data-icon="tune"
+                  >tune</span
+                >
+                <h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">
+                  Alert Preferences
+                </h3>
+              </div>
+              <div class="space-y-md">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="font-body-md text-body-md text-on-surface font-medium">AI Insights</p>
+                    <p class="font-label-caps text-label-caps text-on-surface-variant text-xs mt-1">
+                      Interview summaries &amp; scorings
+                    </p>
+                  </div>
+                  <div class="w-10 h-5 bg-primary rounded-full relative cursor-pointer">
+                    <div
+                      class="w-4 h-4 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm"
+                    ></div>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="font-body-md text-body-md text-on-surface font-medium">
+                      System Errors
+                    </p>
+                    <p class="font-label-caps text-label-caps text-on-surface-variant text-xs mt-1">
+                      Bounces &amp; integration issues
+                    </p>
+                  </div>
+                  <div class="w-10 h-5 bg-primary rounded-full relative cursor-pointer">
+                    <div
+                      class="w-4 h-4 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm"
+                    ></div>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="font-body-md text-body-md text-on-surface font-medium">
+                      Digest Emails
+                    </p>
+                    <p class="font-label-caps text-label-caps text-on-surface-variant text-xs mt-1">
+                      Daily summary at 8 AM
+                    </p>
+                  </div>
+                  <div
+                    class="w-10 h-5 bg-surface-container-highest rounded-full relative cursor-pointer border border-outline-variant"
+                  >
+                    <div
+                      class="w-4 h-4 bg-white rounded-full absolute left-0.5 top-0.5 shadow-sm border border-outline-variant"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+              <button
+                class="w-full mt-lg text-primary font-body-md text-body-md text-sm hover:underline"
+              >
+                Manage All Settings
+              </button>
+            </div>
+            <!-- Upcoming Reminders -->
+            <div class="bg-surface border border-outline-variant rounded-xl p-lg shadow-sm">
+              <div class="flex items-center gap-sm mb-md border-b border-outline-variant pb-sm">
+                <span class="material-symbols-outlined text-on-surface-variant" data-icon="schedule"
+                  >schedule</span
+                >
+                <h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">
+                  Scheduled Automated Comms
+                </h3>
+              </div>
+              <div class="space-y-sm">
+                <div class="flex gap-sm p-sm bg-surface-container-low rounded-lg">
+                  <div class="w-1 bg-secondary rounded-full"></div>
+                  <div>
+                    <p class="font-body-md text-body-md text-on-surface text-sm">
+                      Follow-up: Design Team
+                    </p>
+                    <p class="font-data-mono text-data-mono text-on-surface-variant text-[10px]">
+                      Sending in 2 hours
+                    </p>
+                  </div>
+                </div>
+                <div class="flex gap-sm p-sm bg-surface-container-low rounded-lg">
+                  <div class="w-1 bg-outline-variant rounded-full"></div>
+                  <div>
+                    <p class="font-body-md text-body-md text-on-surface text-sm">
+                      Rejection Batch: Junior QA
+                    </p>
+                    <p class="font-data-mono text-data-mono text-on-surface-variant text-[10px]">
+                      Scheduled for EOD
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <!-- Footer -->
+    <footer
+      class="bg-surface dark:bg-background border-t border-outline-variant dark:border-outline w-full py-md ml-64 w-[calc(100%-16rem)] flex flex-col md:flex-row justify-between items-center px-lg hidden md:flex fixed bottom-0 z-30"
+    >
+      <div class="font-label-caps text-label-caps text-on-surface-variant">
+        © 2024 Logikality AI. Professional Grade Recruitment.
+      </div>
+      <div class="flex items-center gap-md">
+        <a
+          class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors underline-offset-4 hover:underline"
+          href="#"
+          >Privacy Policy</a
+        >
+        <a
+          class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors underline-offset-4 hover:underline"
+          href="#"
+          >Terms of Service</a
+        >
+        <a
+          class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors underline-offset-4 hover:underline"
+          href="#"
+          >Security</a
+        >
+        <a
+          class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors underline-offset-4 hover:underline"
+          href="#"
+          >System Status</a
+        >
+      </div>
+    </footer>
+  </body>
+</html>

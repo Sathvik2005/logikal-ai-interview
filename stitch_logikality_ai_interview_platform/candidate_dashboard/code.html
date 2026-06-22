@@ -1,370 +1,570 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Candidate Dashboard - Logikality AI</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "primary-container": "#4f46e5",
-                        "tertiary-fixed-dim": "#ffb695",
-                        "on-tertiary-fixed-variant": "#7b2f00",
-                        "on-background": "#0b1c30",
-                        "surface-tint": "#4d44e3",
-                        "inverse-on-surface": "#eaf1ff",
-                        "on-surface-variant": "#464555",
-                        "on-tertiary-container": "#ffd2be",
-                        "on-primary": "#ffffff",
-                        "surface-bright": "#f8f9ff",
-                        "primary": "#3525cd",
-                        "tertiary": "#7e3000",
-                        "surface-container-high": "#dce9ff",
-                        "secondary-container": "#57dffe",
-                        "on-primary-fixed": "#0f0069",
-                        "surface-variant": "#d3e4fe",
-                        "on-secondary-fixed-variant": "#004e5c",
-                        "tertiary-fixed": "#ffdbcc",
-                        "surface": "#f8f9ff",
-                        "surface-dim": "#cbdbf5",
-                        "secondary-fixed-dim": "#4cd7f6",
-                        "on-secondary": "#ffffff",
-                        "on-tertiary": "#ffffff",
-                        "error-container": "#ffdad6",
-                        "tertiary-container": "#a44100",
-                        "surface-container-low": "#eff4ff",
-                        "outline-variant": "#c7c4d8",
-                        "surface-container": "#e5eeff",
-                        "on-error": "#ffffff",
-                        "primary-fixed": "#e2dfff",
-                        "on-error-container": "#93000a",
-                        "secondary": "#00687a",
-                        "inverse-primary": "#c3c0ff",
-                        "error": "#ba1a1a",
-                        "secondary-fixed": "#acedff",
-                        "on-primary-container": "#dad7ff",
-                        "background": "#f8f9ff",
-                        "surface-container-lowest": "#ffffff",
-                        "on-tertiary-fixed": "#351000",
-                        "on-primary-fixed-variant": "#3323cc",
-                        "inverse-surface": "#213145",
-                        "on-secondary-fixed": "#001f26",
-                        "on-surface": "#0b1c30",
-                        "surface-container-highest": "#d3e4fe",
-                        "outline": "#777587",
-                        "primary-fixed-dim": "#c3c0ff",
-                        "on-secondary-container": "#006172"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                    "spacing": {
-                        "xl": "40px",
-                        "xs": "4px",
-                        "md": "16px",
-                        "gutter": "24px",
-                        "lg": "24px",
-                        "base": "4px",
-                        "sm": "8px",
-                        "container-max": "1440px"
-                    },
-                    "fontFamily": {
-                        "headline-md": ["Geist"],
-                        "headline-sm": ["Geist"],
-                        "body-lg": ["Inter"],
-                        "label-caps": ["Inter"],
-                        "headline-lg-mobile": ["Geist"],
-                        "headline-lg": ["Geist"],
-                        "body-md": ["Inter"],
-                        "data-mono": ["JetBrains Mono"],
-                        "display-lg": ["Geist"]
-                    },
-                    "fontSize": {
-                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
-                        "headline-sm": ["18px", { "lineHeight": "1.4", "fontWeight": "600" }],
-                        "body-lg": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
-                        "label-caps": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600" }],
-                        "headline-lg-mobile": ["24px", { "lineHeight": "1.2", "fontWeight": "600" }],
-                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
-                        "body-md": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
-                        "data-mono": ["13px", { "lineHeight": "1.4", "fontWeight": "450" }],
-                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700" }]
-                    }
-                }
-            }
-        }
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Candidate Dashboard - Logikality AI</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-container": "#4f46e5",
+              "tertiary-fixed-dim": "#ffb695",
+              "on-tertiary-fixed-variant": "#7b2f00",
+              "on-background": "#0b1c30",
+              "surface-tint": "#4d44e3",
+              "inverse-on-surface": "#eaf1ff",
+              "on-surface-variant": "#464555",
+              "on-tertiary-container": "#ffd2be",
+              "on-primary": "#ffffff",
+              "surface-bright": "#f8f9ff",
+              primary: "#3525cd",
+              tertiary: "#7e3000",
+              "surface-container-high": "#dce9ff",
+              "secondary-container": "#57dffe",
+              "on-primary-fixed": "#0f0069",
+              "surface-variant": "#d3e4fe",
+              "on-secondary-fixed-variant": "#004e5c",
+              "tertiary-fixed": "#ffdbcc",
+              surface: "#f8f9ff",
+              "surface-dim": "#cbdbf5",
+              "secondary-fixed-dim": "#4cd7f6",
+              "on-secondary": "#ffffff",
+              "on-tertiary": "#ffffff",
+              "error-container": "#ffdad6",
+              "tertiary-container": "#a44100",
+              "surface-container-low": "#eff4ff",
+              "outline-variant": "#c7c4d8",
+              "surface-container": "#e5eeff",
+              "on-error": "#ffffff",
+              "primary-fixed": "#e2dfff",
+              "on-error-container": "#93000a",
+              secondary: "#00687a",
+              "inverse-primary": "#c3c0ff",
+              error: "#ba1a1a",
+              "secondary-fixed": "#acedff",
+              "on-primary-container": "#dad7ff",
+              background: "#f8f9ff",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary-fixed": "#351000",
+              "on-primary-fixed-variant": "#3323cc",
+              "inverse-surface": "#213145",
+              "on-secondary-fixed": "#001f26",
+              "on-surface": "#0b1c30",
+              "surface-container-highest": "#d3e4fe",
+              outline: "#777587",
+              "primary-fixed-dim": "#c3c0ff",
+              "on-secondary-container": "#006172",
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+            spacing: {
+              xl: "40px",
+              xs: "4px",
+              md: "16px",
+              gutter: "24px",
+              lg: "24px",
+              base: "4px",
+              sm: "8px",
+              "container-max": "1440px",
+            },
+            fontFamily: {
+              "headline-md": ["Geist"],
+              "headline-sm": ["Geist"],
+              "body-lg": ["Inter"],
+              "label-caps": ["Inter"],
+              "headline-lg-mobile": ["Geist"],
+              "headline-lg": ["Geist"],
+              "body-md": ["Inter"],
+              "data-mono": ["JetBrains Mono"],
+              "display-lg": ["Geist"],
+            },
+            fontSize: {
+              "headline-md": ["24px", { lineHeight: "1.3", fontWeight: "600" }],
+              "headline-sm": ["18px", { lineHeight: "1.4", fontWeight: "600" }],
+              "body-lg": ["16px", { lineHeight: "1.6", fontWeight: "400" }],
+              "label-caps": [
+                "12px",
+                { lineHeight: "1", letterSpacing: "0.05em", fontWeight: "600" },
+              ],
+              "headline-lg-mobile": ["24px", { lineHeight: "1.2", fontWeight: "600" }],
+              "headline-lg": [
+                "32px",
+                { lineHeight: "1.2", letterSpacing: "-0.02em", fontWeight: "600" },
+              ],
+              "body-md": ["14px", { lineHeight: "1.5", fontWeight: "400" }],
+              "data-mono": ["13px", { lineHeight: "1.4", fontWeight: "450" }],
+              "display-lg": [
+                "48px",
+                { lineHeight: "1.1", letterSpacing: "-0.04em", fontWeight: "700" },
+              ],
+            },
+          },
+        },
+      };
     </script>
-<style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        .material-symbols-outlined.filled {
-            font-variation-settings: 'FILL' 1;
-        }
-        
-        /* Subtle shadow for Level 1 Cards */
-        .card-shadow {
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
-        }
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      .material-symbols-outlined.filled {
+        font-variation-settings: "FILL" 1;
+      }
+
+      /* Subtle shadow for Level 1 Cards */
+      .card-shadow {
+        box-shadow:
+          0 1px 3px 0 rgba(0, 0, 0, 0.02),
+          0 1px 2px -1px rgba(0, 0, 0, 0.03);
+      }
     </style>
-</head>
-<body class="bg-background text-on-background font-body-md antialiased flex min-h-screen">
-<!-- SideNavBar (Shared Component) -->
-<nav class="bg-surface-container-lowest h-screen w-64 fixed left-0 top-0 border-r border-outline-variant shadow-sm flex flex-col h-full py-md px-md z-50">
-<!-- Header -->
-<div class="flex items-center gap-sm mb-lg px-sm">
-<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center flex-shrink-0">
-<span class="material-symbols-outlined text-on-primary-container text-[18px]">temp_preferences_custom</span>
-</div>
-<div>
-<h1 class="font-headline-md text-headline-md font-bold text-primary">Logikality AI</h1>
-<p class="font-label-caps text-label-caps text-on-surface-variant uppercase">Enterprise Recruitment</p>
-</div>
-</div>
-<!-- CTA -->
-<button class="w-full bg-primary text-on-primary font-body-md text-body-md font-semibold py-2 px-4 rounded-lg mb-lg hover:brightness-110 transition-all flex items-center justify-center gap-sm">
-<span class="material-symbols-outlined text-[18px]">add</span>
-            New Interview
-        </button>
-<!-- Navigation Tabs -->
-<div class="flex-1 overflow-y-auto">
-<ul class="space-y-1">
-<!-- Active Tab: Dashboard -->
-<li>
-<a class="flex items-center gap-md px-sm py-2 rounded-md text-primary font-bold border-r-2 border-primary bg-surface-container hover:bg-surface-container transition-colors opacity-90 transition-all duration-150" href="#">
-<span class="material-symbols-outlined">dashboard</span>
-<span class="font-body-md text-body-md">Dashboard</span>
-</a>
-</li>
-<li>
-<a class="flex items-center gap-md px-sm py-2 rounded-md text-on-surface-variant hover:bg-surface-container transition-colors" href="#">
-<span class="material-symbols-outlined">groups</span>
-<span class="font-body-md text-body-md">Candidates</span>
-</a>
-</li>
-<li>
-<a class="flex items-center gap-md px-sm py-2 rounded-md text-on-surface-variant hover:bg-surface-container transition-colors" href="#">
-<span class="material-symbols-outlined">description</span>
-<span class="font-body-md text-body-md">Job Descriptions</span>
-</a>
-</li>
-<li>
-<a class="flex items-center gap-md px-sm py-2 rounded-md text-on-surface-variant hover:bg-surface-container transition-colors" href="#">
-<span class="material-symbols-outlined">mic_external_on</span>
-<span class="font-body-md text-body-md">Interviews</span>
-</a>
-</li>
-<li>
-<a class="flex items-center gap-md px-sm py-2 rounded-md text-on-surface-variant hover:bg-surface-container transition-colors" href="#">
-<span class="material-symbols-outlined">assessment</span>
-<span class="font-body-md text-body-md">Reports</span>
-</a>
-</li>
-<li>
-<a class="flex items-center gap-md px-sm py-2 rounded-md text-on-surface-variant hover:bg-surface-container transition-colors" href="#">
-<span class="material-symbols-outlined">analytics</span>
-<span class="font-body-md text-body-md">Analytics</span>
-</a>
-</li>
-</ul>
-</div>
-<!-- Footer Tabs -->
-<div class="pt-md border-t border-outline-variant mt-auto">
-<ul class="space-y-1">
-<li>
-<a class="flex items-center gap-md px-sm py-2 rounded-md text-on-surface-variant hover:bg-surface-container transition-colors" href="#">
-<span class="material-symbols-outlined">settings</span>
-<span class="font-body-md text-body-md">Settings</span>
-</a>
-</li>
-<li>
-<a class="flex items-center gap-md px-sm py-2 rounded-md text-on-surface-variant hover:bg-surface-container transition-colors" href="#">
-<span class="material-symbols-outlined">help</span>
-<span class="font-body-md text-body-md">Support</span>
-</a>
-</li>
-</ul>
-</div>
-</nav>
-<!-- Main Content Area -->
-<div class="flex-1 flex flex-col min-h-screen ml-64 bg-background">
-<!-- TopNavBar (Shared Component) -->
-<header class="bg-surface docked full-width top-0 sticky z-40 border-b border-outline-variant flex justify-between items-center h-16 px-gutter">
-<div class="flex items-center gap-lg">
-<span class="font-headline-sm text-headline-sm font-bold text-primary">Logikality AI</span>
-<nav class="hidden md:flex items-center gap-md">
-<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Organizations</a>
-<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Security</a>
-<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Usage</a>
-</nav>
-</div>
-<div class="flex items-center gap-md">
-<button class="text-on-surface-variant hover:text-primary transition-colors scale-95 duration-100 p-1">
-<span class="material-symbols-outlined">notifications</span>
-</button>
-<button class="text-on-surface-variant hover:text-primary transition-colors scale-95 duration-100 p-1">
-<span class="material-symbols-outlined">apps</span>
-</button>
-<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant ml-sm cursor-pointer">
-<img alt="User Profile Avatar" class="w-full h-full object-cover" data-alt="A close-up studio portrait of a young professional woman with a soft, confident smile. The lighting is clean, bright, and modern, reflecting a premium corporate aesthetic. The color palette is minimal, focusing on natural skin tones and a crisp white background. This conveys intelligence and approachability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYSzWK4-8cyI0I8bp8V_TWmkAAxhaMSv_na_zVXlwRUAF0HkKo47Wf2tdt1K3woi0mVadp-z6dVMyYKAzqbZ3c45B94YVTTHaiHfJ-qsLfcjEfp2dguaZrPvZ1esIVLg8XXdHXm-xBUygW97TE8Moh8IDP5DBgpuurHXlfuop7NG-XYA58c0IhxzSxwlS0RvW_7LFg3XLTZ3BB3QFEg-9BrdTP8y8Xk-nb4gSP77ffr0un_qhA4XAWdgblSBZxuIVc9cI6uETx_Ys0"/>
-</div>
-</div>
-</header>
-<!-- Canvas -->
-<main class="flex-1 p-gutter max-w-container-max mx-auto w-full">
-<!-- Welcome Header -->
-<div class="mb-xl">
-<h2 class="font-headline-lg text-headline-lg text-on-background mb-xs">Welcome back, Sarah.</h2>
-<p class="font-body-lg text-body-lg text-on-surface-variant">You have 1 upcoming interview this week. Let's get you prepared.</p>
-</div>
-<!-- Bento Grid Layout -->
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg mb-xl">
-<!-- Upcoming Interviews (Primary Focus) -->
-<div class="lg:col-span-8 space-y-md">
-<div class="flex items-center justify-between mb-sm">
-<h3 class="font-headline-sm text-headline-sm text-on-background">Upcoming Interviews</h3>
-</div>
-<!-- Next Interview Card -->
-<div class="bg-surface rounded-xl border border-outline-variant card-shadow p-lg relative overflow-hidden">
-<!-- Decorative Top Border -->
-<div class="absolute top-0 left-0 w-full h-1 bg-primary"></div>
-<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md">
-<div>
-<div class="flex items-center gap-sm mb-xs">
-<span class="px-2 py-1 bg-error-container text-on-error-container font-label-caps text-label-caps rounded-full flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]">schedule</span>
-                                        In 2 Days
-                                    </span>
-<span class="font-data-mono text-data-mono text-on-surface-variant">Oct 24, 2024 • 10:00 AM PST</span>
-</div>
-<h4 class="font-headline-md text-headline-md text-on-background">Senior Frontend Engineer</h4>
-<p class="font-body-md text-body-md text-on-surface-variant mt-1 flex items-center gap-1">
-<span class="material-symbols-outlined text-[16px]">domain</span> Acme Corp • Technical Round
-                                </p>
-</div>
-<button class="bg-primary text-on-primary font-body-md text-body-md font-semibold py-2 px-6 rounded-lg hover:brightness-110 transition-all shadow-sm w-full md:w-auto">
-                                Join Interview
-                            </button>
-</div>
-</div>
-</div>
-<!-- Preparation Checklist -->
-<div class="lg:col-span-4">
-<h3 class="font-headline-sm text-headline-sm text-on-background mb-sm">Preparation Checklist</h3>
-<div class="bg-surface rounded-xl border border-outline-variant card-shadow p-md h-full">
-<ul class="space-y-3">
-<li class="flex items-start gap-md group">
-<div class="w-5 h-5 rounded border border-primary bg-primary text-on-primary flex items-center justify-center mt-0.5 flex-shrink-0 cursor-pointer">
-<span class="material-symbols-outlined text-[14px] font-bold">check</span>
-</div>
-<div>
-<p class="font-body-md text-body-md text-on-surface-variant line-through">Review job description</p>
-</div>
-</li>
-<li class="flex items-start gap-md group">
-<div class="w-5 h-5 rounded border border-outline-variant bg-surface flex items-center justify-center mt-0.5 flex-shrink-0 cursor-pointer group-hover:border-primary transition-colors">
-</div>
-<div>
-<p class="font-body-md text-body-md text-on-background font-medium group-hover:text-primary transition-colors">Test audio and video equipment</p>
-</div>
-</li>
-<li class="flex items-start gap-md group">
-<div class="w-5 h-5 rounded border border-outline-variant bg-surface flex items-center justify-center mt-0.5 flex-shrink-0 cursor-pointer group-hover:border-primary transition-colors">
-</div>
-<div>
-<p class="font-body-md text-body-md text-on-background font-medium group-hover:text-primary transition-colors">Complete pre-interview technical assessment</p>
-</div>
-</li>
-<li class="flex items-start gap-md group">
-<div class="w-5 h-5 rounded border border-outline-variant bg-surface flex items-center justify-center mt-0.5 flex-shrink-0 cursor-pointer group-hover:border-primary transition-colors">
-</div>
-<div>
-<p class="font-body-md text-body-md text-on-background font-medium group-hover:text-primary transition-colors">Review portfolio projects</p>
-</div>
-</li>
-</ul>
-<!-- AI Insights Module -->
-<div class="mt-md bg-[#ECFEFF] border-l-2 border-[#06B6D4] p-sm rounded-r-lg flex items-start gap-sm">
-<span class="material-symbols-outlined text-[#06B6D4] text-[18px] filled mt-0.5">electric_bolt</span>
-<p class="font-body-md text-body-md text-on-secondary-fixed-variant text-sm">
-<strong>Logikality Insight:</strong> Based on the role, prepare to discuss state management patterns and performance optimization in React.
-                            </p>
-</div>
-</div>
-</div>
-</div>
-<!-- Completed Interviews Table -->
-<div class="mb-xl">
-<h3 class="font-headline-sm text-headline-sm text-on-background mb-sm">Completed Interviews</h3>
-<div class="bg-surface rounded-xl border border-outline-variant card-shadow overflow-hidden">
-<div class="overflow-x-auto">
-<table class="w-full text-left border-collapse">
-<thead>
-<tr class="bg-surface-bright border-b border-outline-variant">
-<th class="py-3 px-lg font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Role</th>
-<th class="py-3 px-lg font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Company</th>
-<th class="py-3 px-lg font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Date</th>
-<th class="py-3 px-lg font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Status</th>
-<th class="py-3 px-lg font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider text-right">Action</th>
-</tr>
-</thead>
-<tbody class="divide-y divide-outline-variant">
-<tr class="hover:bg-surface-container-low transition-colors group">
-<td class="py-3 px-lg">
-<p class="font-body-md text-body-md font-medium text-on-background">Product Designer</p>
-</td>
-<td class="py-3 px-lg font-body-md text-body-md text-on-surface-variant">Globex Inc</td>
-<td class="py-3 px-lg font-data-mono text-data-mono text-on-surface-variant">Oct 15, 2024</td>
-<td class="py-3 px-lg">
-<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-surface-variant text-on-surface-variant border border-outline-variant">
-                                            Feedback Pending
-                                        </span>
-</td>
-<td class="py-3 px-lg text-right">
-<button class="text-primary hover:text-primary-fixed-variant font-body-md text-body-md font-medium transition-colors">View Details</button>
-</td>
-</tr>
-<tr class="hover:bg-surface-container-low transition-colors group">
-<td class="py-3 px-lg">
-<p class="font-body-md text-body-md font-medium text-on-background">UX Researcher</p>
-</td>
-<td class="py-3 px-lg font-body-md text-body-md text-on-surface-variant">Initech</td>
-<td class="py-3 px-lg font-data-mono text-data-mono text-on-surface-variant">Oct 02, 2024</td>
-<td class="py-3 px-lg">
-<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#eaf1ff] text-primary border border-[#c3c0ff]">
-                                            Advanced to Next Round
-                                        </span>
-</td>
-<td class="py-3 px-lg text-right">
-<button class="text-primary hover:text-primary-fixed-variant font-body-md text-body-md font-medium transition-colors">View Feedback</button>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</main>
-<!-- Footer (Shared Component) -->
-<footer class="bg-surface-container-low w-full py-md border-t border-outline-variant flex flex-col md:flex-row justify-between items-center px-gutter">
-<div class="mb-sm md:mb-0">
-<span class="font-label-caps text-label-caps font-black uppercase text-on-surface-variant">© 2024 Logikality AI. Enterprise Intelligence.</span>
-</div>
-<nav class="flex items-center gap-md">
-<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary opacity-80 transition-opacity" href="#">Privacy Policy</a>
-<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary opacity-80 transition-opacity" href="#">Terms of Service</a>
-<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary opacity-80 transition-opacity" href="#">Compliance</a>
-</nav>
-</footer>
-</div>
-</body></html>
+  </head>
+  <body class="bg-background text-on-background font-body-md antialiased flex min-h-screen">
+    <!-- SideNavBar (Shared Component) -->
+    <nav
+      class="bg-surface-container-lowest h-screen w-64 fixed left-0 top-0 border-r border-outline-variant shadow-sm flex flex-col h-full py-md px-md z-50"
+    >
+      <!-- Header -->
+      <div class="flex items-center gap-sm mb-lg px-sm">
+        <div
+          class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center flex-shrink-0"
+        >
+          <span class="material-symbols-outlined text-on-primary-container text-[18px]"
+            >temp_preferences_custom</span
+          >
+        </div>
+        <div>
+          <h1 class="font-headline-md text-headline-md font-bold text-primary">Logikality AI</h1>
+          <p class="font-label-caps text-label-caps text-on-surface-variant uppercase">
+            Enterprise Recruitment
+          </p>
+        </div>
+      </div>
+      <!-- CTA -->
+      <button
+        class="w-full bg-primary text-on-primary font-body-md text-body-md font-semibold py-2 px-4 rounded-lg mb-lg hover:brightness-110 transition-all flex items-center justify-center gap-sm"
+      >
+        <span class="material-symbols-outlined text-[18px]">add</span>
+        New Interview
+      </button>
+      <!-- Navigation Tabs -->
+      <div class="flex-1 overflow-y-auto">
+        <ul class="space-y-1">
+          <!-- Active Tab: Dashboard -->
+          <li>
+            <a
+              class="flex items-center gap-md px-sm py-2 rounded-md text-primary font-bold border-r-2 border-primary bg-surface-container hover:bg-surface-container transition-colors opacity-90 transition-all duration-150"
+              href="#"
+            >
+              <span class="material-symbols-outlined">dashboard</span>
+              <span class="font-body-md text-body-md">Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a
+              class="flex items-center gap-md px-sm py-2 rounded-md text-on-surface-variant hover:bg-surface-container transition-colors"
+              href="#"
+            >
+              <span class="material-symbols-outlined">groups</span>
+              <span class="font-body-md text-body-md">Candidates</span>
+            </a>
+          </li>
+          <li>
+            <a
+              class="flex items-center gap-md px-sm py-2 rounded-md text-on-surface-variant hover:bg-surface-container transition-colors"
+              href="#"
+            >
+              <span class="material-symbols-outlined">description</span>
+              <span class="font-body-md text-body-md">Job Descriptions</span>
+            </a>
+          </li>
+          <li>
+            <a
+              class="flex items-center gap-md px-sm py-2 rounded-md text-on-surface-variant hover:bg-surface-container transition-colors"
+              href="#"
+            >
+              <span class="material-symbols-outlined">mic_external_on</span>
+              <span class="font-body-md text-body-md">Interviews</span>
+            </a>
+          </li>
+          <li>
+            <a
+              class="flex items-center gap-md px-sm py-2 rounded-md text-on-surface-variant hover:bg-surface-container transition-colors"
+              href="#"
+            >
+              <span class="material-symbols-outlined">assessment</span>
+              <span class="font-body-md text-body-md">Reports</span>
+            </a>
+          </li>
+          <li>
+            <a
+              class="flex items-center gap-md px-sm py-2 rounded-md text-on-surface-variant hover:bg-surface-container transition-colors"
+              href="#"
+            >
+              <span class="material-symbols-outlined">analytics</span>
+              <span class="font-body-md text-body-md">Analytics</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <!-- Footer Tabs -->
+      <div class="pt-md border-t border-outline-variant mt-auto">
+        <ul class="space-y-1">
+          <li>
+            <a
+              class="flex items-center gap-md px-sm py-2 rounded-md text-on-surface-variant hover:bg-surface-container transition-colors"
+              href="#"
+            >
+              <span class="material-symbols-outlined">settings</span>
+              <span class="font-body-md text-body-md">Settings</span>
+            </a>
+          </li>
+          <li>
+            <a
+              class="flex items-center gap-md px-sm py-2 rounded-md text-on-surface-variant hover:bg-surface-container transition-colors"
+              href="#"
+            >
+              <span class="material-symbols-outlined">help</span>
+              <span class="font-body-md text-body-md">Support</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col min-h-screen ml-64 bg-background">
+      <!-- TopNavBar (Shared Component) -->
+      <header
+        class="bg-surface docked full-width top-0 sticky z-40 border-b border-outline-variant flex justify-between items-center h-16 px-gutter"
+      >
+        <div class="flex items-center gap-lg">
+          <span class="font-headline-sm text-headline-sm font-bold text-primary"
+            >Logikality AI</span
+          >
+          <nav class="hidden md:flex items-center gap-md">
+            <a
+              class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
+              href="#"
+              >Organizations</a
+            >
+            <a
+              class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
+              href="#"
+              >Security</a
+            >
+            <a
+              class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
+              href="#"
+              >Usage</a
+            >
+          </nav>
+        </div>
+        <div class="flex items-center gap-md">
+          <button
+            class="text-on-surface-variant hover:text-primary transition-colors scale-95 duration-100 p-1"
+          >
+            <span class="material-symbols-outlined">notifications</span>
+          </button>
+          <button
+            class="text-on-surface-variant hover:text-primary transition-colors scale-95 duration-100 p-1"
+          >
+            <span class="material-symbols-outlined">apps</span>
+          </button>
+          <div
+            class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant ml-sm cursor-pointer"
+          >
+            <img
+              alt="User Profile Avatar"
+              class="w-full h-full object-cover"
+              data-alt="A close-up studio portrait of a young professional woman with a soft, confident smile. The lighting is clean, bright, and modern, reflecting a premium corporate aesthetic. The color palette is minimal, focusing on natural skin tones and a crisp white background. This conveys intelligence and approachability."
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYSzWK4-8cyI0I8bp8V_TWmkAAxhaMSv_na_zVXlwRUAF0HkKo47Wf2tdt1K3woi0mVadp-z6dVMyYKAzqbZ3c45B94YVTTHaiHfJ-qsLfcjEfp2dguaZrPvZ1esIVLg8XXdHXm-xBUygW97TE8Moh8IDP5DBgpuurHXlfuop7NG-XYA58c0IhxzSxwlS0RvW_7LFg3XLTZ3BB3QFEg-9BrdTP8y8Xk-nb4gSP77ffr0un_qhA4XAWdgblSBZxuIVc9cI6uETx_Ys0"
+            />
+          </div>
+        </div>
+      </header>
+      <!-- Canvas -->
+      <main class="flex-1 p-gutter max-w-container-max mx-auto w-full">
+        <!-- Welcome Header -->
+        <div class="mb-xl">
+          <h2 class="font-headline-lg text-headline-lg text-on-background mb-xs">
+            Welcome back, Sarah.
+          </h2>
+          <p class="font-body-lg text-body-lg text-on-surface-variant">
+            You have 1 upcoming interview this week. Let's get you prepared.
+          </p>
+        </div>
+        <!-- Bento Grid Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-lg mb-xl">
+          <!-- Upcoming Interviews (Primary Focus) -->
+          <div class="lg:col-span-8 space-y-md">
+            <div class="flex items-center justify-between mb-sm">
+              <h3 class="font-headline-sm text-headline-sm text-on-background">
+                Upcoming Interviews
+              </h3>
+            </div>
+            <!-- Next Interview Card -->
+            <div
+              class="bg-surface rounded-xl border border-outline-variant card-shadow p-lg relative overflow-hidden"
+            >
+              <!-- Decorative Top Border -->
+              <div class="absolute top-0 left-0 w-full h-1 bg-primary"></div>
+              <div
+                class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md"
+              >
+                <div>
+                  <div class="flex items-center gap-sm mb-xs">
+                    <span
+                      class="px-2 py-1 bg-error-container text-on-error-container font-label-caps text-label-caps rounded-full flex items-center gap-1"
+                    >
+                      <span class="material-symbols-outlined text-[14px]">schedule</span>
+                      In 2 Days
+                    </span>
+                    <span class="font-data-mono text-data-mono text-on-surface-variant"
+                      >Oct 24, 2024 • 10:00 AM PST</span
+                    >
+                  </div>
+                  <h4 class="font-headline-md text-headline-md text-on-background">
+                    Senior Frontend Engineer
+                  </h4>
+                  <p
+                    class="font-body-md text-body-md text-on-surface-variant mt-1 flex items-center gap-1"
+                  >
+                    <span class="material-symbols-outlined text-[16px]">domain</span> Acme Corp •
+                    Technical Round
+                  </p>
+                </div>
+                <button
+                  class="bg-primary text-on-primary font-body-md text-body-md font-semibold py-2 px-6 rounded-lg hover:brightness-110 transition-all shadow-sm w-full md:w-auto"
+                >
+                  Join Interview
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- Preparation Checklist -->
+          <div class="lg:col-span-4">
+            <h3 class="font-headline-sm text-headline-sm text-on-background mb-sm">
+              Preparation Checklist
+            </h3>
+            <div
+              class="bg-surface rounded-xl border border-outline-variant card-shadow p-md h-full"
+            >
+              <ul class="space-y-3">
+                <li class="flex items-start gap-md group">
+                  <div
+                    class="w-5 h-5 rounded border border-primary bg-primary text-on-primary flex items-center justify-center mt-0.5 flex-shrink-0 cursor-pointer"
+                  >
+                    <span class="material-symbols-outlined text-[14px] font-bold">check</span>
+                  </div>
+                  <div>
+                    <p class="font-body-md text-body-md text-on-surface-variant line-through">
+                      Review job description
+                    </p>
+                  </div>
+                </li>
+                <li class="flex items-start gap-md group">
+                  <div
+                    class="w-5 h-5 rounded border border-outline-variant bg-surface flex items-center justify-center mt-0.5 flex-shrink-0 cursor-pointer group-hover:border-primary transition-colors"
+                  ></div>
+                  <div>
+                    <p
+                      class="font-body-md text-body-md text-on-background font-medium group-hover:text-primary transition-colors"
+                    >
+                      Test audio and video equipment
+                    </p>
+                  </div>
+                </li>
+                <li class="flex items-start gap-md group">
+                  <div
+                    class="w-5 h-5 rounded border border-outline-variant bg-surface flex items-center justify-center mt-0.5 flex-shrink-0 cursor-pointer group-hover:border-primary transition-colors"
+                  ></div>
+                  <div>
+                    <p
+                      class="font-body-md text-body-md text-on-background font-medium group-hover:text-primary transition-colors"
+                    >
+                      Complete pre-interview technical assessment
+                    </p>
+                  </div>
+                </li>
+                <li class="flex items-start gap-md group">
+                  <div
+                    class="w-5 h-5 rounded border border-outline-variant bg-surface flex items-center justify-center mt-0.5 flex-shrink-0 cursor-pointer group-hover:border-primary transition-colors"
+                  ></div>
+                  <div>
+                    <p
+                      class="font-body-md text-body-md text-on-background font-medium group-hover:text-primary transition-colors"
+                    >
+                      Review portfolio projects
+                    </p>
+                  </div>
+                </li>
+              </ul>
+              <!-- AI Insights Module -->
+              <div
+                class="mt-md bg-[#ECFEFF] border-l-2 border-[#06B6D4] p-sm rounded-r-lg flex items-start gap-sm"
+              >
+                <span class="material-symbols-outlined text-[#06B6D4] text-[18px] filled mt-0.5"
+                  >electric_bolt</span
+                >
+                <p class="font-body-md text-body-md text-on-secondary-fixed-variant text-sm">
+                  <strong>Logikality Insight:</strong> Based on the role, prepare to discuss state
+                  management patterns and performance optimization in React.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Completed Interviews Table -->
+        <div class="mb-xl">
+          <h3 class="font-headline-sm text-headline-sm text-on-background mb-sm">
+            Completed Interviews
+          </h3>
+          <div
+            class="bg-surface rounded-xl border border-outline-variant card-shadow overflow-hidden"
+          >
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-surface-bright border-b border-outline-variant">
+                    <th
+                      class="py-3 px-lg font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider"
+                    >
+                      Role
+                    </th>
+                    <th
+                      class="py-3 px-lg font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider"
+                    >
+                      Company
+                    </th>
+                    <th
+                      class="py-3 px-lg font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider"
+                    >
+                      Date
+                    </th>
+                    <th
+                      class="py-3 px-lg font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider"
+                    >
+                      Status
+                    </th>
+                    <th
+                      class="py-3 px-lg font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider text-right"
+                    >
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-outline-variant">
+                  <tr class="hover:bg-surface-container-low transition-colors group">
+                    <td class="py-3 px-lg">
+                      <p class="font-body-md text-body-md font-medium text-on-background">
+                        Product Designer
+                      </p>
+                    </td>
+                    <td class="py-3 px-lg font-body-md text-body-md text-on-surface-variant">
+                      Globex Inc
+                    </td>
+                    <td class="py-3 px-lg font-data-mono text-data-mono text-on-surface-variant">
+                      Oct 15, 2024
+                    </td>
+                    <td class="py-3 px-lg">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-surface-variant text-on-surface-variant border border-outline-variant"
+                      >
+                        Feedback Pending
+                      </span>
+                    </td>
+                    <td class="py-3 px-lg text-right">
+                      <button
+                        class="text-primary hover:text-primary-fixed-variant font-body-md text-body-md font-medium transition-colors"
+                      >
+                        View Details
+                      </button>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-surface-container-low transition-colors group">
+                    <td class="py-3 px-lg">
+                      <p class="font-body-md text-body-md font-medium text-on-background">
+                        UX Researcher
+                      </p>
+                    </td>
+                    <td class="py-3 px-lg font-body-md text-body-md text-on-surface-variant">
+                      Initech
+                    </td>
+                    <td class="py-3 px-lg font-data-mono text-data-mono text-on-surface-variant">
+                      Oct 02, 2024
+                    </td>
+                    <td class="py-3 px-lg">
+                      <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#eaf1ff] text-primary border border-[#c3c0ff]"
+                      >
+                        Advanced to Next Round
+                      </span>
+                    </td>
+                    <td class="py-3 px-lg text-right">
+                      <button
+                        class="text-primary hover:text-primary-fixed-variant font-body-md text-body-md font-medium transition-colors"
+                      >
+                        View Feedback
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+      <!-- Footer (Shared Component) -->
+      <footer
+        class="bg-surface-container-low w-full py-md border-t border-outline-variant flex flex-col md:flex-row justify-between items-center px-gutter"
+      >
+        <div class="mb-sm md:mb-0">
+          <span class="font-label-caps text-label-caps font-black uppercase text-on-surface-variant"
+            >© 2024 Logikality AI. Enterprise Intelligence.</span
+          >
+        </div>
+        <nav class="flex items-center gap-md">
+          <a
+            class="font-body-md text-body-md text-on-surface-variant hover:text-primary opacity-80 transition-opacity"
+            href="#"
+            >Privacy Policy</a
+          >
+          <a
+            class="font-body-md text-body-md text-on-surface-variant hover:text-primary opacity-80 transition-opacity"
+            href="#"
+            >Terms of Service</a
+          >
+          <a
+            class="font-body-md text-body-md text-on-surface-variant hover:text-primary opacity-80 transition-opacity"
+            href="#"
+            >Compliance</a
+          >
+        </nav>
+      </footer>
+    </div>
+  </body>
+</html>

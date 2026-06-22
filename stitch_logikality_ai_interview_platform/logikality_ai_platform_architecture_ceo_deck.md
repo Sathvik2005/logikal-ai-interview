@@ -5,7 +5,8 @@ This document serves as a high-level overview of the Logikality AI ecosystem, ca
 ---
 
 ## 🛡️ Admin Module: Infrastructure & Compliance
-*Focus: Global oversight, organizational health, and enterprise security.*
+
+_Focus: Global oversight, organizational health, and enterprise security._
 
 1. **Admin Control Center** ({{DATA:SCREEN:SCREEN_4}}) - The primary dashboard for global platform health.
 2. **Organization Management** ({{DATA:SCREEN:SCREEN_6}}) - Managing multi-tenant enterprise entities.
@@ -17,7 +18,8 @@ This document serves as a high-level overview of the Logikality AI ecosystem, ca
 ---
 
 ## 👨‍💼 Recruiter Module: Intelligence & Orchestration
-*Focus: AI-assisted sourcing, evaluation, and interview management.*
+
+_Focus: AI-assisted sourcing, evaluation, and interview management._
 
 1. **Recruiter Dashboard** ({{DATA:SCREEN:SCREEN_22}}) - Command center for active requisitions.
 2. **Candidate Management** ({{DATA:SCREEN:SCREEN_15}}) - High-level pipeline overview.
@@ -37,7 +39,8 @@ This document serves as a high-level overview of the Logikality AI ecosystem, ca
 ---
 
 ## 🧑‍🎓 Candidate Module: Immersive Experience
-*Focus: Professional, friction-free AI interaction.*
+
+_Focus: Professional, friction-free AI interaction._
 
 1. **Candidate Dashboard** ({{DATA:SCREEN:SCREEN_10}}) - Personal interview landing page.
 2. **Candidate Profile & Account Settings** ({{DATA:SCREEN:SCREEN_2}}) - Managing resume and digital footprint.
@@ -51,7 +54,8 @@ This document serves as a high-level overview of the Logikality AI ecosystem, ca
 ---
 
 ## 🌐 Common & Global: Platform Reliability
-*Focus: Brand consistency and operational support.*
+
+_Focus: Brand consistency and operational support._
 
 1. **Logikality Landing Page** ({{DATA:SCREEN:SCREEN_30}}) - Public-facing brand presence.
 2. **Login to Logikality AI** ({{DATA:SCREEN:SCREEN_34}}) - Secure entry point.

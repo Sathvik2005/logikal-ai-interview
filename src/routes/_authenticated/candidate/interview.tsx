@@ -21,7 +21,16 @@ export const Route = createFileRoute("/_authenticated/candidate/interview")({
   component: InterviewOrchestrator,
 });
 
-type Phase = "boot" | "waiting" | "briefing" | "device" | "identity" | "proctor" | "room" | "completed" | "no-interview";
+type Phase =
+  | "boot"
+  | "waiting"
+  | "briefing"
+  | "device"
+  | "identity"
+  | "proctor"
+  | "room"
+  | "completed"
+  | "no-interview";
 
 type InterviewMeta = {
   id: string;
@@ -33,7 +42,6 @@ type InterviewMeta = {
   jobTitle?: string | null;
   curatedQuestionCount?: number;
 } | null;
-
 
 function withinWindow(scheduledAt: string | null, durationMinutes: number | null): boolean {
   if (!scheduledAt) return true;
@@ -72,7 +80,6 @@ function InterviewOrchestrator() {
     })();
   }, [resolveInterview, interviewId]);
 
-
   // Cleanup all media streams on unmount
   useEffect(() => {
     return () => {
@@ -95,12 +102,7 @@ function InterviewOrchestrator() {
     );
   }
   if (phase === "waiting" && interview) {
-    return (
-      <WaitingScreen
-        interview={interview}
-        onReady={() => setPhase("briefing")}
-      />
-    );
+    return <WaitingScreen interview={interview} onReady={() => setPhase("briefing")} />;
   }
   if (phase === "briefing") {
     return <BriefingScreen interview={interview} onStart={() => setPhase("device")} />;
@@ -182,7 +184,13 @@ function CenterMsg({ icon, title, body }: { icon: string; title: string; body?: 
 
 /* ----------------------------- 0. Waiting room ----------------------------- */
 
-function WaitingScreen({ interview, onReady }: { interview: NonNullable<InterviewMeta>; onReady: () => void }) {
+function WaitingScreen({
+  interview,
+  onReady,
+}: {
+  interview: NonNullable<InterviewMeta>;
+  onReady: () => void;
+}) {
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
     const id = window.setInterval(() => setNow(Date.now()), 1000);
@@ -229,7 +237,9 @@ function WaitingScreen({ interview, onReady }: { interview: NonNullable<Intervie
       <div className="w-16 h-16 rounded-full bg-primary-container text-on-primary-container mx-auto flex items-center justify-center">
         <Icon name="schedule" className="text-3xl" />
       </div>
-      <h1 className="text-headline-lg font-headline-lg text-on-surface">You're early — hang tight</h1>
+      <h1 className="text-headline-lg font-headline-lg text-on-surface">
+        You're early — hang tight
+      </h1>
       <p className="text-body-md text-on-surface-variant">
         Your interview for <span className="font-semibold">{role}</span> is scheduled for{" "}
         <span className="font-semibold">
@@ -239,7 +249,12 @@ function WaitingScreen({ interview, onReady }: { interview: NonNullable<Intervie
       </p>
 
       <div className="grid grid-cols-4 gap-2 max-w-md mx-auto pt-2" aria-label="Countdown">
-        {[{ l: "Days", v: d }, { l: "Hours", v: h }, { l: "Min", v: m }, { l: "Sec", v: s }].map((x) => (
+        {[
+          { l: "Days", v: d },
+          { l: "Hours", v: h },
+          { l: "Min", v: m },
+          { l: "Sec", v: s },
+        ].map((x) => (
           <div key={x.l} className="bg-surface-container-low rounded-lg p-3">
             <p className="text-display-sm font-bold tabular-nums text-on-surface">{pad(x.v)}</p>
             <p className="text-label-sm uppercase text-on-surface-variant">{x.l}</p>
@@ -281,10 +296,12 @@ function BriefingScreen({ interview, onStart }: { interview: InterviewMeta; onSt
           <Meta label="Duration" value={`${interview?.duration_minutes ?? 45} minutes`} />
           <Meta label="Status" value={interview?.status ?? "scheduled"} />
           <Meta label="Interviewer" value={personaName} />
-          <Meta label="Curated questions" value={curated > 0 ? `${curated} prepared` : "Adaptive"} />
+          <Meta
+            label="Curated questions"
+            value={curated > 0 ? `${curated} prepared` : "Adaptive"}
+          />
         </div>
       </Card>
-
 
       <Card className="p-lg">
         <h2 className="text-title-md font-semibold mb-sm text-on-surface">Before you begin</h2>
@@ -411,8 +428,10 @@ function DeviceCheckScreen({ onPass }: { onPass: (s: MediaStream) => void }) {
 }
 
 function CheckRow({ label, state }: { label: string; state: CheckState }) {
-  const icon = state === "ok" ? "check_circle" : state === "fail" ? "cancel" : "radio_button_unchecked";
-  const color = state === "ok" ? "text-success" : state === "fail" ? "text-error" : "text-on-surface-variant";
+  const icon =
+    state === "ok" ? "check_circle" : state === "fail" ? "cancel" : "radio_button_unchecked";
+  const color =
+    state === "ok" ? "text-success" : state === "fail" ? "text-error" : "text-on-surface-variant";
   return (
     <div className="flex items-center justify-between p-3 bg-surface-container-low rounded-lg">
       <span className="text-body-md text-on-surface">{label}</span>
@@ -484,7 +503,9 @@ function IdentityScreen({
   return (
     <div className="max-w-3xl mx-auto space-y-md">
       <Card className="p-lg">
-        <h1 className="text-headline-md font-headline-md text-on-surface mb-sm">Identity Verification</h1>
+        <h1 className="text-headline-md font-headline-md text-on-surface mb-sm">
+          Identity Verification
+        </h1>
         <p className="text-body-md text-on-surface-variant mb-md">
           Please look directly at the camera and capture a clear selfie.
         </p>
@@ -558,14 +579,23 @@ function ProctorScreen({ onReady }: { onReady: (s: MediaStream) => void | Promis
       <Card className="p-lg space-y-sm">
         <h1 className="text-headline-md font-headline-md text-on-surface">Proctoring Setup</h1>
         <p className="text-body-md text-on-surface-variant">
-          This interview is monitored for integrity purposes. We will enable fullscreen and require you to share
-          your entire screen. Webcam snapshots, transcript, and integrity signals will be recorded.
+          This interview is monitored for integrity purposes. We will enable fullscreen and require
+          you to share your entire screen. Webcam snapshots, transcript, and integrity signals will
+          be recorded.
         </p>
         <ul className="space-y-1 text-body-sm text-on-surface mt-2">
-          <li className="flex items-center gap-2"><Icon name="fullscreen" /> Fullscreen mode</li>
-          <li className="flex items-center gap-2"><Icon name="screen_share" /> Entire screen sharing</li>
-          <li className="flex items-center gap-2"><Icon name="videocam" /> Webcam monitoring</li>
-          <li className="flex items-center gap-2"><Icon name="mic" /> Microphone monitoring</li>
+          <li className="flex items-center gap-2">
+            <Icon name="fullscreen" /> Fullscreen mode
+          </li>
+          <li className="flex items-center gap-2">
+            <Icon name="screen_share" /> Entire screen sharing
+          </li>
+          <li className="flex items-center gap-2">
+            <Icon name="videocam" /> Webcam monitoring
+          </li>
+          <li className="flex items-center gap-2">
+            <Icon name="mic" /> Microphone monitoring
+          </li>
         </ul>
         {err && <p className="text-body-sm text-error mt-2">{err}</p>}
         <div className="flex justify-end">
@@ -685,7 +715,9 @@ function InterviewRoom({
     webcamStream.getTracks().forEach((track) => {
       const fn = () => {
         setIsPaused(true);
-        toast.error(`${track.kind === "audio" ? "Microphone" : "Camera"} disconnected. Interview paused.`);
+        toast.error(
+          `${track.kind === "audio" ? "Microphone" : "Camera"} disconnected. Interview paused.`,
+        );
       };
       track.addEventListener("ended", fn);
       handlers.push({ track, fn });
@@ -714,7 +746,8 @@ function InterviewRoom({
       return;
     }
 
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       toast.error("Speech recognition is not supported in this browser.");
       return;
@@ -765,7 +798,13 @@ function InterviewRoom({
     const txt = answer.trim();
     setAnswer("");
     const now = new Date().toISOString();
-    await appendTurn.mutateAsync({ sessionId, speaker: "candidate", text: txt, startedAt: now, endedAt: now });
+    await appendTurn.mutateAsync({
+      sessionId,
+      speaker: "candidate",
+      text: txt,
+      startedAt: now,
+      endedAt: now,
+    });
     await nextPersona.mutateAsync({ sessionId });
     turnsQuery.refetch();
   }
@@ -797,7 +836,8 @@ function InterviewRoom({
             </div>
             <h3 className="text-headline-md font-bold text-on-surface">Interview Paused</h3>
             <p className="text-body-md text-on-surface-variant">
-              The interview is paused due to network connection loss or a device disconnection. Please check your camera, microphone, and internet connection.
+              The interview is paused due to network connection loss or a device disconnection.
+              Please check your camera, microphone, and internet connection.
             </p>
             <div className="flex gap-2 justify-center pt-2">
               <button
@@ -815,12 +855,18 @@ function InterviewRoom({
       {/* LEFT: AI persona */}
       <Card className="p-md flex flex-col items-center text-center justify-between">
         <div className="flex flex-col items-center">
-          <div className={`w-24 h-24 rounded-full bg-gradient-to-br from-primary to-primary/60 text-on-primary flex items-center justify-center text-headline-lg font-bold transition-transform ${
-            typeof window !== "undefined" && window.speechSynthesis?.speaking ? "animate-pulse scale-105" : ""
-          }`}>
+          <div
+            className={`w-24 h-24 rounded-full bg-gradient-to-br from-primary to-primary/60 text-on-primary flex items-center justify-center text-headline-lg font-bold transition-transform ${
+              typeof window !== "undefined" && window.speechSynthesis?.speaking
+                ? "animate-pulse scale-105"
+                : ""
+            }`}
+          >
             AI
           </div>
-          <p className="mt-3 text-title-md font-semibold text-on-surface">{interview.personaName ?? "Aria"}</p>
+          <p className="mt-3 text-title-md font-semibold text-on-surface">
+            {interview.personaName ?? "Aria"}
+          </p>
           <p className="text-body-sm text-on-surface-variant">AI Interviewer</p>
           <div className="mt-3 px-3 py-1 rounded-full bg-surface-container-low text-label-sm text-on-surface-variant">
             {awaiting ? "Thinking…" : "Listening"}
@@ -833,17 +879,21 @@ function InterviewRoom({
             type="button"
             onClick={toggleMute}
             className={`w-full px-4 py-2 rounded-lg border text-sm font-semibold flex items-center justify-center gap-2 transition ${
-              muted ? "bg-error-container text-on-error-container border-error" : "bg-white text-on-surface border-outline-variant hover:bg-surface-container-low"
+              muted
+                ? "bg-error-container text-on-error-container border-error"
+                : "bg-white text-on-surface border-outline-variant hover:bg-surface-container-low"
             }`}
           >
-            <Icon name={muted ? "volume_off" : "volume_up"} /> {muted ? "Unmute AI Voice" : "Mute AI Voice"}
+            <Icon name={muted ? "volume_off" : "volume_up"} />{" "}
+            {muted ? "Unmute AI Voice" : "Mute AI Voice"}
           </button>
           <button
             type="button"
             onClick={() => setIsPaused(!isPaused)}
             className="w-full px-4 py-2 rounded-lg border border-outline-variant bg-white text-on-surface text-sm font-semibold flex items-center justify-center gap-2 hover:bg-surface-container-low transition"
           >
-            <Icon name={isPaused ? "play_arrow" : "pause"} /> {isPaused ? "Resume Interview" : "Pause Interview"}
+            <Icon name={isPaused ? "play_arrow" : "pause"} />{" "}
+            {isPaused ? "Resume Interview" : "Pause Interview"}
           </button>
         </div>
       </Card>
@@ -856,8 +906,12 @@ function InterviewRoom({
             <span className="w-2 h-2 rounded-full bg-on-error animate-pulse" /> REC · {mm}:{ss}
           </div>
           <div className="absolute top-3 right-3 flex gap-2">
-            <span className="px-2 py-1 rounded-full bg-black/50 text-white text-label-sm flex items-center gap-1"><Icon name="mic" /> on</span>
-            <span className="px-2 py-1 rounded-full bg-black/50 text-white text-label-sm flex items-center gap-1"><Icon name="videocam" /> on</span>
+            <span className="px-2 py-1 rounded-full bg-black/50 text-white text-label-sm flex items-center gap-1">
+              <Icon name="mic" /> on
+            </span>
+            <span className="px-2 py-1 rounded-full bg-black/50 text-white text-label-sm flex items-center gap-1">
+              <Icon name="videocam" /> on
+            </span>
           </div>
         </div>
         <div className="p-md space-y-sm flex-1 flex flex-col justify-between">
@@ -879,7 +933,9 @@ function InterviewRoom({
               onClick={toggleSpeech}
               disabled={awaiting || finalizing || isPaused}
               className={`absolute right-3 bottom-4 p-2 rounded-full transition ${
-                isListening ? "bg-error text-on-error animate-pulse" : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
+                isListening
+                  ? "bg-error text-on-error animate-pulse"
+                  : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
               }`}
               title={isListening ? "Listening - Click to stop" : "Speak verbally"}
             >
@@ -887,7 +943,13 @@ function InterviewRoom({
             </button>
           </div>
           <div className="flex justify-between items-center mt-2">
-            <p className="text-label-sm text-on-surface-variant">{awaiting ? "Aria is thinking…" : isListening ? "Listening to your voice..." : "Press Send when ready."}</p>
+            <p className="text-label-sm text-on-surface-variant">
+              {awaiting
+                ? "Aria is thinking…"
+                : isListening
+                  ? "Listening to your voice..."
+                  : "Press Send when ready."}
+            </p>
             <div className="flex gap-2">
               <button
                 type="button"
@@ -914,7 +976,9 @@ function InterviewRoom({
       <Card className="p-md flex flex-col">
         <h3 className="text-title-md font-semibold text-on-surface mb-2">Transcript</h3>
         <div className="flex-1 overflow-y-auto space-y-2 max-h-[70vh] pr-1">
-          {turns.length === 0 && <p className="text-body-sm text-on-surface-variant">Awaiting first question…</p>}
+          {turns.length === 0 && (
+            <p className="text-body-sm text-on-surface-variant">Awaiting first question…</p>
+          )}
           {turns.map((t) => (
             <div
               key={t.id}
@@ -926,7 +990,9 @@ function InterviewRoom({
                     : "bg-surface-container-low text-on-surface-variant italic"
               }`}
             >
-              <p className="text-label-caps uppercase opacity-70">{t.speaker === "persona" ? (interview.personaName ?? "Interviewer") : t.speaker}</p>
+              <p className="text-label-caps uppercase opacity-70">
+                {t.speaker === "persona" ? (interview.personaName ?? "Interviewer") : t.speaker}
+              </p>
               <p>{t.text}</p>
             </div>
           ))}
@@ -936,13 +1002,27 @@ function InterviewRoom({
       {confirming && (
         <Modal onClose={() => setConfirming(false)}>
           <div className="text-center space-y-md">
-            <h2 className="text-headline-md font-headline-md text-on-surface">End the interview?</h2>
+            <h2 className="text-headline-md font-headline-md text-on-surface">
+              End the interview?
+            </h2>
             <p className="text-body-md text-on-surface-variant">
               Once ended you cannot resume. Your responses will be evaluated automatically.
             </p>
             <div className="flex justify-center gap-2 pt-2">
-              <button type="button" onClick={() => setConfirming(false)} className="px-4 py-2 rounded-lg border border-outline-variant">Continue</button>
-              <button type="button" onClick={endInterview} className="px-4 py-2 rounded-lg bg-error text-on-error font-semibold">End Interview</button>
+              <button
+                type="button"
+                onClick={() => setConfirming(false)}
+                className="px-4 py-2 rounded-lg border border-outline-variant"
+              >
+                Continue
+              </button>
+              <button
+                type="button"
+                onClick={endInterview}
+                className="px-4 py-2 rounded-lg bg-error text-on-error font-semibold"
+              >
+                End Interview
+              </button>
             </div>
           </div>
         </Modal>
@@ -970,10 +1050,12 @@ function CompletionScreen() {
       <div className="w-20 h-20 rounded-full bg-success-container text-on-success-container mx-auto flex items-center justify-center">
         <Icon name="task_alt" className="text-4xl" />
       </div>
-      <h2 className="text-headline-md font-headline-md text-on-surface">Thank you for completing the interview.</h2>
+      <h2 className="text-headline-md font-headline-md text-on-surface">
+        Thank you for completing the interview.
+      </h2>
       <p className="text-body-md text-on-surface-variant">
-        Your responses have been recorded successfully. Our recruitment team will review your interview and contact
-        you regarding the next steps.
+        Your responses have been recorded successfully. Our recruitment team will review your
+        interview and contact you regarding the next steps.
       </p>
       <p className="text-body-sm text-on-surface-variant">You may now close this window.</p>
       <button

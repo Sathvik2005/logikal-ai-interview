@@ -174,14 +174,17 @@ export const finalizeEvaluation = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => z.object({ interviewId: z.string().uuid() }).parse(data))
   .handler(async ({ data }) => {
     // Session id can be retrieved inside NestJS engine
-    const res = await fetch(`${getBackendUrl()}/api/interviews/${data.interviewId}/finalize-evaluation`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeader(),
+    const res = await fetch(
+      `${getBackendUrl()}/api/interviews/${data.interviewId}/finalize-evaluation`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+        body: JSON.stringify({ sessionId: "00000000-0000-0000-0000-000000000000" }), // Nest will auto-detect recent session
       },
-      body: JSON.stringify({ sessionId: "00000000-0000-0000-0000-000000000000" }), // Nest will auto-detect recent session
-    });
+    );
 
     if (!res.ok) {
       throw new Error(`Failed to finalize evaluation: ${res.statusText}`);
@@ -213,14 +216,17 @@ export const nextPersonaQuestion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => z.object({ sessionId: z.string().uuid() }).parse(data))
   .handler(async ({ data }) => {
-    const res = await fetch(`${getBackendUrl()}/api/interviews/session/${data.sessionId}/next-question`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeader(),
+    const res = await fetch(
+      `${getBackendUrl()}/api/interviews/session/${data.sessionId}/next-question`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+        body: JSON.stringify({}),
       },
-      body: JSON.stringify({}),
-    });
+    );
 
     if (!res.ok) {
       throw new Error(`Failed to fetch next question: ${res.statusText}`);

@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { CardShadow, Icon } from "@/components/recruiter/RecruiterShell";
+import { CardShadow, Icon, EmptyState } from "@/components/recruiter/RecruiterShell";
 import { fmtDate, type Interview } from "@/components/recruiter/mock-data";
 import { ScheduleInterviewWizard } from "@/components/recruiter/ScheduleInterviewWizard";
 import { WeekCalendar } from "@/components/recruiter/WeekCalendar";
@@ -16,7 +16,6 @@ import {
 import type { InterviewDTO } from "@/lib/interviews.functions";
 import { listNotifications } from "@/lib/candidates.functions";
 import { getInvitationLink, resendInterviewInvitation } from "@/lib/invitations.functions";
-
 
 export const Route = createFileRoute("/_authenticated/recruiter/scheduling/")({
   component: SchedulingHub,
@@ -85,10 +84,17 @@ function SchedulingHub() {
 
   const [activity, setActivity] = useState<ActivityEntry[]>([]);
   const logActivity = (kind: ActivityKind, message: string) =>
-    setActivity((a) => [
-      { id: `a-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, kind, message, at: new Date().toISOString() },
-      ...a,
-    ].slice(0, 30));
+    setActivity((a) =>
+      [
+        {
+          id: `a-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          kind,
+          message,
+          at: new Date().toISOString(),
+        },
+        ...a,
+      ].slice(0, 30),
+    );
 
   const [wizardOpen, setWizardOpen] = useState(false);
   const [prefill, setPrefill] = useState<{ date?: string; time?: string } | undefined>();
@@ -127,7 +133,10 @@ function SchedulingHub() {
   };
 
   const upcoming = useMemo(
-    () => interviews.filter((i) => i.status === "scheduled" || i.status === "live").sort((a, b) => a.scheduledAt.localeCompare(b.scheduledAt)),
+    () =>
+      interviews
+        .filter((i) => i.status === "scheduled" || i.status === "live")
+        .sort((a, b) => a.scheduledAt.localeCompare(b.scheduledAt)),
     [interviews],
   );
   const past = interviews.filter((i) => i.status === "completed");
@@ -137,7 +146,10 @@ function SchedulingHub() {
     try {
       await rescheduleMut.mutateAsync({ id, scheduledAt: newISO });
       const email = dto?.candidateEmail ?? "candidate@example.com";
-      logActivity("rescheduled", `Rescheduled ${dto?.candidateName ?? "interview"} to ${new Date(newISO).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}`);
+      logActivity(
+        "rescheduled",
+        `Rescheduled ${dto?.candidateName ?? "interview"} to ${new Date(newISO).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}`,
+      );
       logActivity("email", `Reschedule notice queued for ${email}`);
       toast.success("Interview rescheduled");
     } catch (e) {
@@ -158,20 +170,25 @@ function SchedulingHub() {
     }
   };
 
-
   return (
     <>
       <div className="mb-lg grid grid-cols-[minmax(0,1fr)_auto] items-center gap-md sm:flex sm:flex-wrap sm:justify-between">
         <div className="min-w-0">
           <h2 className="text-headline-lg">Interview Scheduling Hub</h2>
-          <p className="text-body-lg text-on-surface-variant">Drag to reschedule. Click an empty slot to create.</p>
+          <p className="text-body-lg text-on-surface-variant">
+            Drag to reschedule. Click an empty slot to create.
+          </p>
         </div>
         <button
           type="button"
-          onClick={() => { setPrefill(undefined); setWizardOpen(true); }}
+          onClick={() => {
+            setPrefill(undefined);
+            setWizardOpen(true);
+          }}
           className="px-4 py-2 bg-primary text-on-primary rounded-lg flex items-center gap-2 hover:brightness-110"
         >
-          <Icon name="add" />Schedule Interview
+          <Icon name="add" />
+          Schedule Interview
         </button>
       </div>
 
@@ -221,18 +238,35 @@ function SchedulingHub() {
           </CardShadow>
 
           <CardShadow>
-            <div className="p-lg border-b border-outline-variant"><h3 className="text-headline-sm">Past interviews</h3></div>
+            <div className="p-lg border-b border-outline-variant">
+              <h3 className="text-headline-sm">Past interviews</h3>
+            </div>
             <ul className="divide-y divide-outline-variant">
-              {past.length === 0 && <li className="p-lg text-body-md text-on-surface-variant">No past interviews yet.</li>}
+              {past.length === 0 && (
+                <EmptyState
+                  icon="history"
+                  title="No past interviews yet"
+                  hint="Completed candidate sessions will show up here for review and playback."
+                  className="py-8"
+                />
+              )}
               {past.map((i) => (
-                <li key={i.id} className="p-lg flex items-center justify-between hover:bg-surface-container-low gap-md flex-wrap">
+                <li
+                  key={i.id}
+                  className="p-lg flex items-center justify-between hover:bg-surface-container-low gap-md flex-wrap"
+                >
                   <div>
                     <p className="font-semibold">{i.candidateName}</p>
                     <p className="text-body-md text-on-surface-variant">{fmtDate(i.scheduledAt)}</p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Link to="/recruiter/monitor" hash={`playback-${i.id}`} className="text-primary text-body-md hover:underline flex items-center gap-1">
-                      <Icon name="play_circle" />Playback
+                    <Link
+                      to="/recruiter/monitor"
+                      hash={`playback-${i.id}`}
+                      className="text-primary text-body-md hover:underline flex items-center gap-1"
+                    >
+                      <Icon name="play_circle" />
+                      Playback
                     </Link>
                   </div>
                 </li>
@@ -245,30 +279,46 @@ function SchedulingHub() {
         <div className="space-y-lg">
           <CardShadow className="p-lg space-y-md h-fit">
             <h3 className="text-headline-sm">Upcoming</h3>
-            {upcoming.length === 0 && <p className="text-body-md text-on-surface-variant">Nothing scheduled.</p>}
+            {upcoming.length === 0 && (
+              <EmptyState
+                icon="event"
+                title="Nothing scheduled"
+                hint="No upcoming interviews scheduled."
+                className="py-6"
+              />
+            )}
             {upcoming.slice(0, 6).map((i) => {
               const dto = dtoById.get(i.id);
               return (
                 <div key={i.id} className="p-md border border-outline-variant rounded-lg">
                   <p className="font-semibold">{i.candidateName}</p>
                   <p className="text-body-md text-on-surface-variant">{i.persona}</p>
-                  <p className="text-label-caps uppercase text-on-surface-variant mt-1">{fmtDate(i.scheduledAt)}</p>
+                  <p className="text-label-caps uppercase text-on-surface-variant mt-1">
+                    {fmtDate(i.scheduledAt)}
+                  </p>
                   <div className="grid grid-cols-2 gap-2 mt-2">
                     <button
                       type="button"
                       onClick={() => handleCopyLink(i.id, i.candidateName)}
                       className="text-body-md px-2 py-1 border border-outline-variant rounded hover:bg-surface-container-low flex items-center justify-center gap-1"
                     >
-                      <Icon name="link" className="text-base" />Copy link
+                      <Icon name="link" className="text-base" />
+                      Copy link
                     </button>
                     <button
                       type="button"
                       onClick={() => handleResend(i.id, i.candidateName, dto?.candidateEmail)}
                       className="text-body-md px-2 py-1 border border-outline-variant rounded hover:bg-surface-container-low flex items-center justify-center gap-1"
                     >
-                      <Icon name="mail" className="text-base" />Resend
+                      <Icon name="mail" className="text-base" />
+                      Resend
                     </button>
-                    <Link to="/recruiter/monitor" className="col-span-1 text-center text-body-md px-2 py-1 bg-primary text-on-primary rounded">Monitor</Link>
+                    <Link
+                      to="/recruiter/monitor"
+                      className="col-span-1 text-center text-body-md px-2 py-1 bg-primary text-on-primary rounded"
+                    >
+                      Monitor
+                    </Link>
                     <button
                       type="button"
                       onClick={() => handleCancel(i.id)}
@@ -285,12 +335,21 @@ function SchedulingHub() {
           <CardShadow className="p-lg h-fit">
             <h3 className="text-headline-sm mb-md">Activity</h3>
             <ul className="space-y-3">
-              {activity.length === 0 && <li className="text-body-md text-on-surface-variant">No recent activity.</li>}
+              {activity.length === 0 && (
+                <EmptyState
+                  icon="history"
+                  title="No recent activity"
+                  hint="Operational logs will appear as scheduling changes occur."
+                  className="py-6"
+                />
+              )}
               {activity.slice(0, 10).map((a) => {
                 const meta = ACTIVITY_ICON[a.kind];
                 return (
                   <li key={a.id} className="flex items-start gap-3">
-                    <span className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${meta.cls}`}>
+                    <span
+                      className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${meta.cls}`}
+                    >
                       <Icon name={meta.name} className="text-base" />
                     </span>
                     <div className="min-w-0 flex-1">
@@ -310,18 +369,28 @@ function SchedulingHub() {
               className="w-full flex items-center justify-between text-left"
             >
               <span className="text-headline-sm flex items-center gap-2">
-                <Icon name="outbox" /> Sent emails <span className="text-xs text-on-surface-variant">({mail.length})</span>
+                <Icon name="outbox" /> Sent emails{" "}
+                <span className="text-xs text-on-surface-variant">({mail.length})</span>
               </span>
               <Icon name={showMail ? "expand_less" : "expand_more"} />
             </button>
             {showMail && (
               <ul className="mt-md space-y-2 max-h-72 overflow-y-auto pr-1">
-                {mail.length === 0 && <li className="text-body-md text-on-surface-variant">No emails sent yet.</li>}
+                {mail.length === 0 && (
+                  <EmptyState
+                    icon="mail"
+                    title="No emails sent yet"
+                    hint="Candidate invitations and alerts will be logged here."
+                    className="py-6"
+                  />
+                )}
                 {mail.map((m) => (
                   <li key={m.id} className="p-2 border border-outline-variant rounded-lg text-xs">
                     <div className="flex justify-between gap-2">
                       <span className="font-semibold truncate">{kindLabel(m.kind)}</span>
-                      <span className="text-on-surface-variant shrink-0">{relTime(m.sent_at ?? m.created_at)}</span>
+                      <span className="text-on-surface-variant shrink-0">
+                        {relTime(m.sent_at ?? m.created_at)}
+                      </span>
                     </div>
                     <p className="text-on-surface-variant truncate">to {m.recipient_email}</p>
                     <p className="text-on-surface-variant truncate uppercase mt-0.5">{m.status}</p>

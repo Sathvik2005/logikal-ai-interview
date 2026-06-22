@@ -1,11 +1,6 @@
 import type { CandidateDTO } from "@/lib/candidates.functions";
 
-export type MissingField =
-  | "phone"
-  | "role"
-  | "experienceYears"
-  | "skills"
-  | "resumeSummary";
+export type MissingField = "phone" | "role" | "experienceYears" | "skills" | "resumeSummary";
 
 export const FIELD_LABELS: Record<MissingField, string> = {
   phone: "Phone number",
@@ -15,9 +10,9 @@ export const FIELD_LABELS: Record<MissingField, string> = {
   resumeSummary: "Resume summary (40+ chars)",
 };
 
-export function getMissingFields(c: Pick<CandidateDTO,
-  "phone" | "role" | "experienceYears" | "skills" | "resumeSummary"
->): MissingField[] {
+export function getMissingFields(
+  c: Pick<CandidateDTO, "phone" | "role" | "experienceYears" | "skills" | "resumeSummary">,
+): MissingField[] {
   const missing: MissingField[] = [];
   if (!c.phone || c.phone.trim().length < 5) missing.push("phone");
   if (!c.role || c.role.trim().length === 0) missing.push("role");

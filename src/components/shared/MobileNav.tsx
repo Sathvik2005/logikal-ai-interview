@@ -17,7 +17,8 @@ export function MobileNav({
 }) {
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isActive = (to: string) => (to === rootPath ? pathname === rootPath : pathname.startsWith(to));
+  const isActive = (to: string) =>
+    to === rootPath ? pathname === rootPath : pathname.startsWith(to);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -25,7 +26,9 @@ export function MobileNav({
         className="md:hidden p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low focus:outline-none focus:ring-2 focus:ring-primary-container"
         aria-label="Open menu"
       >
-        <span className="material-symbols-outlined" aria-hidden>menu</span>
+        <span className="material-symbols-outlined" aria-hidden>
+          menu
+        </span>
       </SheetTrigger>
       <SheetContent side="left" className="w-72 bg-surface p-md flex flex-col">
         <div className="mb-lg">
@@ -44,7 +47,9 @@ export function MobileNav({
                   : "text-on-surface-variant hover:bg-surface-container-high"
               }`}
             >
-              <span className="material-symbols-outlined" aria-hidden>{item.icon}</span>
+              <span className="material-symbols-outlined" aria-hidden>
+                {item.icon}
+              </span>
               <span className="text-body-md">{item.label}</span>
             </Link>
           ))}

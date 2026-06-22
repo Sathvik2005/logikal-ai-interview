@@ -1,4 +1,4 @@
-import { Interview } from './interview.entity';
+import { Interview } from "./interview.entity";
 
 export interface IInterviewRepository {
   findById(id: string): Promise<Interview | null>;
@@ -6,4 +6,4 @@ export interface IInterviewRepository {
   create(interview: Interview): Promise<void>;
 }
 
-export const IInterviewRepositoryToken = Symbol('IInterviewRepository');
+export const IInterviewRepositoryToken = Symbol("IInterviewRepository");

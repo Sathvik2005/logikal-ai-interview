@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { IInterviewRepository } from '../../../domain/interview/interview.repository.interface';
-import { Interview, InterviewStatus } from '../../../domain/interview/interview.entity';
-import { PrismaService } from '../prisma.service';
+import { Injectable } from "@nestjs/common";
+import { IInterviewRepository } from "../../../domain/interview/interview.repository.interface";
+import { Interview, InterviewStatus } from "../../../domain/interview/interview.entity";
+import { PrismaService } from "../prisma.service";
 
 @Injectable()
 export class PrismaInterviewRepository implements IInterviewRepository {
@@ -14,7 +14,7 @@ export class PrismaInterviewRepository implements IInterviewRepository {
     if (!row) return null;
     return new Interview(
       row.id,
-      row.org_id || '',
+      row.org_id || "",
       row.candidate_id,
       row.status as InterviewStatus,
       row.scheduled_at,
@@ -30,7 +30,7 @@ export class PrismaInterviewRepository implements IInterviewRepository {
       data: {
         id: interview.id,
         org_id: interview.orgId || null,
-        created_by: '00000000-0000-0000-0000-000000000000',
+        created_by: "00000000-0000-0000-0000-000000000000",
         candidate_id: interview.candidateId,
         status: interview.status,
         scheduled_at: interview.scheduledAt,

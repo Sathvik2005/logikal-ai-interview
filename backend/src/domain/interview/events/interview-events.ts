@@ -1,4 +1,4 @@
-import { DomainEvent } from '../../common/domain-event.base';
+import { DomainEvent } from "../../common/domain-event.base";
 
 export class InterviewScheduledEvent extends DomainEvent {
   constructor(
@@ -9,7 +9,7 @@ export class InterviewScheduledEvent extends DomainEvent {
     super();
   }
   getEventName(): string {
-    return 'InterviewScheduledEvent';
+    return "InterviewScheduledEvent";
   }
 }
 
@@ -21,7 +21,7 @@ export class InterviewStartedEvent extends DomainEvent {
     super();
   }
   getEventName(): string {
-    return 'InterviewStartedEvent';
+    return "InterviewStartedEvent";
   }
 }
 
@@ -33,7 +33,7 @@ export class InterviewCompletedEvent extends DomainEvent {
     super();
   }
   getEventName(): string {
-    return 'InterviewCompletedEvent';
+    return "InterviewCompletedEvent";
   }
 }
 
@@ -47,6 +47,6 @@ export class EvaluationCompletedEvent extends DomainEvent {
     super();
   }
   getEventName(): string {
-    return 'EvaluationCompletedEvent';
+    return "EvaluationCompletedEvent";
   }
 }

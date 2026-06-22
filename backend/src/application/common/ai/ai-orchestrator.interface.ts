@@ -19,7 +19,7 @@ export interface JdMatchResult {
 
 export interface EvaluationResult {
   overallScore: number;
-  recommendation: 'strong_hire' | 'hire' | 'no_hire' | 'strong_no_hire';
+  recommendation: "strong_hire" | "hire" | "no_hire" | "strong_no_hire";
   strengths: string[];
   concerns: string[];
   summary: string;
@@ -50,4 +50,4 @@ export interface IAIOrchestrator {
   ): Promise<string>;
 }
 
-export const IAIOrchestratorToken = Symbol('IAIOrchestrator');
+export const IAIOrchestratorToken = Symbol("IAIOrchestrator");

@@ -1,4 +1,4 @@
-import { Candidate } from './candidate.entity';
+import { Candidate } from "./candidate.entity";
 
 export interface ICandidateRepository {
   findById(id: string): Promise<Candidate | null>;
@@ -6,4 +6,4 @@ export interface ICandidateRepository {
   create(candidate: Candidate): Promise<void>;
 }
 
-export const ICandidateRepositoryToken = Symbol('ICandidateRepository');
+export const ICandidateRepositoryToken = Symbol("ICandidateRepository");

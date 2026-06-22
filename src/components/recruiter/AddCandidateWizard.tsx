@@ -5,7 +5,6 @@ import { Icon } from "@/components/recruiter/RecruiterShell";
 import { type Candidate } from "@/components/recruiter/mock-data";
 import { makeInitials, useCreateCandidate } from "@/components/recruiter/use-candidates";
 
-
 // ============================================================================
 // Types
 // ============================================================================
@@ -85,7 +84,6 @@ const ALL_SKILLS: string[] = [
   "Product Strategy",
 ];
 
-
 // ============================================================================
 // Component
 // ============================================================================
@@ -143,8 +141,6 @@ export function AddCandidateWizard({
           : `${created.name} added to pipeline`,
       );
 
-
-
       if (form.scheduleAfter) {
         onScheduleRequest?.({
           id: created.id,
@@ -175,11 +171,19 @@ export function AddCandidateWizard({
               <Icon name="person_add" />
             </span>
             <div>
-              <h2 className="text-[15px] font-semibold text-on-surface leading-tight">Add Candidate</h2>
-              <p className="text-xs text-on-surface-variant">Capture a new candidate in a guided flow.</p>
+              <h2 className="text-[15px] font-semibold text-on-surface leading-tight">
+                Add Candidate
+              </h2>
+              <p className="text-xs text-on-surface-variant">
+                Capture a new candidate in a guided flow.
+              </p>
             </div>
           </div>
-          <button onClick={close} className="p-1.5 text-on-surface-variant hover:bg-surface-container rounded-md" aria-label="Close">
+          <button
+            onClick={close}
+            className="p-1.5 text-on-surface-variant hover:bg-surface-container rounded-md"
+            aria-label="Close"
+          >
             <Icon name="close" className="text-base" />
           </button>
         </header>
@@ -211,14 +215,20 @@ export function AddCandidateWizard({
                     </span>
                     <span
                       className={`hidden md:inline text-xs font-medium whitespace-nowrap truncate ${
-                        active ? "text-on-surface" : done ? "text-on-surface group-hover:text-on-surface" : "text-outline"
+                        active
+                          ? "text-on-surface"
+                          : done
+                            ? "text-on-surface group-hover:text-on-surface"
+                            : "text-outline"
                       }`}
                     >
                       {s.title}
                     </span>
                   </button>
                   {i < STEPS.length - 1 && (
-                    <div className={`h-px flex-1 mx-2 transition-colors ${s.id < step ? "bg-secondary" : "bg-surface-container-high"}`} />
+                    <div
+                      className={`h-px flex-1 mx-2 transition-colors ${s.id < step ? "bg-secondary" : "bg-surface-container-high"}`}
+                    />
                   )}
                 </li>
               );
@@ -245,7 +255,10 @@ export function AddCandidateWizard({
             Step {step} of {STEPS.length} — {STEPS[step - 1]?.title}
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={close} className="px-3 py-1.5 text-sm font-medium text-on-surface-variant hover:bg-surface-container rounded-md">
+            <button
+              onClick={close}
+              className="px-3 py-1.5 text-sm font-medium text-on-surface-variant hover:bg-surface-container rounded-md"
+            >
               Cancel
             </button>
             <button
@@ -283,7 +296,15 @@ export function AddCandidateWizard({
 // Step frame
 // ============================================================================
 
-function StepFrame({ title, subtitle, children }: { title: string; subtitle: string; children: ReactNode }) {
+function StepFrame({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string;
+  subtitle: string;
+  children: ReactNode;
+}) {
   return (
     <div>
       <div className="mb-5">
@@ -339,7 +360,12 @@ function StepBasics({
     <StepFrame title="Candidate basics" subtitle="Who are you adding to the pipeline?">
       <div className="grid sm:grid-cols-2 gap-4">
         <Field label="Full name">
-          <input className={inputCls} value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="e.g. Jordan Park" />
+          <input
+            className={inputCls}
+            value={form.name}
+            onChange={(e) => set("name", e.target.value)}
+            placeholder="e.g. Jordan Park"
+          />
         </Field>
         <Field
           label="Email"
@@ -353,11 +379,27 @@ function StepBasics({
             placeholder="jordan@example.com"
           />
         </Field>
-        <Field label="Phone *" hint="Required — used for interview reminders" error={form.phone && form.phone.trim().length < 5 ? "Enter a valid phone number" : undefined}>
-          <input className={inputCls} value={form.phone} onChange={(e) => set("phone", e.target.value)} placeholder="+1 555 123 4567" />
+        <Field
+          label="Phone *"
+          hint="Required — used for interview reminders"
+          error={
+            form.phone && form.phone.trim().length < 5 ? "Enter a valid phone number" : undefined
+          }
+        >
+          <input
+            className={inputCls}
+            value={form.phone}
+            onChange={(e) => set("phone", e.target.value)}
+            placeholder="+1 555 123 4567"
+          />
         </Field>
         <Field label="Location" hint="Optional">
-          <input className={inputCls} value={form.location} onChange={(e) => set("location", e.target.value)} placeholder="Remote · NYC" />
+          <input
+            className={inputCls}
+            value={form.location}
+            onChange={(e) => set("location", e.target.value)}
+            placeholder="Remote · NYC"
+          />
         </Field>
         <div className="sm:col-span-2">
           <Field label="LinkedIn URL" hint="Optional">
@@ -378,7 +420,13 @@ function StepBasics({
 // Step 2 — Role & Pipeline
 // ============================================================================
 
-function StepRole({ form, set }: { form: Form; set: <K extends keyof Form>(k: K, v: Form[K]) => void }) {
+function StepRole({
+  form,
+  set,
+}: {
+  form: Form;
+  set: <K extends keyof Form>(k: K, v: Form[K]) => void;
+}) {
   return (
     <StepFrame title="Role & pipeline" subtitle="Where does this candidate fit?">
       <div className="grid sm:grid-cols-2 gap-4">
@@ -397,7 +445,11 @@ function StepRole({ form, set }: { form: Form; set: <K extends keyof Form>(k: K,
           </datalist>
         </Field>
         <Field label="Seniority">
-          <select className={inputCls} value={form.seniority} onChange={(e) => set("seniority", e.target.value as Seniority)}>
+          <select
+            className={inputCls}
+            value={form.seniority}
+            onChange={(e) => set("seniority", e.target.value as Seniority)}
+          >
             {(["Junior", "Mid", "Senior", "Staff", "Principal"] as const).map((s) => (
               <option key={s} value={s}>
                 {s}
@@ -416,12 +468,18 @@ function StepRole({ form, set }: { form: Form; set: <K extends keyof Form>(k: K,
           />
         </Field>
         <Field label="Pipeline status">
-          <select className={inputCls} value={form.status} onChange={(e) => set("status", e.target.value as Candidate["status"])}>
-            {(["new", "screening", "interviewing", "evaluated", "offer", "rejected"] as const).map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
+          <select
+            className={inputCls}
+            value={form.status}
+            onChange={(e) => set("status", e.target.value as Candidate["status"])}
+          >
+            {(["new", "screening", "interviewing", "evaluated", "offer", "rejected"] as const).map(
+              (s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ),
+            )}
           </select>
         </Field>
       </div>
@@ -444,7 +502,9 @@ function StepRole({ form, set }: { form: Form; set: <K extends keyof Form>(k: K,
               >
                 <span
                   className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                    selected ? "bg-primary text-on-primary" : "bg-surface-container text-on-surface-variant"
+                    selected
+                      ? "bg-primary text-on-primary"
+                      : "bg-surface-container text-on-surface-variant"
                   }`}
                 >
                   <Icon name={s.icon} className="text-base" />
@@ -469,7 +529,13 @@ function StepRole({ form, set }: { form: Form; set: <K extends keyof Form>(k: K,
 // Step 3 — Skills & Resume
 // ============================================================================
 
-function StepSkills({ form, set }: { form: Form; set: <K extends keyof Form>(k: K, v: Form[K]) => void }) {
+function StepSkills({
+  form,
+  set,
+}: {
+  form: Form;
+  set: <K extends keyof Form>(k: K, v: Form[K]) => void;
+}) {
   const [draft, setDraft] = useState("");
   const addSkill = (s: string) => {
     const v = s.trim();
@@ -477,18 +543,33 @@ function StepSkills({ form, set }: { form: Form; set: <K extends keyof Form>(k: 
     set("skills", [...form.skills, v]);
     setDraft("");
   };
-  const removeSkill = (s: string) => set("skills", form.skills.filter((x) => x !== s));
+  const removeSkill = (s: string) =>
+    set(
+      "skills",
+      form.skills.filter((x) => x !== s),
+    );
   const suggestions = ALL_SKILLS.filter((s) => !form.skills.includes(s)).slice(0, 8);
 
   return (
     <StepFrame title="Skills & resume" subtitle="Add highlights so AI matching can do its work.">
-      <Field label={`Skills * (${form.skills.length}/3+)`} hint="Add at least 3 skills — press Enter to add" error={form.skills.length > 0 && form.skills.length < 3 ? "Add at least 3 skills" : undefined}>
+      <Field
+        label={`Skills * (${form.skills.length}/3+)`}
+        hint="Add at least 3 skills — press Enter to add"
+        error={
+          form.skills.length > 0 && form.skills.length < 3 ? "Add at least 3 skills" : undefined
+        }
+      >
         <div
           className={`${inputCls} flex flex-wrap items-center gap-1.5 min-h-[42px] cursor-text`}
-          onClick={(e) => (e.currentTarget.querySelector("input") as HTMLInputElement | null)?.focus()}
+          onClick={(e) =>
+            (e.currentTarget.querySelector("input") as HTMLInputElement | null)?.focus()
+          }
         >
           {form.skills.map((s) => (
-            <span key={s} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary-fixed text-primary text-xs font-medium">
+            <span
+              key={s}
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary-fixed text-primary text-xs font-medium"
+            >
               {s}
               <button type="button" onClick={() => removeSkill(s)} className="hover:text-primary">
                 <Icon name="close" className="text-[14px]" />
@@ -551,7 +632,11 @@ function StepSkills({ form, set }: { form: Form; set: <K extends keyof Form>(k: 
         <Field
           label={`Resume summary * (${form.notes.trim().length}/40+ chars)`}
           hint="Required — short summary used for AI matching and interview prep"
-          error={form.notes.trim().length > 0 && form.notes.trim().length < 40 ? "Write at least 40 characters" : undefined}
+          error={
+            form.notes.trim().length > 0 && form.notes.trim().length < 40
+              ? "Write at least 40 characters"
+              : undefined
+          }
         >
           <textarea
             className={`${inputCls} min-h-[88px] resize-y`}
@@ -582,7 +667,9 @@ function StepReview({
     <div className="flex items-start justify-between gap-3 py-2.5 border-b border-outline-variant last:border-0">
       <div className="min-w-0">
         <p className="text-[11px] uppercase tracking-wide text-on-surface-variant">{label}</p>
-        <div className="text-sm text-on-surface mt-0.5">{value || <span className="text-outline">—</span>}</div>
+        <div className="text-sm text-on-surface mt-0.5">
+          {value || <span className="text-outline">—</span>}
+        </div>
       </div>
       <button
         type="button"
@@ -608,7 +695,10 @@ function StepReview({
           form.skills.length ? (
             <div className="flex flex-wrap gap-1 mt-0.5">
               {form.skills.map((s) => (
-                <span key={s} className="px-1.5 py-0.5 rounded bg-surface-container text-on-surface text-[11px]">
+                <span
+                  key={s}
+                  className="px-1.5 py-0.5 rounded bg-surface-container text-on-surface text-[11px]"
+                >
                   {s}
                 </span>
               ))}
@@ -657,7 +747,9 @@ function Toggle({
       type="button"
       onClick={() => onChange(!checked)}
       className={`w-full flex items-start gap-3 p-3 rounded-xl border transition text-left ${
-        checked ? "border-primary bg-primary-fixed/60" : "border-outline-variant hover:border-outline-variant bg-white"
+        checked
+          ? "border-primary bg-primary-fixed/60"
+          : "border-outline-variant hover:border-outline-variant bg-white"
       }`}
     >
       <span
@@ -691,7 +783,9 @@ function SummaryCard({ form }: { form: Form }) {
   const initials = makeInitials(form.name || "?");
   return (
     <aside className="rounded-2xl border border-outline-variant bg-gradient-to-b from-surface-container-low to-white p-4 h-fit sticky top-0">
-      <p className="text-[11px] uppercase tracking-wide text-on-surface-variant mb-3">Live preview</p>
+      <p className="text-[11px] uppercase tracking-wide text-on-surface-variant mb-3">
+        Live preview
+      </p>
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center font-semibold text-lg">
           {initials}
@@ -727,10 +821,15 @@ function SummaryCard({ form }: { form: Form }) {
 
       {form.skills.length > 0 && (
         <div className="mt-4">
-          <p className="text-[11px] uppercase tracking-wide text-on-surface-variant mb-1.5">Skills</p>
+          <p className="text-[11px] uppercase tracking-wide text-on-surface-variant mb-1.5">
+            Skills
+          </p>
           <div className="flex flex-wrap gap-1">
             {form.skills.map((s) => (
-              <span key={s} className="px-1.5 py-0.5 rounded bg-primary-fixed text-primary text-[11px] font-medium">
+              <span
+                key={s}
+                className="px-1.5 py-0.5 rounded bg-primary-fixed text-primary text-[11px] font-medium"
+              >
                 {s}
               </span>
             ))}

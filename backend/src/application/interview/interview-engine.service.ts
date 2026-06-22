@@ -1,10 +1,13 @@
-import { Injectable, Inject, Logger } from '@nestjs/common';
-import { PrismaService } from '../../infrastructure/database/prisma.service';
-import { IInterviewRepository, IInterviewRepositoryToken } from '../../domain/interview/interview.repository.interface';
-import { Interview, InterviewStatus } from '../../domain/interview/interview.entity';
-import { CandidateWorkflowService } from '../candidate/candidate-workflow.service';
-import { IAIOrchestrator, IAIOrchestratorToken } from '../common/ai/ai-orchestrator.interface';
-import { IQueueService, IQueueServiceToken } from '../common/queue/queue.service';
+import { Injectable, Inject, Logger } from "@nestjs/common";
+import { PrismaService } from "../../infrastructure/database/prisma.service";
+import {
+  IInterviewRepository,
+  IInterviewRepositoryToken,
+} from "../../domain/interview/interview.repository.interface";
+import { Interview, InterviewStatus } from "../../domain/interview/interview.entity";
+import { CandidateWorkflowService } from "../candidate/candidate-workflow.service";
+import { IAIOrchestrator, IAIOrchestratorToken } from "../common/ai/ai-orchestrator.interface";
+import { IQueueService, IQueueServiceToken } from "../common/queue/queue.service";
 
 @Injectable()
 export class InterviewEngineService {
@@ -28,7 +31,7 @@ export class InterviewEngineService {
       throw new Error(`Interview not found: ${interviewId}`);
     }
 
-    interview.transitionTo('in_progress');
+    interview.transitionTo("in_progress");
     await this.interviewRepo.save(interview);
 
     // Create session row
@@ -43,9 +46,9 @@ export class InterviewEngineService {
     // Update candidate state
     await this.candidateWorkflow.transition(
       interview.candidateId,
-      'interview_started',
-      'Candidate joined the interview room and initialized their session.',
-      { sessionId: session.id }
+      "interview_started",
+      "Candidate joined the interview room and initialized their session.",
+      { sessionId: session.id },
     );
 
     return {
@@ -55,11 +58,16 @@ export class InterviewEngineService {
     };
   }
 
-  async appendTurn(sessionId: string, speaker: 'candidate' | 'persona' | 'system', text: string, audioPath?: string): Promise<any> {
+  async appendTurn(
+    sessionId: string,
+    speaker: "candidate" | "persona" | "system",
+    text: string,
+    audioPath?: string,
+  ): Promise<any> {
     const session = await this.prisma.interviewSession.findUnique({
       where: { id: sessionId },
     });
-    if (!session) throw new Error('Session not found');
+    if (!session) throw new Error("Session not found");
 
     const turn = await this.prisma.interviewTurn.create({
       data: {
@@ -81,7 +89,7 @@ export class InterviewEngineService {
         interview.candidate_id,
         `turn_${speaker}`,
         `${speaker.toUpperCase()} Turn`,
-        text.slice(0, 150) + (text.length > 150 ? '...' : '')
+        text.slice(0, 150) + (text.length > 150 ? "..." : ""),
       );
     }
 
@@ -93,7 +101,7 @@ export class InterviewEngineService {
       where: { id: sessionId },
       include: { interview: true },
     });
-    if (!session) throw new Error('Session not found');
+    if (!session) throw new Error("Session not found");
 
     await this.prisma.interviewEvent.create({
       data: {
@@ -105,13 +113,13 @@ export class InterviewEngineService {
     });
 
     // Log integrity signals on timeline
-    if (['tab_switch', 'devtools', 'focus_loss', 'multi_face'].includes(type)) {
+    if (["tab_switch", "devtools", "focus_loss", "multi_face"].includes(type)) {
       await this.candidateWorkflow.logTimeline(
         session.interview.candidate_id,
         `integrity_violation`,
         `Integrity Signal: ${type}`,
         `Suspicious activity caught: ${type} event recorded during session.`,
-        payload
+        payload,
       );
     }
   }
@@ -121,18 +129,19 @@ export class InterviewEngineService {
       where: { id: sessionId },
       include: { interview: true },
     });
-    if (!session) throw new Error('Session not found');
+    if (!session) throw new Error("Session not found");
 
     const interviewId = session.interview_id;
     const interview = session.interview;
 
     // Load AI Persona details
-    let personaPrompt = 'You are a professional AI interviewer. Ask one focused question at a time.';
-    let personaName = 'Ava';
+    let personaPrompt =
+      "You are a professional AI interviewer. Ask one focused question at a time.";
+    let personaName = "Ava";
     if (interview.persona_version_id) {
       const pv = await this.prisma.personaVersion.findUnique({
         where: { id: interview.persona_version_id },
-        include: { persona: true }
+        include: { persona: true },
       });
       if (pv) {
         personaPrompt = pv.system_prompt;
@@ -149,13 +158,13 @@ export class InterviewEngineService {
     }
 
     // Load Job Description context
-    let jdContext = '';
+    let jdContext = "";
     if (interview.job_id) {
       const jd = await this.prisma.jobDescription.findUnique({
         where: { id: interview.job_id },
       });
       if (jd) {
-        jdContext = `Job Title: ${jd.title}\nRequirements: ${jd.requirements || ''}`;
+        jdContext = `Job Title: ${jd.title}\nRequirements: ${jd.requirements || ""}`;
       }
     }
 
@@ -163,15 +172,15 @@ export class InterviewEngineService {
     const candidate = await this.prisma.candidate.findUnique({
       where: { id: interview.candidate_id },
     });
-    let candidateContext = '';
+    let candidateContext = "";
     if (candidate) {
-      candidateContext = `Candidate Name: ${candidate.full_name}\nResume Summary: ${candidate.resume_summary || ''}\nSkills: ${candidate.skills.join(', ')}`;
+      candidateContext = `Candidate Name: ${candidate.full_name}\nResume Summary: ${candidate.resume_summary || ""}\nSkills: ${candidate.skills.join(", ")}`;
     }
 
     // Fetch previous turns in the session
     const turns = await this.prisma.interviewTurn.findMany({
       where: { session_id: sessionId },
-      orderBy: { started_at: 'asc' },
+      orderBy: { started_at: "asc" },
     });
 
     const history = turns.map((t) => ({
@@ -180,10 +189,10 @@ export class InterviewEngineService {
     }));
 
     // Check curated questions queue
-    const personaTurns = turns.filter((t) => t.speaker === 'persona');
+    const personaTurns = turns.filter((t) => t.speaker === "persona");
     const curatedQuestions = await this.prisma.interviewQuestion.findMany({
       where: { interview_id: interviewId },
-      orderBy: { ordering: 'asc' },
+      orderBy: { ordering: "asc" },
       include: { question: true },
     });
 
@@ -192,7 +201,9 @@ export class InterviewEngineService {
       nextCuratedQuestion = curatedQuestions[personaTurns.length].question.prompt;
     }
 
-    this.logger.log(`Generating next question. Curated turns: ${personaTurns.length}/${curatedQuestions.length}`);
+    this.logger.log(
+      `Generating next question. Curated turns: ${personaTurns.length}/${curatedQuestions.length}`,
+    );
     const questionText = await this.aiOrchestrator.generateInterviewQuestion(
       personaPrompt,
       history,
@@ -202,10 +213,10 @@ export class InterviewEngineService {
     );
 
     // Save generated question turn
-    const turn = await this.appendTurn(sessionId, 'persona', questionText);
+    const turn = await this.appendTurn(sessionId, "persona", questionText);
     return {
       id: turn.id,
-      speaker: 'persona',
+      speaker: "persona",
       text: questionText,
     };
   }
@@ -216,7 +227,7 @@ export class InterviewEngineService {
       where: { id: sessionId },
       include: { interview: true },
     });
-    if (!session) throw new Error('Session not found');
+    if (!session) throw new Error("Session not found");
 
     await this.prisma.interviewSession.update({
       where: { id: sessionId },
@@ -225,24 +236,24 @@ export class InterviewEngineService {
 
     const interview = await this.interviewRepo.findById(session.interview_id);
     if (interview) {
-      interview.transitionTo('evaluation_pending');
+      interview.transitionTo("evaluation_pending");
       await this.interviewRepo.save(interview);
-      
+
       await this.prisma.interview.update({
         where: { id: session.interview_id },
-        data: { evaluation_status: 'queued' },
+        data: { evaluation_status: "queued" },
       });
 
       // Update candidate workflow
       await this.candidateWorkflow.transition(
         interview.candidateId,
-        'evaluation_processing',
-        'Interview room closed. Enqueuing AI evaluation pipeline.',
-        { sessionId }
+        "evaluation_processing",
+        "Interview room closed. Enqueuing AI evaluation pipeline.",
+        { sessionId },
       );
 
       // Dispatch to background queue
-      await this.queue.enqueue('finalize-evaluation', {
+      await this.queue.enqueue("finalize-evaluation", {
         interviewId: interview.id,
         sessionId: sessionId,
       });

@@ -96,7 +96,10 @@ export const upsertQuestion = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => UpsertInput.parse(input))
   .handler(async ({ data, context }) => {
     const { data: prof } = await context.supabase
-      .from("profiles").select("org_id").eq("id", context.userId).maybeSingle();
+      .from("profiles")
+      .select("org_id")
+      .eq("id", context.userId)
+      .maybeSingle();
     const orgId = prof?.org_id;
     if (!orgId) throw new Error("Missing organization");
     const payload: Record<string, unknown> = {
@@ -106,13 +109,15 @@ export const upsertQuestion = createServerFn({ method: "POST" })
       prompt: data.prompt,
       expected_signals: data.expectedSignals,
     };
-    
+
     let row: Row | null = null;
     const auditAction = data.id ? "update" : "create";
 
     if (data.id) {
       const { data: updated, error } = await context.supabase
-        .from("questions").update(payload as never).eq("id", data.id)
+        .from("questions")
+        .update(payload as never)
+        .eq("id", data.id)
         .select("id, competency, difficulty, type, prompt, expected_signals, created_at")
         .maybeSingle();
       if (error) throw new Error(error.message);
@@ -120,7 +125,8 @@ export const upsertQuestion = createServerFn({ method: "POST" })
     } else {
       const insertPayload = { ...payload, org_id: orgId, created_by: context.userId };
       const { data: inserted, error } = await context.supabase
-        .from("questions").insert(insertPayload as never)
+        .from("questions")
+        .insert(insertPayload as never)
         .select("id, competency, difficulty, type, prompt, expected_signals, created_at")
         .maybeSingle();
       if (error) throw new Error(error.message);
@@ -148,12 +154,16 @@ export const deleteQuestion = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { data: prof } = await context.supabase
-      .from("profiles").select("org_id").eq("id", context.userId).maybeSingle();
+      .from("profiles")
+      .select("org_id")
+      .eq("id", context.userId)
+      .maybeSingle();
     const orgId = prof?.org_id;
     if (!orgId) throw new Error("Missing organization");
 
     const { error } = await context.supabase
-      .from("questions").update({ deleted_at: new Date().toISOString() })
+      .from("questions")
+      .update({ deleted_at: new Date().toISOString() })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
 

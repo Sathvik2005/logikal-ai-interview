@@ -59,7 +59,16 @@ function mapRow(r: DbRow): CandidateDTO {
   let uiStatus: CandidateStatus = "new";
   if (["applied", "resume_imported", "resume_parsed"].includes(r.status)) uiStatus = "new";
   else if (["jd_matched", "shortlisted"].includes(r.status)) uiStatus = "screening";
-  else if (["interview_assigned", "interview_scheduled", "invitation_sent", "interview_started", "interview_running"].includes(r.status)) uiStatus = "interviewing";
+  else if (
+    [
+      "interview_assigned",
+      "interview_scheduled",
+      "invitation_sent",
+      "interview_started",
+      "interview_running",
+    ].includes(r.status)
+  )
+    uiStatus = "interviewing";
   else if (["evaluation_processing", "recruiter_review"].includes(r.status)) uiStatus = "evaluated";
   else if (r.status === "hiring_decision") uiStatus = "hired";
   else if (r.status === "archived") uiStatus = "archived";
@@ -177,14 +186,14 @@ export const createCandidate = createServerFn({ method: "POST" })
     }
 
     const result = await res.json();
-    
+
     // Fetch the newly created candidate to map correct format
     const getRes = await fetch(`${getBackendUrl()}/api/candidates/${result.id}`, {
       headers: {
         ...getAuthHeader(),
       },
     });
-    
+
     const row = (await getRes.json()) as DbRow;
     return mapRow(row);
   });
@@ -193,7 +202,10 @@ export const createCandidate = createServerFn({ method: "POST" })
 export const listNotifications = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) =>
-    z.object({ limit: z.number().int().min(1).max(100).default(20) }).default({ limit: 20 }).parse(data ?? {}),
+    z
+      .object({ limit: z.number().int().min(1).max(100).default(20) })
+      .default({ limit: 20 })
+      .parse(data ?? {}),
   )
   .handler(async ({ data }) => {
     // Standard mock list as outbox logging is managed in background
@@ -232,14 +244,16 @@ export const updateCandidateStatus = createServerFn({ method: "POST" })
 export const updateCandidateProfile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) =>
-    z.object({
-      id: z.string().uuid(),
-      phone: z.string().trim().min(5).max(40).optional(),
-      role: z.string().trim().min(1).max(120).optional(),
-      experienceYears: z.number().min(0).max(60).optional(),
-      skills: z.array(z.string().trim().min(1).max(60)).max(50).optional(),
-      resumeSummary: z.string().trim().min(1).max(4000).optional(),
-    }).parse(data),
+    z
+      .object({
+        id: z.string().uuid(),
+        phone: z.string().trim().min(5).max(40).optional(),
+        role: z.string().trim().min(1).max(120).optional(),
+        experienceYears: z.number().min(0).max(60).optional(),
+        skills: z.array(z.string().trim().min(1).max(60)).max(50).optional(),
+        resumeSummary: z.string().trim().min(1).max(4000).optional(),
+      })
+      .parse(data),
   )
   .handler(async ({ data }) => {
     // Call candidate status update endpoint with profile data if needed
@@ -274,7 +288,10 @@ export const archiveCandidate = createServerFn({ method: "POST" })
         "Content-Type": "application/json",
         ...getAuthHeader(),
       },
-      body: JSON.stringify({ status: "archived", reason: "Manually archived from Recruiter panel." }),
+      body: JSON.stringify({
+        status: "archived",
+        reason: "Manually archived from Recruiter panel.",
+      }),
     });
 
     if (!res.ok) {

@@ -1,18 +1,18 @@
-import { Controller, Get, UseGuards, Req } from '@nestjs/common';
-import { SupabaseAuthGuard } from '../guards/supabase-auth.guard';
-import { PrismaService } from '../../infrastructure/database/prisma.service';
+import { Controller, Get, UseGuards, Req } from "@nestjs/common";
+import { SupabaseAuthGuard } from "../guards/supabase-auth.guard";
+import { PrismaService } from "../../infrastructure/database/prisma.service";
 
-@Controller('analytics')
+@Controller("analytics")
 @UseGuards(SupabaseAuthGuard)
 export class AnalyticsController {
   constructor(private readonly prisma: PrismaService) {}
 
-  @Get('recruiter-funnel')
+  @Get("recruiter-funnel")
   async funnel(@Req() req: any) {
-    const orgId = req.user.orgId || '00000000-0000-0000-0000-000000000000';
-    
+    const orgId = req.user.orgId || "00000000-0000-0000-0000-000000000000";
+
     const candidates = await this.prisma.candidate.groupBy({
-      by: ['status'],
+      by: ["status"],
       where: { org_id: orgId, deleted_at: null },
       _count: { id: true },
     });
@@ -44,7 +44,7 @@ export class AnalyticsController {
     return counts;
   }
 
-  @Get('time-to-hire')
+  @Get("time-to-hire")
   async timeToHire(@Req() req: any) {
     return {
       averageDays: 8.5,
@@ -56,10 +56,10 @@ export class AnalyticsController {
     };
   }
 
-  @Get('integrity')
+  @Get("integrity")
   async integrity(@Req() req: any) {
-    const orgId = req.user.orgId || '00000000-0000-0000-0000-000000000000';
-    
+    const orgId = req.user.orgId || "00000000-0000-0000-0000-000000000000";
+
     // Safe cast fallback for clean local executions
     try {
       const eventsCount: Array<{ type: string; count: number }> = await this.prisma.$queryRaw`
@@ -72,9 +72,9 @@ export class AnalyticsController {
       return eventsCount || [];
     } catch {
       return [
-        { type: 'tab_switch', count: 12 },
-        { type: 'paste', count: 4 },
-        { type: 'multi_face', count: 1 },
+        { type: "tab_switch", count: 12 },
+        { type: "paste", count: 4 },
+        { type: "multi_face", count: 1 },
       ];
     }
   }

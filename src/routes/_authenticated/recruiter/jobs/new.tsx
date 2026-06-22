@@ -14,7 +14,14 @@ function NewJob() {
   const createJobFn = useServerFn(upsertJob);
   const suggest = useServerFn(suggestJobDescription);
 
-  const [form, setForm] = useState({ title: "", department: "", location: "", employment_type: "Full-time", description: "", requirements: "" });
+  const [form, setForm] = useState({
+    title: "",
+    department: "",
+    location: "",
+    employment_type: "Full-time",
+    description: "",
+    requirements: "",
+  });
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
   const set = <K extends keyof typeof form>(k: K, v: string) => setForm((f) => ({ ...f, [k]: v }));
@@ -32,7 +39,7 @@ function NewJob() {
           description: form.description || null,
           requirements: form.requirements || null,
           status,
-        }
+        },
       });
       toast.success(status === "draft" ? "Saved as draft" : "Published");
       navigate({ to: "/recruiter/jobs" });
@@ -60,35 +67,107 @@ function NewJob() {
 
   return (
     <>
-      <Link to="/recruiter/jobs" className="text-primary text-body-md hover:underline mb-md inline-flex items-center gap-1"><Icon name="arrow_back" />Back to JDs</Link>
+      <Link
+        to="/recruiter/jobs"
+        className="text-primary text-body-md hover:underline mb-md inline-flex items-center gap-1"
+      >
+        <Icon name="arrow_back" />
+        Back to JDs
+      </Link>
       <div className="mb-lg">
         <h2 className="text-headline-lg">New Job Description</h2>
-        <p className="text-body-lg text-on-surface-variant">Define the role; your AI persona will calibrate to these requirements.</p>
+        <p className="text-body-lg text-on-surface-variant">
+          Define the role; your AI persona will calibrate to these requirements.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg">
         <CardShadow className="lg:col-span-2 p-lg space-y-md">
-          <Field label="Title"><input value={form.title} onChange={(e) => set("title", e.target.value)} className="input" placeholder="Senior Software Engineer" /></Field>
+          <Field label="Title">
+            <input
+              value={form.title}
+              onChange={(e) => set("title", e.target.value)}
+              className="input"
+              placeholder="Senior Software Engineer"
+            />
+          </Field>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-md">
-            <Field label="Department"><input value={form.department} onChange={(e) => set("department", e.target.value)} className="input" placeholder="Engineering" /></Field>
-            <Field label="Location"><input value={form.location} onChange={(e) => set("location", e.target.value)} className="input" placeholder="Remote / NYC" /></Field>
+            <Field label="Department">
+              <input
+                value={form.department}
+                onChange={(e) => set("department", e.target.value)}
+                className="input"
+                placeholder="Engineering"
+              />
+            </Field>
+            <Field label="Location">
+              <input
+                value={form.location}
+                onChange={(e) => set("location", e.target.value)}
+                className="input"
+                placeholder="Remote / NYC"
+              />
+            </Field>
             <Field label="Employment Type">
-              <select value={form.employment_type} onChange={(e) => set("employment_type", e.target.value)} className="input">
-                <option>Full-time</option><option>Part-time</option><option>Contract</option><option>Intern</option>
+              <select
+                value={form.employment_type}
+                onChange={(e) => set("employment_type", e.target.value)}
+                className="input"
+              >
+                <option>Full-time</option>
+                <option>Part-time</option>
+                <option>Contract</option>
+                <option>Intern</option>
               </select>
             </Field>
           </div>
-          <Field label="Description"><textarea rows={6} value={form.description} onChange={(e) => set("description", e.target.value)} className="input" placeholder="What the candidate will own…" /></Field>
-          <Field label="Requirements"><textarea rows={6} value={form.requirements} onChange={(e) => set("requirements", e.target.value)} className="input" placeholder="Must-have skills, experience, qualifications…" /></Field>
+          <Field label="Description">
+            <textarea
+              rows={6}
+              value={form.description}
+              onChange={(e) => set("description", e.target.value)}
+              className="input"
+              placeholder="What the candidate will own…"
+            />
+          </Field>
+          <Field label="Requirements">
+            <textarea
+              rows={6}
+              value={form.requirements}
+              onChange={(e) => set("requirements", e.target.value)}
+              className="input"
+              placeholder="Must-have skills, experience, qualifications…"
+            />
+          </Field>
           <div className="flex gap-sm pt-md">
-            <button type="button" disabled={saving} onClick={() => save("draft")} className="px-4 py-2 border border-outline-variant rounded-lg hover:bg-surface-container-low disabled:opacity-50">Save Draft</button>
-            <button type="button" disabled={saving} onClick={() => save("open")} className="px-4 py-2 bg-primary text-on-primary rounded-lg hover:brightness-110 disabled:opacity-50">Publish</button>
+            <button
+              type="button"
+              disabled={saving}
+              onClick={() => save("draft")}
+              className="px-4 py-2 border border-outline-variant rounded-lg hover:bg-surface-container-low disabled:opacity-50"
+            >
+              Save Draft
+            </button>
+            <button
+              type="button"
+              disabled={saving}
+              onClick={() => save("open")}
+              className="px-4 py-2 bg-primary text-on-primary rounded-lg hover:brightness-110 disabled:opacity-50"
+            >
+              Publish
+            </button>
           </div>
         </CardShadow>
 
         <CardShadow className="p-lg ai-insight space-y-md h-fit">
-          <h3 className="text-headline-sm flex items-center gap-2"><Icon name="auto_awesome" className="text-secondary" />AI Assist</h3>
-          <p className="text-body-md">Once you publish, your selected AI persona will generate a tailored question set and rubric for this role.</p>
+          <h3 className="text-headline-sm flex items-center gap-2">
+            <Icon name="auto_awesome" className="text-secondary" />
+            AI Assist
+          </h3>
+          <p className="text-body-md">
+            Once you publish, your selected AI persona will generate a tailored question set and
+            rubric for this role.
+          </p>
           <button
             type="button"
             disabled={generating}

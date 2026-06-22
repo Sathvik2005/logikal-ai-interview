@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { CardShadow, Icon } from "@/components/recruiter/RecruiterShell";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { STATUS_TONE, scoreColor } from "@/components/recruiter/mock-data";
 import {
   useCandidatesQuery,
@@ -13,7 +14,6 @@ import { ImportCandidatesWizard } from "@/components/recruiter/ImportCandidatesW
 import { ScheduleInterviewWizard } from "@/components/recruiter/ScheduleInterviewWizard";
 import { useInterviewSchedule } from "@/components/recruiter/use-interview-schedule";
 import { isProfileComplete } from "@/components/recruiter/candidate-completeness";
-
 
 export const Route = createFileRoute("/_authenticated/recruiter/candidates/")({
   loader: ({ context }) => {
@@ -136,70 +136,78 @@ function CandidatesPage() {
                 filtered.map((c) => {
                   const incomplete = !isProfileComplete(c);
                   return (
-                  <tr key={c.id} className="hover:bg-surface-container-low transition">
-                    <td className="p-lg">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-semibold">
-                          {c.avatar}
+                    <tr key={c.id} className="hover:bg-surface-container-low transition">
+                      <td className="p-lg">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-semibold">
+                            {c.avatar}
+                          </div>
+                          <div>
+                            <p className="font-semibold flex items-center gap-2">
+                              {c.name}
+                              {incomplete && (
+                                <span
+                                  title="Profile incomplete"
+                                  className="text-xs px-1.5 py-0.5 rounded-full bg-error-container text-on-error-container inline-flex items-center gap-1"
+                                >
+                                  <Icon name="warning" className="text-[12px]" />
+                                  Incomplete
+                                </span>
+                              )}
+                            </p>
+                            <p className="text-label-caps text-on-surface-variant uppercase">
+                              {c.email}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-semibold flex items-center gap-2">
-                            {c.name}
-                            {incomplete && (
-                              <span title="Profile incomplete" className="text-xs px-1.5 py-0.5 rounded-full bg-error-container text-on-error-container inline-flex items-center gap-1">
-                                <Icon name="warning" className="text-[12px]" />Incomplete
-                              </span>
-                            )}
-                          </p>
-                          <p className="text-label-caps text-on-surface-variant uppercase">{c.email}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="p-lg text-on-surface-variant">{c.role || "—"}</td>
-                    <td className="p-lg">
-                      <span
-                        className={`px-2 py-1 rounded-full text-label-caps uppercase ${STATUS_TONE[c.status]}`}
-                      >
-                        {c.status}
-                      </span>
-                    </td>
-                    <td className={`p-lg text-data-mono font-bold ${scoreColor(c.score)}`}>
-                      {c.score || "—"}
-                    </td>
-                    <td className="p-lg text-on-surface-variant">{c.experienceYears} yrs</td>
-                    <td className="p-lg text-right font-medium">
-                      <Link
-                        to="/recruiter/candidates/$id"
-                        params={{ id: c.id }}
-                        className="text-primary hover:underline mr-3"
-                      >
-                        Profile
-                      </Link>
-                      {incomplete ? (
+                      </td>
+                      <td className="p-lg text-on-surface-variant">{c.role || "—"}</td>
+                      <td className="p-lg">
+                        <span
+                          className={`px-2 py-1 rounded-full text-label-caps uppercase ${STATUS_TONE[c.status]}`}
+                        >
+                          {c.status}
+                        </span>
+                      </td>
+                      <td className={`p-lg text-data-mono font-bold ${scoreColor(c.score)}`}>
+                        {c.score || "—"}
+                      </td>
+                      <td className="p-lg text-on-surface-variant">{c.experienceYears} yrs</td>
+                      <td className="p-lg text-right font-medium">
                         <Link
                           to="/recruiter/candidates/$id"
                           params={{ id: c.id }}
-                          title="Complete the profile before scheduling"
-                          className="text-on-surface-variant hover:underline inline-flex items-center gap-1"
+                          className="text-primary hover:underline mr-3"
                         >
-                          <Icon name="lock" className="text-[14px]" />Complete
+                          Profile
                         </Link>
-                      ) : (
-                        <Link
-                          to="/recruiter/scheduling"
-                          className="text-primary hover:underline"
-                        >
-                          Schedule
-                        </Link>
-                      )}
-                    </td>
-                  </tr>
+                        {incomplete ? (
+                          <Link
+                            to="/recruiter/candidates/$id"
+                            params={{ id: c.id }}
+                            title="Complete the profile before scheduling"
+                            className="text-on-surface-variant hover:underline inline-flex items-center gap-1"
+                          >
+                            <Icon name="lock" className="text-[14px]" />
+                            Complete
+                          </Link>
+                        ) : (
+                          <Link to="/recruiter/scheduling" className="text-primary hover:underline">
+                            Schedule
+                          </Link>
+                        )}
+                      </td>
+                    </tr>
                   );
                 })}
               {!isLoading && !error && filtered.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="p-xl text-center text-on-surface-variant">
-                    No candidates match your filters.
+                  <td colSpan={6} className="p-0">
+                    <EmptyState
+                      icon="person_search"
+                      title="No candidates match your filters"
+                      description="Try adjusting your keywords or filters to find candidates."
+                    />
                   </td>
                 </tr>
               )}

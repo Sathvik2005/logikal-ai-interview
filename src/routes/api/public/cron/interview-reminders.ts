@@ -33,9 +33,7 @@ export const Route = createFileRoute("/api/public/cron/interview-reminders")({
         // Verify Supabase anon key (cron passes it via `apikey` header).
         const apikey = request.headers.get("apikey") ?? request.headers.get("x-api-key");
         const expected =
-          process.env.SUPABASE_PUBLISHABLE_KEY ||
-          process.env.SUPABASE_ANON_KEY ||
-          "";
+          process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY || "";
         if (!apikey || !expected || apikey !== expected) {
           return new Response(JSON.stringify({ error: "unauthorized" }), {
             status: 401,

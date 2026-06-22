@@ -77,7 +77,9 @@ export const listLiveInterviews = createServerFn({ method: "POST" })
     const horizon = new Date(now.getTime() + 24 * 60 * 60 * 1000);
     const { data, error } = await context.supabase
       .from("interviews")
-      .select("id, scheduled_at, duration_minutes, status, overall_score, candidates(full_name, email, role_applied), personas(name)")
+      .select(
+        "id, scheduled_at, duration_minutes, status, overall_score, candidates(full_name, email, role_applied), personas(name)",
+      )
       .is("deleted_at", null)
       .in("status", ["scheduled", "in_progress"])
       .lte("scheduled_at", horizon.toISOString())
@@ -87,9 +89,13 @@ export const listLiveInterviews = createServerFn({ method: "POST" })
     if (rows.length === 0) return [];
     const ids = rows.map((r) => r.id);
     const { data: sessions } = await context.supabase
-      .from("interview_sessions").select("id, interview_id").in("interview_id", ids);
+      .from("interview_sessions")
+      .select("id, interview_id")
+      .in("interview_id", ids);
     const sessByIv = new Map<string, string>();
-    (sessions ?? []).forEach((s: { id: string; interview_id: string }) => sessByIv.set(s.interview_id, s.id));
+    (sessions ?? []).forEach((s: { id: string; interview_id: string }) =>
+      sessByIv.set(s.interview_id, s.id),
+    );
     return rows.map((r) => liveFromRow(r, sessByIv.get(r.id) ?? null));
   });
 
@@ -99,8 +105,11 @@ export const getMonitorSession = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: iv, error } = await context.supabase
       .from("interviews")
-      .select("id, scheduled_at, duration_minutes, status, overall_score, candidates(full_name, email, role_applied), personas(name)")
-      .eq("id", data.interviewId).maybeSingle();
+      .select(
+        "id, scheduled_at, duration_minutes, status, overall_score, candidates(full_name, email, role_applied), personas(name)",
+      )
+      .eq("id", data.interviewId)
+      .maybeSingle();
     if (error) throw new Error(error.message);
     if (!iv) throw new Error("Interview not found");
     const { data: sess } = await context.supabase
@@ -108,33 +117,53 @@ export const getMonitorSession = createServerFn({ method: "POST" })
       .select("id, started_at, ended_at")
       .eq("interview_id", data.interviewId)
       .order("started_at", { ascending: false })
-      .limit(1).maybeSingle();
+      .limit(1)
+      .maybeSingle();
     const sessionId = sess?.id ?? null;
     const interview = liveFromRow(iv as unknown as IvRow, sessionId);
     let turns: MonitorTurn[] = [];
     let events: MonitorEvent[] = [];
     if (sessionId) {
       const [{ data: tRows }, { data: eRows }] = await Promise.all([
-        context.supabase.from("interview_turns")
+        context.supabase
+          .from("interview_turns")
           .select("id, speaker, text, created_at, started_at")
-          .eq("session_id", sessionId).order("created_at", { ascending: true }),
-        context.supabase.from("interview_events")
+          .eq("session_id", sessionId)
+          .order("created_at", { ascending: true }),
+        context.supabase
+          .from("interview_events")
           .select("id, type, payload, at")
-          .eq("session_id", sessionId).order("at", { ascending: true }),
+          .eq("session_id", sessionId)
+          .order("at", { ascending: true }),
       ]);
-      turns = ((tRows ?? []) as { id: string; speaker: string | null; text: string | null; created_at: string; started_at: string | null }[])
-        .map((t) => ({
-          id: t.id,
-          who: t.speaker === "candidate" ? "Candidate" : "AI",
-          text: t.text ?? "",
-          at: t.started_at ?? t.created_at,
-        }));
-      events = ((eRows ?? []) as { id: string; type: string; payload: unknown; at: string }[])
-        .map((e) => ({ id: e.id, type: e.type, payload: e.payload == null ? null : JSON.stringify(e.payload), at: e.at }));
+      turns = (
+        (tRows ?? []) as {
+          id: string;
+          speaker: string | null;
+          text: string | null;
+          created_at: string;
+          started_at: string | null;
+        }[]
+      ).map((t) => ({
+        id: t.id,
+        who: t.speaker === "candidate" ? "Candidate" : "AI",
+        text: t.text ?? "",
+        at: t.started_at ?? t.created_at,
+      }));
+      events = ((eRows ?? []) as { id: string; type: string; payload: unknown; at: string }[]).map(
+        (e) => ({
+          id: e.id,
+          type: e.type,
+          payload: e.payload == null ? null : JSON.stringify(e.payload),
+          at: e.at,
+        }),
+      );
     }
     return {
       interview,
-      session: sess ? { id: sess.id, startedAt: sess.started_at ?? null, endedAt: sess.ended_at ?? null } : null,
+      session: sess
+        ? { id: sess.id, startedAt: sess.started_at ?? null, endedAt: sess.ended_at ?? null }
+        : null,
       turns,
       events,
     } satisfies MonitorSessionDTO;
@@ -145,7 +174,9 @@ export const listRecordedSessions = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("interviews")
-      .select("id, scheduled_at, duration_minutes, status, overall_score, candidates(full_name, email, role_applied), personas(name)")
+      .select(
+        "id, scheduled_at, duration_minutes, status, overall_score, candidates(full_name, email, role_applied), personas(name)",
+      )
       .is("deleted_at", null)
       .in("status", ["completed", "evaluation_pending"])
       .order("scheduled_at", { ascending: false })
@@ -159,12 +190,20 @@ export const listRecordedSessions = createServerFn({ method: "POST" })
       .select("id, interview_id, started_at, ended_at")
       .in("interview_id", ids);
     const sessByIv = new Map<string, { id: string; durationSec: number }>();
-    (sessions ?? []).forEach((s: { id: string; interview_id: string; started_at: string | null; ends?: string; ended_at: string | null }) => {
-      const start = s.started_at ? new Date(s.started_at).getTime() : 0;
-      const end = s.ended_at ? new Date(s.ended_at).getTime() : 0;
-      const sec = end > start ? Math.round((end - start) / 1000) : 0;
-      sessByIv.set(s.interview_id, { id: s.id, durationSec: sec });
-    });
+    (sessions ?? []).forEach(
+      (s: {
+        id: string;
+        interview_id: string;
+        started_at: string | null;
+        ends?: string;
+        ended_at: string | null;
+      }) => {
+        const start = s.started_at ? new Date(s.started_at).getTime() : 0;
+        const end = s.ended_at ? new Date(s.ended_at).getTime() : 0;
+        const sec = end > start ? Math.round((end - start) / 1000) : 0;
+        sessByIv.set(s.interview_id, { id: s.id, durationSec: sec });
+      },
+    );
     return rows.map((r) => {
       const s = sessByIv.get(r.id);
       return {
@@ -175,7 +214,10 @@ export const listRecordedSessions = createServerFn({ method: "POST" })
         personaName: r.personas?.name ?? "AI Interviewer",
         durationSec: s?.durationSec ?? (r.duration_minutes ?? 45) * 60,
         scheduledAt: r.scheduled_at,
-        score: r.overall_score === null || r.overall_score === undefined ? null : Number(r.overall_score),
+        score:
+          r.overall_score === null || r.overall_score === undefined
+            ? null
+            : Number(r.overall_score),
       } satisfies RecordedSessionDTO;
     });
   });
@@ -200,4 +242,3 @@ export const flagSessionEvent = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true } as const;
   });
-

@@ -25,7 +25,11 @@ function SettingsPage() {
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await supabase.from("workspace_settings").select("*").limit(1).maybeSingle();
+      const { data, error } = await supabase
+        .from("workspace_settings")
+        .select("*")
+        .limit(1)
+        .maybeSingle();
       if (error) setError(error.message);
       else if (data) setSettings(data as Settings);
     })();
@@ -51,21 +55,34 @@ function SettingsPage() {
     else setSavedAt(new Date().toLocaleTimeString());
   };
 
-  if (!settings) return <div className="p-lg text-on-surface-variant">Loading workspace settings…</div>;
+  if (!settings)
+    return <div className="p-lg text-on-surface-variant">Loading workspace settings…</div>;
 
-  const update = <K extends keyof Settings>(k: K, v: Settings[K]) => setSettings((s) => (s ? { ...s, [k]: v } : s));
+  const update = <K extends keyof Settings>(k: K, v: Settings[K]) =>
+    setSettings((s) => (s ? { ...s, [k]: v } : s));
 
   return (
     <div className="space-y-lg max-w-3xl">
       <header>
         <h1 className="text-headline-lg font-headline-lg text-on-surface">Workspace Settings</h1>
-        <p className="text-body-lg text-on-surface-variant">Branding, authentication policy and data retention.</p>
+        <p className="text-body-lg text-on-surface-variant">
+          Branding, authentication policy and data retention.
+        </p>
       </header>
 
       <Card className="p-lg space-y-md">
         <h3 className="text-headline-sm font-headline-sm text-on-surface">Branding</h3>
-        <Field label="Organization name" value={settings.org_name} onChange={(v) => update("org_name", v)} />
-        <Field label="Logo URL" value={settings.logo_url ?? ""} onChange={(v) => update("logo_url", v)} placeholder="https://…/logo.svg" />
+        <Field
+          label="Organization name"
+          value={settings.org_name}
+          onChange={(v) => update("org_name", v)}
+        />
+        <Field
+          label="Logo URL"
+          value={settings.logo_url ?? ""}
+          onChange={(v) => update("logo_url", v)}
+          placeholder="https://…/logo.svg"
+        />
         <div>
           <label className="text-body-md text-on-surface-variant">Primary color</label>
           <div className="mt-1 flex items-center gap-2">
@@ -89,14 +106,29 @@ function SettingsPage() {
         <label className="flex items-center justify-between p-3 rounded-lg bg-surface-container-low">
           <div>
             <p className="text-body-md text-on-surface font-semibold">Require MFA</p>
-            <p className="text-body-md text-on-surface-variant">Enforce two-factor for every workspace member.</p>
+            <p className="text-body-md text-on-surface-variant">
+              Enforce two-factor for every workspace member.
+            </p>
           </div>
-          <input type="checkbox" className="accent-primary w-5 h-5" checked={settings.require_mfa} onChange={(e) => update("require_mfa", e.target.checked)} />
+          <input
+            type="checkbox"
+            className="accent-primary w-5 h-5"
+            checked={settings.require_mfa}
+            onChange={(e) => update("require_mfa", e.target.checked)}
+          />
         </label>
         <Field
           label="Allowed email domains (comma-separated)"
           value={settings.allowed_domains.join(", ")}
-          onChange={(v) => update("allowed_domains", v.split(",").map((d) => d.trim()).filter(Boolean))}
+          onChange={(v) =>
+            update(
+              "allowed_domains",
+              v
+                .split(",")
+                .map((d) => d.trim())
+                .filter(Boolean),
+            )
+          }
           placeholder="acme.com, globex.com"
         />
       </Card>
@@ -104,7 +136,9 @@ function SettingsPage() {
       <Card className="p-lg space-y-md">
         <h3 className="text-headline-sm font-headline-sm text-on-surface">Data retention</h3>
         <div>
-          <label className="text-body-md text-on-surface-variant">Retain interview recordings for (months)</label>
+          <label className="text-body-md text-on-surface-variant">
+            Retain interview recordings for (months)
+          </label>
           <input
             type="number"
             min={1}
@@ -116,11 +150,24 @@ function SettingsPage() {
         </div>
       </Card>
 
-      {error && <p className="text-body-md text-error flex items-center gap-2"><Icon name="error" /> {error}</p>}
+      {error && (
+        <p className="text-body-md text-error flex items-center gap-2">
+          <Icon name="error" /> {error}
+        </p>
+      )}
 
       <div className="flex items-center justify-end gap-3 sticky bottom-0 py-3 bg-background/80 backdrop-blur-md">
-        {savedAt && <span className="text-body-md text-success flex items-center gap-1"><Icon name="check_circle" /> Saved at {savedAt}</span>}
-        <button type="button" onClick={save} disabled={saving} className="px-4 py-2 rounded-lg bg-primary text-on-primary font-semibold text-body-md hover:brightness-110 disabled:opacity-50">
+        {savedAt && (
+          <span className="text-body-md text-success flex items-center gap-1">
+            <Icon name="check_circle" /> Saved at {savedAt}
+          </span>
+        )}
+        <button
+          type="button"
+          onClick={save}
+          disabled={saving}
+          className="px-4 py-2 rounded-lg bg-primary text-on-primary font-semibold text-body-md hover:brightness-110 disabled:opacity-50"
+        >
           {saving ? "Saving…" : "Save changes"}
         </button>
       </div>
@@ -128,7 +175,17 @@ function SettingsPage() {
   );
 }
 
-function Field({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
+function Field({
+  label,
+  value,
+  onChange,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+}) {
   return (
     <div>
       <label className="text-body-md text-on-surface-variant">{label}</label>

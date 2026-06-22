@@ -1,11 +1,11 @@
-import { Injectable, Inject, Logger, OnModuleInit } from '@nestjs/common';
-import { PrismaService } from '../../infrastructure/database/prisma.service';
-import { IAIOrchestrator, IAIOrchestratorToken } from '../common/ai/ai-orchestrator.interface';
-import { CandidateWorkflowService } from '../candidate/candidate-workflow.service';
-import { IQueueService, IQueueServiceToken } from '../common/queue/queue.service';
-import { InMemoryQueueService } from '../../infrastructure/queue/in-memory-queue.service';
-import { IEventBus, IEventBusToken } from '../common/event-bus/event-bus.interface';
-import { EvaluationCompletedEvent } from '../../domain/interview/events/interview-events';
+import { Injectable, Inject, Logger, OnModuleInit } from "@nestjs/common";
+import { PrismaService } from "../../infrastructure/database/prisma.service";
+import { IAIOrchestrator, IAIOrchestratorToken } from "../common/ai/ai-orchestrator.interface";
+import { CandidateWorkflowService } from "../candidate/candidate-workflow.service";
+import { IQueueService, IQueueServiceToken } from "../common/queue/queue.service";
+import { InMemoryQueueService } from "../../infrastructure/queue/in-memory-queue.service";
+import { IEventBus, IEventBusToken } from "../common/event-bus/event-bus.interface";
+import { EvaluationCompletedEvent } from "../../domain/interview/events/interview-events";
 
 @Injectable()
 export class EvaluationService implements OnModuleInit {
@@ -24,7 +24,7 @@ export class EvaluationService implements OnModuleInit {
 
   onModuleInit() {
     if (this.queue instanceof InMemoryQueueService) {
-      this.queue.registerProcessor('finalize-evaluation', async (payload: any) => {
+      this.queue.registerProcessor("finalize-evaluation", async (payload: any) => {
         await this.finalizeEvaluation(payload.interviewId, payload.sessionId);
       });
     }
@@ -32,17 +32,17 @@ export class EvaluationService implements OnModuleInit {
 
   async finalizeEvaluation(interviewId: string, sessionId: string): Promise<void> {
     this.logger.log(`Starting background AI evaluation grading for interview: ${interviewId}`);
-    
+
     await this.prisma.interview.update({
       where: { id: interviewId },
-      data: { evaluation_status: 'running' },
+      data: { evaluation_status: "running" },
     });
 
     try {
       // 1. Gather all transcript turns
       const turns = await this.prisma.interviewTurn.findMany({
         where: { session_id: sessionId },
-        orderBy: { started_at: 'asc' },
+        orderBy: { started_at: "asc" },
       });
 
       // 2. Gather all integrity events
@@ -60,20 +60,24 @@ export class EvaluationService implements OnModuleInit {
         where: { id: interviewId },
         include: { candidate: true, job: true, template: true },
       });
-      if (!interview) throw new Error('Interview not found');
+      if (!interview) throw new Error("Interview not found");
 
       const rubric = interview.template?.evaluation_criteria || {};
-      
+
       // 4. Call AI Evaluation Agent
       const turnsPayload = turns.map((t) => ({ speaker: t.speaker, text: t.text }));
-      const evaluation = await this.aiOrchestrator.evaluateInterview(rubric, turnsPayload, integrityFlags);
+      const evaluation = await this.aiOrchestrator.evaluateInterview(
+        rubric,
+        turnsPayload,
+        integrityFlags,
+      );
 
       // 5. Update interview record
       await this.prisma.interview.update({
         where: { id: interviewId },
         data: {
-          status: 'completed',
-          evaluation_status: 'done',
+          status: "completed",
+          evaluation_status: "done",
           overall_score: evaluation.overallScore,
           integrity_score: evaluation.integrityScore,
           recommendation: evaluation.recommendation,
@@ -82,17 +86,19 @@ export class EvaluationService implements OnModuleInit {
       });
 
       // 6. Generate detailed report
-      const jdContext = interview.job ? { title: interview.job.title, requirements: interview.job.requirements } : {};
+      const jdContext = interview.job
+        ? { title: interview.job.title, requirements: interview.job.requirements }
+        : {};
       const reportMarkdown = await this.aiOrchestrator.generateReportMarkdown(
         { name: interview.candidate.full_name, email: interview.candidate.email },
         jdContext,
-        evaluation
+        evaluation,
       );
 
       // 7. Write scorecard to database
       const report = await this.prisma.interviewReport.create({
         data: {
-          org_id: interview.org_id || '00000000-0000-0000-0000-000000000000',
+          org_id: interview.org_id || "00000000-0000-0000-0000-000000000000",
           interview_id: interviewId,
           executive_summary: reportMarkdown,
           scores: evaluation.competencyScores as any,
@@ -106,23 +112,25 @@ export class EvaluationService implements OnModuleInit {
       // 8. Move candidate state to recruiter review
       await this.workflow.transition(
         interview.candidate_id,
-        'recruiter_review',
-        'AI Evaluation engine completed grading. Report metrics available.',
-        { score: evaluation.overallScore, recommendation: evaluation.recommendation }
+        "recruiter_review",
+        "AI Evaluation engine completed grading. Report metrics available.",
+        { score: evaluation.overallScore, recommendation: evaluation.recommendation },
       );
 
       // 9. Dispatch event
-      this.eventBus.publish(new EvaluationCompletedEvent(
-        interviewId,
-        report.id,
-        evaluation.overallScore,
-        evaluation.recommendation
-      ));
+      this.eventBus.publish(
+        new EvaluationCompletedEvent(
+          interviewId,
+          report.id,
+          evaluation.overallScore,
+          evaluation.recommendation,
+        ),
+      );
 
       // 10. Queue email delivery
-      await this.queue.enqueue('send-notification', {
+      await this.queue.enqueue("send-notification", {
         orgId: interview.org_id,
-        kind: 'interview_report_ready',
+        kind: "interview_report_ready",
         recipientEmail: interview.candidate.email,
         payload: {
           candidateName: interview.candidate.full_name,
@@ -130,12 +138,11 @@ export class EvaluationService implements OnModuleInit {
           interviewId,
         },
       });
-
     } catch (err) {
       this.logger.error(`AI Evaluation task failed: ${err}`);
       await this.prisma.interview.update({
         where: { id: interviewId },
-        data: { evaluation_status: 'failed' },
+        data: { evaluation_status: "failed" },
       });
       throw err;
     }

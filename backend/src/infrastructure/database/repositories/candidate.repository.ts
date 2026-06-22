@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { ICandidateRepository } from '../../../domain/candidate/candidate.repository.interface';
-import { Candidate, CandidateStatus } from '../../../domain/candidate/candidate.entity';
-import { PrismaService } from '../prisma.service';
+import { Injectable } from "@nestjs/common";
+import { ICandidateRepository } from "../../../domain/candidate/candidate.repository.interface";
+import { Candidate, CandidateStatus } from "../../../domain/candidate/candidate.entity";
+import { PrismaService } from "../prisma.service";
 
 @Injectable()
 export class PrismaCandidateRepository implements ICandidateRepository {
@@ -14,7 +14,7 @@ export class PrismaCandidateRepository implements ICandidateRepository {
     if (!row) return null;
     return new Candidate(
       row.id,
-      row.org_id || '',
+      row.org_id || "",
       row.full_name,
       row.email,
       row.status as CandidateStatus,
@@ -31,7 +31,7 @@ export class PrismaCandidateRepository implements ICandidateRepository {
       data: {
         id: candidate.id,
         org_id: candidate.orgId || null,
-        created_by: '00000000-0000-0000-0000-000000000000', // Default system boundary actor
+        created_by: "00000000-0000-0000-0000-000000000000", // Default system boundary actor
         full_name: candidate.name,
         email: candidate.email,
         status: candidate.status,

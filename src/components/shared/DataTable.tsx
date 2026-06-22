@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import { EmptyState } from "./EmptyState";
 
 export type SortDirection = "asc" | "desc" | null;
 
@@ -65,16 +66,24 @@ export function DataTable<T extends { id: string }>({
   const paged = sorted.slice((page - 1) * pageSize, page * pageSize);
 
   return (
-    <div className={`bg-surface-container-lowest rounded-xl border border-outline-variant shadow-soft overflow-hidden ${className}`}>
+    <div
+      className={`bg-surface-container-lowest rounded-xl border border-outline-variant shadow-soft overflow-hidden ${className}`}
+    >
       <div className="w-full overflow-x-auto">
         <table className="w-full text-body-md" style={{ minWidth: "800px" }}>
-          <thead className={`text-label-caps uppercase text-on-surface-variant bg-surface-container-low ${stickyHeader ? "sticky top-0 z-10" : ""}`}>
+          <thead
+            className={`text-label-caps uppercase text-on-surface-variant bg-surface-container-low ${stickyHeader ? "sticky top-0 z-10" : ""}`}
+          >
             <tr>
               {columns.map((col) => (
                 <th
                   key={String(col.key)}
                   className={`p-4 font-semibold tracking-wider whitespace-nowrap border-b border-outline-variant ${
-                    col.align === "right" ? "text-right" : col.align === "center" ? "text-center" : "text-left"
+                    col.align === "right"
+                      ? "text-right"
+                      : col.align === "center"
+                        ? "text-center"
+                        : "text-left"
                   } ${col.sortable ? "cursor-pointer select-none hover:bg-surface-container transition" : ""}`}
                   style={{ width: col.width }}
                   onClick={col.sortable ? () => handleSort(String(col.key)) : undefined}
@@ -83,7 +92,11 @@ export function DataTable<T extends { id: string }>({
                     {col.label}
                     {col.sortable && (
                       <span className="material-symbols-outlined text-[14px] opacity-50">
-                        {sortKey === String(col.key) ? (sortDir === "asc" ? "arrow_upward" : "arrow_downward") : "unfold_more"}
+                        {sortKey === String(col.key)
+                          ? sortDir === "asc"
+                            ? "arrow_upward"
+                            : "arrow_downward"
+                          : "unfold_more"}
                       </span>
                     )}
                   </span>
@@ -97,21 +110,18 @@ export function DataTable<T extends { id: string }>({
                 <tr key={i}>
                   {columns.map((col) => (
                     <td key={String(col.key)} className="p-4">
-                      <div className="h-4 bg-surface-container rounded animate-pulse" style={{ width: i % 2 === 0 ? "80%" : "60%" }} />
+                      <div
+                        className="h-4 bg-surface-container rounded animate-pulse"
+                        style={{ width: i % 2 === 0 ? "80%" : "60%" }}
+                      />
                     </td>
                   ))}
                 </tr>
               ))
             ) : paged.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="py-16 text-center">
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center">
-                      <span className="material-symbols-outlined text-on-surface-variant">inbox</span>
-                    </div>
-                    <p className="text-headline-sm text-on-surface">{emptyTitle}</p>
-                    {emptyHint && <p className="text-body-md text-on-surface-variant max-w-sm">{emptyHint}</p>}
-                  </div>
+                <td colSpan={columns.length} className="p-0">
+                  <EmptyState icon="inbox" title={emptyTitle} description={emptyHint} />
                 </td>
               </tr>
             ) : (

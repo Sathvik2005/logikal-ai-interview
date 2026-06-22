@@ -41,9 +41,9 @@ export const requestDataExport = createServerFn({ method: "POST" })
         .select("*")
         .in(
           "candidate_id",
-          (
-            await supabaseAdmin.from("candidates").select("id").eq("user_id", userId)
-          ).data?.map((c) => c.id) ?? [],
+          (await supabaseAdmin.from("candidates").select("id").eq("user_id", userId)).data?.map(
+            (c) => c.id,
+          ) ?? [],
         ),
     ]);
 

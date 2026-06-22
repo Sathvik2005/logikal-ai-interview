@@ -1,6 +1,13 @@
 import { useMutation, useQuery, useQueryClient, queryOptions } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listQuestions, listQuestionBanks, upsertQuestion, deleteQuestion, type QuestionDTO, type QuestionBankDTO } from "@/lib/questions.functions";
+import {
+  listQuestions,
+  listQuestionBanks,
+  upsertQuestion,
+  deleteQuestion,
+  type QuestionDTO,
+  type QuestionBankDTO,
+} from "@/lib/questions.functions";
 
 export type { QuestionDTO, QuestionBankDTO };
 export const questionsKeys = {
@@ -10,7 +17,11 @@ export const questionsKeys = {
 };
 
 export const questionBanksOptions = () =>
-  queryOptions({ queryKey: questionsKeys.banks, queryFn: () => listQuestionBanks(), staleTime: 30_000 });
+  queryOptions({
+    queryKey: questionsKeys.banks,
+    queryFn: () => listQuestionBanks(),
+    staleTime: 30_000,
+  });
 
 export const questionsByCompetencyOptions = (competency?: string) =>
   queryOptions({
@@ -18,13 +29,24 @@ export const questionsByCompetencyOptions = (competency?: string) =>
     queryFn: () => listQuestions({ data: competency ? { competency } : {} }),
   });
 
-export function useQuestionBanksQuery() { return useQuery(questionBanksOptions()); }
-export function useQuestionsQuery(competency?: string) { return useQuery(questionsByCompetencyOptions(competency)); }
+export function useQuestionBanksQuery() {
+  return useQuery(questionBanksOptions());
+}
+export function useQuestionsQuery(competency?: string) {
+  return useQuery(questionsByCompetencyOptions(competency));
+}
 export function useUpsertQuestion() {
   const qc = useQueryClient();
   const fn = useServerFn(upsertQuestion);
   return useMutation({
-    mutationFn: (input: { id?: string; competency: string; difficulty?: "easy" | "medium" | "hard"; type?: string; prompt: string; expectedSignals?: string[] }) => fn({ data: { difficulty: "medium", type: "open", expectedSignals: [], ...input } }),
+    mutationFn: (input: {
+      id?: string;
+      competency: string;
+      difficulty?: "easy" | "medium" | "hard";
+      type?: string;
+      prompt: string;
+      expectedSignals?: string[];
+    }) => fn({ data: { difficulty: "medium", type: "open", expectedSignals: [], ...input } }),
     onSuccess: () => qc.invalidateQueries({ queryKey: questionsKeys.all }),
   });
 }

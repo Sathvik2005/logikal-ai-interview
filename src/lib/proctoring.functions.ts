@@ -248,24 +248,22 @@ ${transcript || "(no transcript captured)"}`;
       payload: e.payload,
     }));
 
-    await supabaseAdmin
-      .from("interview_reports")
-      .upsert(
-        {
-          org_id: interview.org_id,
-          interview_id: data.interviewId,
-          executive_summary: String(parsed.executiveSummary ?? ""),
-          scores: scores as never,
-          strengths: (Array.isArray(parsed.strengths) ? parsed.strengths : []) as never,
-          weaknesses: (Array.isArray(parsed.weaknesses) ? parsed.weaknesses : []) as never,
-          knowledge_gaps: (Array.isArray(parsed.knowledgeGaps) ? parsed.knowledgeGaps : []) as never,
-          evidence: (Array.isArray(parsed.evidence) ? parsed.evidence : []) as never,
-          integrity_score: integrityScore,
-          integrity_timeline: timeline as never,
-          recommendation: rec,
-        },
-        { onConflict: "interview_id" },
-      );
+    await supabaseAdmin.from("interview_reports").upsert(
+      {
+        org_id: interview.org_id,
+        interview_id: data.interviewId,
+        executive_summary: String(parsed.executiveSummary ?? ""),
+        scores: scores as never,
+        strengths: (Array.isArray(parsed.strengths) ? parsed.strengths : []) as never,
+        weaknesses: (Array.isArray(parsed.weaknesses) ? parsed.weaknesses : []) as never,
+        knowledge_gaps: (Array.isArray(parsed.knowledgeGaps) ? parsed.knowledgeGaps : []) as never,
+        evidence: (Array.isArray(parsed.evidence) ? parsed.evidence : []) as never,
+        integrity_score: integrityScore,
+        integrity_timeline: timeline as never,
+        recommendation: rec,
+      },
+      { onConflict: "interview_id" },
+    );
 
     await supabaseAdmin
       .from("interviews")
@@ -273,7 +271,12 @@ ${transcript || "(no transcript captured)"}`;
         status: "completed",
         evaluation_status: "done",
         overall_score: Math.round(
-          (scores.technical + scores.communication + scores.behavioral + scores.confidence + scores.knowledge) / 5,
+          (scores.technical +
+            scores.communication +
+            scores.behavioral +
+            scores.confidence +
+            scores.knowledge) /
+            5,
         ),
         recommendation: rec === "reject" ? "no_hire" : rec === "maybe" ? "no_hire" : rec,
         integrity_score: integrityScore,
@@ -327,14 +330,20 @@ export const getInterviewReportBundle = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<InterviewReportBundle> => {
     const { data: iv, error: ivErr } = await context.supabase
       .from("interviews")
-      .select("id, scheduled_at, duration_minutes, status, overall_score, recommendation, integrity_score, candidates(full_name, email, phone, role_applied, resume_summary, skills, experience_years), personas(name)")
+      .select(
+        "id, scheduled_at, duration_minutes, status, overall_score, recommendation, integrity_score, candidates(full_name, email, phone, role_applied, resume_summary, skills, experience_years), personas(name)",
+      )
       .eq("id", data.interviewId)
       .maybeSingle();
     if (ivErr) throw new Error(ivErr.message);
     if (!iv) throw new Error("Interview not found");
     const ivRow = iv as unknown as {
-      id: string; scheduled_at: string | null; duration_minutes: number | null;
-      status: string; overall_score: number | string | null; recommendation: string | null;
+      id: string;
+      scheduled_at: string | null;
+      duration_minutes: number | null;
+      status: string;
+      overall_score: number | string | null;
+      recommendation: string | null;
       integrity_score: number | string | null;
       candidates: {
         full_name: string;
@@ -349,11 +358,18 @@ export const getInterviewReportBundle = createServerFn({ method: "POST" })
     };
 
     const { data: report } = await context.supabase
-      .from("interview_reports").select("*").eq("interview_id", data.interviewId).maybeSingle();
+      .from("interview_reports")
+      .select("*")
+      .eq("interview_id", data.interviewId)
+      .maybeSingle();
 
     const { data: session } = await context.supabase
-      .from("interview_sessions").select("id").eq("interview_id", data.interviewId)
-      .order("started_at", { ascending: false }).limit(1).maybeSingle();
+      .from("interview_sessions")
+      .select("id")
+      .eq("interview_id", data.interviewId)
+      .order("started_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
     let turns: InterviewReportBundle["turns"] = [];
     let events: InterviewReportBundle["events"] = [];
@@ -361,18 +377,45 @@ export const getInterviewReportBundle = createServerFn({ method: "POST" })
 
     if (session?.id) {
       const [tRes, eRes, sRes] = await Promise.all([
-        context.supabase.from("interview_turns").select("id, speaker, text, started_at").eq("session_id", session.id).order("started_at"),
-        context.supabase.from("interview_events").select("type, at, payload").eq("session_id", session.id).order("at"),
-        context.supabase.from("proctoring_snapshots").select("id, kind, captured_at, storage_path").eq("session_id", session.id).order("captured_at", { ascending: false }).limit(60),
+        context.supabase
+          .from("interview_turns")
+          .select("id, speaker, text, started_at")
+          .eq("session_id", session.id)
+          .order("started_at"),
+        context.supabase
+          .from("interview_events")
+          .select("type, at, payload")
+          .eq("session_id", session.id)
+          .order("at"),
+        context.supabase
+          .from("proctoring_snapshots")
+          .select("id, kind, captured_at, storage_path")
+          .eq("session_id", session.id)
+          .order("captured_at", { ascending: false })
+          .limit(60),
       ]);
-      turns = ((tRes.data ?? []) as never);
-      events = ((eRes.data ?? []) as never);
+      turns = (tRes.data ?? []) as never;
+      events = (eRes.data ?? []) as never;
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const snapRows = (sRes.data ?? []) as Array<{ id: string; kind: string; captured_at: string; storage_path: string }>;
-      snapshots = await Promise.all(snapRows.map(async (s) => {
-        const { data: signed } = await supabaseAdmin.storage.from("snapshots").createSignedUrl(s.storage_path, 3600);
-        return { id: s.id, kind: s.kind, capturedAt: s.captured_at, url: signed?.signedUrl ?? null };
-      }));
+      const snapRows = (sRes.data ?? []) as Array<{
+        id: string;
+        kind: string;
+        captured_at: string;
+        storage_path: string;
+      }>;
+      snapshots = await Promise.all(
+        snapRows.map(async (s) => {
+          const { data: signed } = await supabaseAdmin.storage
+            .from("snapshots")
+            .createSignedUrl(s.storage_path, 3600);
+          return {
+            id: s.id,
+            kind: s.kind,
+            capturedAt: s.captured_at,
+            url: signed?.signedUrl ?? null,
+          };
+        }),
+      );
     }
 
     return {

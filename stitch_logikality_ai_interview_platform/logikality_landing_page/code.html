@@ -1,293 +1,440 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Logikality AI INTERVIEW - Adaptive Intelligence Platform</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "on-secondary-fixed-variant": "#004e5c",
-                        "on-error-container": "#93000a",
-                        "background": "#f8f9ff",
-                        "surface-container-low": "#eff4ff",
-                        "surface-container": "#e5eeff",
-                        "surface-tint": "#4d44e3",
-                        "tertiary-fixed-dim": "#ffb695",
-                        "inverse-primary": "#c3c0ff",
-                        "surface-container-lowest": "#ffffff",
-                        "secondary-fixed": "#acedff",
-                        "on-background": "#0b1c30",
-                        "outline": "#777587",
-                        "primary": "#3525cd",
-                        "on-surface-variant": "#464555",
-                        "on-tertiary-fixed-variant": "#7b2f00",
-                        "surface-dim": "#cbdbf5",
-                        "tertiary-fixed": "#ffdbcc",
-                        "secondary-fixed-dim": "#4cd7f6",
-                        "error-container": "#ffdad6",
-                        "inverse-on-surface": "#eaf1ff",
-                        "surface-bright": "#f8f9ff",
-                        "on-primary-fixed-variant": "#3323cc",
-                        "on-secondary-fixed": "#001f26",
-                        "secondary": "#00687a",
-                        "on-tertiary-container": "#ffd2be",
-                        "surface-container-highest": "#d3e4fe",
-                        "primary-container": "#4f46e5",
-                        "on-primary": "#ffffff",
-                        "tertiary-container": "#a44100",
-                        "primary-fixed": "#e2dfff",
-                        "surface": "#f8f9ff",
-                        "on-primary-fixed": "#0f0069",
-                        "on-secondary-container": "#006172",
-                        "surface-container-high": "#dce9ff",
-                        "on-error": "#ffffff",
-                        "on-primary-container": "#dad7ff",
-                        "on-tertiary-fixed": "#351000",
-                        "on-surface": "#0b1c30",
-                        "on-tertiary": "#ffffff",
-                        "on-secondary": "#ffffff",
-                        "inverse-surface": "#213145",
-                        "outline-variant": "#c7c4d8",
-                        "primary-fixed-dim": "#c3c0ff",
-                        "tertiary": "#7e3000",
-                        "error": "#ba1a1a",
-                        "surface-variant": "#d3e4fe",
-                        "secondary-container": "#57dffe"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                    "spacing": {
-                        "lg": "24px",
-                        "sm": "8px",
-                        "md": "16px",
-                        "container-max": "1440px",
-                        "gutter": "24px",
-                        "xl": "40px",
-                        "base": "4px",
-                        "xs": "4px"
-                    },
-                    "fontFamily": {
-                        "data-mono": ["JetBrains Mono"],
-                        "body-md": ["Inter"],
-                        "headline-md": ["Geist"],
-                        "label-caps": ["Inter"],
-                        "display-lg": ["Geist"],
-                        "headline-lg": ["Geist"],
-                        "headline-sm": ["Geist"],
-                        "body-lg": ["Inter"],
-                        "headline-lg-mobile": ["Geist"]
-                    },
-                    "fontSize": {
-                        "data-mono": ["13px", {"lineHeight": "1.4", "fontWeight": "450"}],
-                        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
-                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
-                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
-                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
-                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
-                        "headline-sm": ["18px", {"lineHeight": "1.4", "fontWeight": "600"}],
-                        "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
-                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}]
-                    }
-                }
-            }
-        }
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Logikality AI INTERVIEW - Adaptive Intelligence Platform</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-fixed-variant": "#004e5c",
+              "on-error-container": "#93000a",
+              background: "#f8f9ff",
+              "surface-container-low": "#eff4ff",
+              "surface-container": "#e5eeff",
+              "surface-tint": "#4d44e3",
+              "tertiary-fixed-dim": "#ffb695",
+              "inverse-primary": "#c3c0ff",
+              "surface-container-lowest": "#ffffff",
+              "secondary-fixed": "#acedff",
+              "on-background": "#0b1c30",
+              outline: "#777587",
+              primary: "#3525cd",
+              "on-surface-variant": "#464555",
+              "on-tertiary-fixed-variant": "#7b2f00",
+              "surface-dim": "#cbdbf5",
+              "tertiary-fixed": "#ffdbcc",
+              "secondary-fixed-dim": "#4cd7f6",
+              "error-container": "#ffdad6",
+              "inverse-on-surface": "#eaf1ff",
+              "surface-bright": "#f8f9ff",
+              "on-primary-fixed-variant": "#3323cc",
+              "on-secondary-fixed": "#001f26",
+              secondary: "#00687a",
+              "on-tertiary-container": "#ffd2be",
+              "surface-container-highest": "#d3e4fe",
+              "primary-container": "#4f46e5",
+              "on-primary": "#ffffff",
+              "tertiary-container": "#a44100",
+              "primary-fixed": "#e2dfff",
+              surface: "#f8f9ff",
+              "on-primary-fixed": "#0f0069",
+              "on-secondary-container": "#006172",
+              "surface-container-high": "#dce9ff",
+              "on-error": "#ffffff",
+              "on-primary-container": "#dad7ff",
+              "on-tertiary-fixed": "#351000",
+              "on-surface": "#0b1c30",
+              "on-tertiary": "#ffffff",
+              "on-secondary": "#ffffff",
+              "inverse-surface": "#213145",
+              "outline-variant": "#c7c4d8",
+              "primary-fixed-dim": "#c3c0ff",
+              tertiary: "#7e3000",
+              error: "#ba1a1a",
+              "surface-variant": "#d3e4fe",
+              "secondary-container": "#57dffe",
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+            spacing: {
+              lg: "24px",
+              sm: "8px",
+              md: "16px",
+              "container-max": "1440px",
+              gutter: "24px",
+              xl: "40px",
+              base: "4px",
+              xs: "4px",
+            },
+            fontFamily: {
+              "data-mono": ["JetBrains Mono"],
+              "body-md": ["Inter"],
+              "headline-md": ["Geist"],
+              "label-caps": ["Inter"],
+              "display-lg": ["Geist"],
+              "headline-lg": ["Geist"],
+              "headline-sm": ["Geist"],
+              "body-lg": ["Inter"],
+              "headline-lg-mobile": ["Geist"],
+            },
+            fontSize: {
+              "data-mono": ["13px", { lineHeight: "1.4", fontWeight: "450" }],
+              "body-md": ["14px", { lineHeight: "1.5", fontWeight: "400" }],
+              "headline-md": ["24px", { lineHeight: "1.3", fontWeight: "600" }],
+              "label-caps": [
+                "12px",
+                { lineHeight: "1", letterSpacing: "0.05em", fontWeight: "600" },
+              ],
+              "display-lg": [
+                "48px",
+                { lineHeight: "1.1", letterSpacing: "-0.04em", fontWeight: "700" },
+              ],
+              "headline-lg": [
+                "32px",
+                { lineHeight: "1.2", letterSpacing: "-0.02em", fontWeight: "600" },
+              ],
+              "headline-sm": ["18px", { lineHeight: "1.4", fontWeight: "600" }],
+              "body-lg": ["16px", { lineHeight: "1.6", fontWeight: "400" }],
+              "headline-lg-mobile": ["24px", { lineHeight: "1.2", fontWeight: "600" }],
+            },
+          },
+        },
+      };
     </script>
-<style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        .material-symbols-outlined.fill {
-            font-variation-settings: 'FILL' 1;
-        }
-        
-        .shadow-soft {
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
-        }
-        .shadow-hover {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      .material-symbols-outlined.fill {
+        font-variation-settings: "FILL" 1;
+      }
+
+      .shadow-soft {
+        box-shadow:
+          0 1px 3px 0 rgba(0, 0, 0, 0.02),
+          0 1px 2px -1px rgba(0, 0, 0, 0.03);
+      }
+      .shadow-hover {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      }
     </style>
-</head>
-<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col antialiased selection:bg-primary-container selection:text-on-primary-container">
-<!-- TopAppBar -->
-<nav class="sticky top-0 z-40 w-full bg-surface/80 backdrop-blur-md dark:bg-surface-dim/80 shadow-sm transition-all">
-<div class="flex justify-between items-center h-16 px-lg max-w-container-max mx-auto">
-<div class="flex items-center gap-md">
-<span class="font-headline-sm text-headline-sm font-black text-on-surface tracking-tight">Logikality AI</span>
-<span class="hidden md:inline-block px-2 py-1 rounded bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps border border-outline-variant/30">INTERVIEW</span>
-</div>
-<div class="hidden md:flex items-center gap-xl">
-<a class="text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md" href="#platform">Platform</a>
-<a class="text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md" href="#solutions">Solutions</a>
-<a class="text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md" href="#architecture">Architecture</a>
-</div>
-<div class="flex items-center gap-md">
-<button class="hidden md:block text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md px-4 py-2">Log in</button>
-<button class="bg-primary text-on-primary hover:brightness-110 transition-all font-body-md text-body-md px-4 py-2 rounded-lg shadow-soft flex items-center gap-2">
-                    Request Access
-                    <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-</button>
-</div>
-</div>
-</nav>
-<main class="flex-grow">
-<!-- Hero Section -->
-<section class="relative pt-32 pb-24 px-lg overflow-hidden">
-<!-- Atmospheric background element -->
-<div class="absolute top-0 inset-x-0 h-[500px] bg-gradient-to-b from-surface-container-high/50 to-transparent -z-10 pointer-events-none"></div>
-<div class="max-w-4xl mx-auto text-center relative z-10">
-<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-low border border-outline-variant/50 mb-8">
-<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-<span class="font-label-caps text-label-caps text-on-surface-variant tracking-wider">Logikality Engine v2.0 Now Live</span>
-</div>
-<h1 class="font-display-lg text-display-lg text-on-surface mb-6 tracking-tight">
-                    AI-Powered Adaptive <br class="hidden md:block"/>Interview Intelligence Platform
-                </h1>
-<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-10">
-                    Enterprise recruitment workflows powered by adaptive AI interviewing, explainable evaluations, and intelligent recruiter analytics. Achieve executive-grade precision at scale.
-                </p>
-<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-<button class="w-full sm:w-auto bg-primary text-on-primary hover:brightness-110 transition-all font-body-md text-body-md px-6 py-3 rounded-lg shadow-soft">
-                        Start Building Workflows
-                    </button>
-<button class="w-full sm:w-auto bg-surface-container-lowest text-on-surface border border-outline-variant hover:bg-surface-container-low transition-colors font-body-md text-body-md px-6 py-3 rounded-lg shadow-soft">
-                        View Technical Docs
-                    </button>
-</div>
-</div>
-<!-- Hero Abstract Visual -->
-<div class="max-w-container-max mx-auto mt-20 relative">
-<div class="aspect-[21/9] rounded-xl bg-surface-container-lowest border border-outline-variant shadow-hover overflow-hidden flex items-center justify-center relative group">
-<div class="absolute inset-0 bg-gradient-to-br from-surface-container-lowest via-surface to-surface-container-high opacity-50"></div>
-<!-- Abstract workflow representation -->
-<div class="relative z-10 flex items-center gap-8 p-12 w-full max-w-4xl opacity-90 transition-transform duration-700 group-hover:scale-[1.02]">
-<div class="flex-1 space-y-4">
-<div class="h-8 bg-surface-container-high rounded w-3/4"></div>
-<div class="h-4 bg-surface-container rounded w-full"></div>
-<div class="h-4 bg-surface-container rounded w-5/6"></div>
-</div>
-<span class="material-symbols-outlined text-primary text-[48px]">sync_alt</span>
-<div class="flex-1 bg-surface-container-lowest border-2 border-primary/20 rounded-xl p-6 shadow-soft relative overflow-hidden">
-<div class="absolute top-0 left-0 w-1 h-full bg-primary"></div>
-<div class="flex items-center gap-3 mb-4">
-<span class="material-symbols-outlined text-primary fill">psychology</span>
-<span class="font-label-caps text-label-caps text-primary">AI Evaluation Complete</span>
-</div>
-<div class="space-y-2">
-<div class="h-2 bg-surface-container rounded w-full"></div>
-<div class="h-2 bg-surface-container rounded w-4/5"></div>
-<div class="h-2 bg-surface-container rounded w-2/3"></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- Product Highlights (Bento Grid) -->
-<section class="py-24 px-lg bg-surface-container-lowest" id="platform">
-<div class="max-w-container-max mx-auto">
-<div class="mb-16 max-w-2xl">
-<h2 class="font-headline-lg text-headline-lg text-on-surface mb-4">Surgical precision across the candidate lifecycle.</h2>
-<p class="font-body-lg text-body-lg text-on-surface-variant">Modular tools designed to augment human decision-making with explainable AI insights.</p>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
-<!-- Highlight 1 -->
-<div class="md:col-span-2 bg-surface border border-outline-variant rounded-xl p-8 flex flex-col justify-between group hover:shadow-hover transition-all">
-<div class="mb-8">
-<span class="material-symbols-outlined text-primary text-[32px] mb-4">description</span>
-<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">JD Builder Engine</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Intelligently parse requirements and generate comprehensive job descriptions optimized for targeted talent acquisition.</p>
-</div>
-<div class="bg-surface-container-lowest border border-outline-variant/50 rounded-lg p-6 opacity-80 group-hover:opacity-100 transition-opacity">
-<div class="flex items-center gap-4 mb-4 pb-4 border-b border-outline-variant/30">
-<div class="w-10 h-10 rounded bg-surface-container flex items-center justify-center">
-<span class="material-symbols-outlined text-on-surface-variant">work</span>
-</div>
-<div>
-<div class="font-label-caps text-label-caps text-on-surface mb-1">Generated Output</div>
-<div class="font-data-mono text-data-mono text-on-surface-variant">Senior ML Engineer</div>
-</div>
-</div>
-<div class="space-y-2">
-<div class="h-1.5 bg-surface-container rounded w-full"></div>
-<div class="h-1.5 bg-surface-container rounded w-5/6"></div>
-<div class="h-1.5 bg-surface-container rounded w-4/6"></div>
-</div>
-</div>
-</div>
-<!-- Highlight 2 -->
-<div class="bg-surface border border-outline-variant rounded-xl p-8 flex flex-col justify-between group hover:shadow-hover transition-all">
-<div class="mb-8">
-<span class="material-symbols-outlined text-primary text-[32px] mb-4">psychology</span>
-<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">AI Personas</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Deploy dynamic conversational agents tailored to specific roles and technical domains.</p>
-</div>
-<div class="bg-surface-container-lowest border border-outline-variant/50 rounded-lg p-4 flex items-center gap-3">
-<div class="w-2 h-12 bg-primary rounded-full"></div>
-<div>
-<div class="font-label-caps text-label-caps text-on-surface">Active Persona</div>
-<div class="font-body-md text-body-md text-on-surface-variant">Technical Screener Beta-v4</div>
-</div>
-</div>
-</div>
-<!-- Highlight 3 -->
-<div class="md:col-span-3 bg-[#ECFEFF] border border-[#06B6D4]/30 rounded-xl p-8 relative overflow-hidden group">
-<div class="absolute top-0 left-0 w-1 h-full bg-[#06B6D4]"></div>
-<div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 relative z-10">
-<div class="max-w-xl">
-<div class="flex items-center gap-2 mb-4">
-<span class="material-symbols-outlined text-[#06B6D4] fill">auto_awesome</span>
-<span class="font-label-caps text-label-caps text-[#06B6D4] tracking-wider">XAI Reports</span>
-</div>
-<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">Explainable AI Insights</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Never trust a black box. Our XAI engine provides transparent reasoning for every candidate evaluation, surfacing behavioral signals and technical competency gaps with cited evidence.</p>
-</div>
-<button class="bg-surface-container-lowest text-on-surface border border-outline-variant hover:bg-surface-container-low transition-colors font-body-md text-body-md px-6 py-3 rounded-lg shadow-soft whitespace-nowrap">
-                                View Sample Report
-                            </button>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- Call to Action -->
-<section class="py-24 px-lg">
-<div class="max-w-4xl mx-auto text-center">
-<h2 class="font-headline-lg text-headline-lg text-on-surface mb-6">Ready to elevate your recruitment workflow?</h2>
-<p class="font-body-lg text-body-lg text-on-surface-variant mb-10">Join elite talent teams utilizing Logikality AI for executive-grade precision.</p>
-<button class="bg-primary text-on-primary hover:brightness-110 transition-all font-body-md text-body-md px-8 py-4 rounded-lg shadow-hover text-lg font-semibold">
-                    Request Enterprise Demo
-                </button>
-</div>
-</section>
-</main>
-<!-- Footer -->
-<footer class="w-full py-lg bg-surface-container-lowest border-t border-outline-variant">
-<div class="flex flex-col md:flex-row justify-between items-center px-lg max-w-container-max mx-auto gap-4">
-<div class="flex items-center gap-2">
-<span class="font-headline-sm text-headline-sm font-bold text-on-surface">Logikality AI</span>
-</div>
-<p class="font-body-md text-body-md text-on-surface-variant text-center md:text-left">
-                © 2024 Logikality AI. Executive-grade recruitment intelligence.
+  </head>
+  <body
+    class="bg-background text-on-background font-body-md min-h-screen flex flex-col antialiased selection:bg-primary-container selection:text-on-primary-container"
+  >
+    <!-- TopAppBar -->
+    <nav
+      class="sticky top-0 z-40 w-full bg-surface/80 backdrop-blur-md dark:bg-surface-dim/80 shadow-sm transition-all"
+    >
+      <div class="flex justify-between items-center h-16 px-lg max-w-container-max mx-auto">
+        <div class="flex items-center gap-md">
+          <span class="font-headline-sm text-headline-sm font-black text-on-surface tracking-tight"
+            >Logikality AI</span
+          >
+          <span
+            class="hidden md:inline-block px-2 py-1 rounded bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps border border-outline-variant/30"
+            >INTERVIEW</span
+          >
+        </div>
+        <div class="hidden md:flex items-center gap-xl">
+          <a
+            class="text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md"
+            href="#platform"
+            >Platform</a
+          >
+          <a
+            class="text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md"
+            href="#solutions"
+            >Solutions</a
+          >
+          <a
+            class="text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md"
+            href="#architecture"
+            >Architecture</a
+          >
+        </div>
+        <div class="flex items-center gap-md">
+          <button
+            class="hidden md:block text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md px-4 py-2"
+          >
+            Log in
+          </button>
+          <button
+            class="bg-primary text-on-primary hover:brightness-110 transition-all font-body-md text-body-md px-4 py-2 rounded-lg shadow-soft flex items-center gap-2"
+          >
+            Request Access
+            <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+    </nav>
+    <main class="flex-grow">
+      <!-- Hero Section -->
+      <section class="relative pt-32 pb-24 px-lg overflow-hidden">
+        <!-- Atmospheric background element -->
+        <div
+          class="absolute top-0 inset-x-0 h-[500px] bg-gradient-to-b from-surface-container-high/50 to-transparent -z-10 pointer-events-none"
+        ></div>
+        <div class="max-w-4xl mx-auto text-center relative z-10">
+          <div
+            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-low border border-outline-variant/50 mb-8"
+          >
+            <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+            <span class="font-label-caps text-label-caps text-on-surface-variant tracking-wider"
+              >Logikality Engine v2.0 Now Live</span
+            >
+          </div>
+          <h1 class="font-display-lg text-display-lg text-on-surface mb-6 tracking-tight">
+            AI-Powered Adaptive <br class="hidden md:block" />Interview Intelligence Platform
+          </h1>
+          <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-10">
+            Enterprise recruitment workflows powered by adaptive AI interviewing, explainable
+            evaluations, and intelligent recruiter analytics. Achieve executive-grade precision at
+            scale.
+          </p>
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button
+              class="w-full sm:w-auto bg-primary text-on-primary hover:brightness-110 transition-all font-body-md text-body-md px-6 py-3 rounded-lg shadow-soft"
+            >
+              Start Building Workflows
+            </button>
+            <button
+              class="w-full sm:w-auto bg-surface-container-lowest text-on-surface border border-outline-variant hover:bg-surface-container-low transition-colors font-body-md text-body-md px-6 py-3 rounded-lg shadow-soft"
+            >
+              View Technical Docs
+            </button>
+          </div>
+        </div>
+        <!-- Hero Abstract Visual -->
+        <div class="max-w-container-max mx-auto mt-20 relative">
+          <div
+            class="aspect-[21/9] rounded-xl bg-surface-container-lowest border border-outline-variant shadow-hover overflow-hidden flex items-center justify-center relative group"
+          >
+            <div
+              class="absolute inset-0 bg-gradient-to-br from-surface-container-lowest via-surface to-surface-container-high opacity-50"
+            ></div>
+            <!-- Abstract workflow representation -->
+            <div
+              class="relative z-10 flex items-center gap-8 p-12 w-full max-w-4xl opacity-90 transition-transform duration-700 group-hover:scale-[1.02]"
+            >
+              <div class="flex-1 space-y-4">
+                <div class="h-8 bg-surface-container-high rounded w-3/4"></div>
+                <div class="h-4 bg-surface-container rounded w-full"></div>
+                <div class="h-4 bg-surface-container rounded w-5/6"></div>
+              </div>
+              <span class="material-symbols-outlined text-primary text-[48px]">sync_alt</span>
+              <div
+                class="flex-1 bg-surface-container-lowest border-2 border-primary/20 rounded-xl p-6 shadow-soft relative overflow-hidden"
+              >
+                <div class="absolute top-0 left-0 w-1 h-full bg-primary"></div>
+                <div class="flex items-center gap-3 mb-4">
+                  <span class="material-symbols-outlined text-primary fill">psychology</span>
+                  <span class="font-label-caps text-label-caps text-primary"
+                    >AI Evaluation Complete</span
+                  >
+                </div>
+                <div class="space-y-2">
+                  <div class="h-2 bg-surface-container rounded w-full"></div>
+                  <div class="h-2 bg-surface-container rounded w-4/5"></div>
+                  <div class="h-2 bg-surface-container rounded w-2/3"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Product Highlights (Bento Grid) -->
+      <section class="py-24 px-lg bg-surface-container-lowest" id="platform">
+        <div class="max-w-container-max mx-auto">
+          <div class="mb-16 max-w-2xl">
+            <h2 class="font-headline-lg text-headline-lg text-on-surface mb-4">
+              Surgical precision across the candidate lifecycle.
+            </h2>
+            <p class="font-body-lg text-body-lg text-on-surface-variant">
+              Modular tools designed to augment human decision-making with explainable AI insights.
             </p>
-<div class="flex flex-wrap items-center justify-center gap-4">
-<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
-<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
-<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors" href="#">Security</a>
-<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors" href="#">API Documentation</a>
-</div>
-</div>
-</footer>
-</body></html>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+            <!-- Highlight 1 -->
+            <div
+              class="md:col-span-2 bg-surface border border-outline-variant rounded-xl p-8 flex flex-col justify-between group hover:shadow-hover transition-all"
+            >
+              <div class="mb-8">
+                <span class="material-symbols-outlined text-primary text-[32px] mb-4"
+                  >description</span
+                >
+                <h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">
+                  JD Builder Engine
+                </h3>
+                <p class="font-body-md text-body-md text-on-surface-variant">
+                  Intelligently parse requirements and generate comprehensive job descriptions
+                  optimized for targeted talent acquisition.
+                </p>
+              </div>
+              <div
+                class="bg-surface-container-lowest border border-outline-variant/50 rounded-lg p-6 opacity-80 group-hover:opacity-100 transition-opacity"
+              >
+                <div class="flex items-center gap-4 mb-4 pb-4 border-b border-outline-variant/30">
+                  <div
+                    class="w-10 h-10 rounded bg-surface-container flex items-center justify-center"
+                  >
+                    <span class="material-symbols-outlined text-on-surface-variant">work</span>
+                  </div>
+                  <div>
+                    <div class="font-label-caps text-label-caps text-on-surface mb-1">
+                      Generated Output
+                    </div>
+                    <div class="font-data-mono text-data-mono text-on-surface-variant">
+                      Senior ML Engineer
+                    </div>
+                  </div>
+                </div>
+                <div class="space-y-2">
+                  <div class="h-1.5 bg-surface-container rounded w-full"></div>
+                  <div class="h-1.5 bg-surface-container rounded w-5/6"></div>
+                  <div class="h-1.5 bg-surface-container rounded w-4/6"></div>
+                </div>
+              </div>
+            </div>
+            <!-- Highlight 2 -->
+            <div
+              class="bg-surface border border-outline-variant rounded-xl p-8 flex flex-col justify-between group hover:shadow-hover transition-all"
+            >
+              <div class="mb-8">
+                <span class="material-symbols-outlined text-primary text-[32px] mb-4"
+                  >psychology</span
+                >
+                <h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">AI Personas</h3>
+                <p class="font-body-md text-body-md text-on-surface-variant">
+                  Deploy dynamic conversational agents tailored to specific roles and technical
+                  domains.
+                </p>
+              </div>
+              <div
+                class="bg-surface-container-lowest border border-outline-variant/50 rounded-lg p-4 flex items-center gap-3"
+              >
+                <div class="w-2 h-12 bg-primary rounded-full"></div>
+                <div>
+                  <div class="font-label-caps text-label-caps text-on-surface">Active Persona</div>
+                  <div class="font-body-md text-body-md text-on-surface-variant">
+                    Technical Screener Beta-v4
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Highlight 3 -->
+            <div
+              class="md:col-span-3 bg-[#ECFEFF] border border-[#06B6D4]/30 rounded-xl p-8 relative overflow-hidden group"
+            >
+              <div class="absolute top-0 left-0 w-1 h-full bg-[#06B6D4]"></div>
+              <div
+                class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 relative z-10"
+              >
+                <div class="max-w-xl">
+                  <div class="flex items-center gap-2 mb-4">
+                    <span class="material-symbols-outlined text-[#06B6D4] fill">auto_awesome</span>
+                    <span class="font-label-caps text-label-caps text-[#06B6D4] tracking-wider"
+                      >XAI Reports</span
+                    >
+                  </div>
+                  <h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">
+                    Explainable AI Insights
+                  </h3>
+                  <p class="font-body-md text-body-md text-on-surface-variant">
+                    Never trust a black box. Our XAI engine provides transparent reasoning for every
+                    candidate evaluation, surfacing behavioral signals and technical competency gaps
+                    with cited evidence.
+                  </p>
+                </div>
+                <button
+                  class="bg-surface-container-lowest text-on-surface border border-outline-variant hover:bg-surface-container-low transition-colors font-body-md text-body-md px-6 py-3 rounded-lg shadow-soft whitespace-nowrap"
+                >
+                  View Sample Report
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Call to Action -->
+      <section class="py-24 px-lg">
+        <div class="max-w-4xl mx-auto text-center">
+          <h2 class="font-headline-lg text-headline-lg text-on-surface mb-6">
+            Ready to elevate your recruitment workflow?
+          </h2>
+          <p class="font-body-lg text-body-lg text-on-surface-variant mb-10">
+            Join elite talent teams utilizing Logikality AI for executive-grade precision.
+          </p>
+          <button
+            class="bg-primary text-on-primary hover:brightness-110 transition-all font-body-md text-body-md px-8 py-4 rounded-lg shadow-hover text-lg font-semibold"
+          >
+            Request Enterprise Demo
+          </button>
+        </div>
+      </section>
+    </main>
+    <!-- Footer -->
+    <footer class="w-full py-lg bg-surface-container-lowest border-t border-outline-variant">
+      <div
+        class="flex flex-col md:flex-row justify-between items-center px-lg max-w-container-max mx-auto gap-4"
+      >
+        <div class="flex items-center gap-2">
+          <span class="font-headline-sm text-headline-sm font-bold text-on-surface"
+            >Logikality AI</span
+          >
+        </div>
+        <p class="font-body-md text-body-md text-on-surface-variant text-center md:text-left">
+          © 2024 Logikality AI. Executive-grade recruitment intelligence.
+        </p>
+        <div class="flex flex-wrap items-center justify-center gap-4">
+          <a
+            class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
+            href="#"
+            >Privacy Policy</a
+          >
+          <a
+            class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
+            href="#"
+            >Terms of Service</a
+          >
+          <a
+            class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
+            href="#"
+            >Security</a
+          >
+          <a
+            class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors"
+            href="#"
+            >API Documentation</a
+          >
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

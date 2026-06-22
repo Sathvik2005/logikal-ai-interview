@@ -45,7 +45,13 @@ type Draft = {
 
 function autoMap(headers: string[]): Record<FieldKey, string | null> {
   const out: Record<FieldKey, string | null> = {
-    name: null, email: null, phone: null, role: null, experienceYears: null, skills: null, resumeUrl: null,
+    name: null,
+    email: null,
+    phone: null,
+    role: null,
+    experienceYears: null,
+    skills: null,
+    resumeUrl: null,
   };
   (Object.keys(FIELD_HINTS) as FieldKey[]).forEach((k) => {
     const match = headers.find((h) => FIELD_HINTS[k].test(h));
@@ -73,7 +79,13 @@ export function ImportCandidatesWizard({
   const [headers, setHeaders] = useState<string[]>([]);
   const [rawRows, setRawRows] = useState<Row[]>([]);
   const [mapping, setMapping] = useState<Record<FieldKey, string | null>>({
-    name: null, email: null, phone: null, role: null, experienceYears: null, skills: null, resumeUrl: null,
+    name: null,
+    email: null,
+    phone: null,
+    role: null,
+    experienceYears: null,
+    skills: null,
+    resumeUrl: null,
   });
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [filterMissing, setFilterMissing] = useState(false);
@@ -84,7 +96,10 @@ export function ImportCandidatesWizard({
   const importMut = useMutation({
     mutationFn: (rows: BulkImportRow[]) => importFn({ data: { rows, jobId: jobId ?? null } }),
     onSuccess: (res) => {
-      toast.success(`Imported ${res.imported} candidate${res.imported === 1 ? "" : "s"}` + (res.skipped ? ` (${res.skipped} duplicates skipped)` : ""));
+      toast.success(
+        `Imported ${res.imported} candidate${res.imported === 1 ? "" : "s"}` +
+          (res.skipped ? ` (${res.skipped} duplicates skipped)` : ""),
+      );
       qc.invalidateQueries({ queryKey: ["candidates"] });
       close();
     },
@@ -94,7 +109,11 @@ export function ImportCandidatesWizard({
   function close() {
     onOpenChange(false);
     setTimeout(() => {
-      setStep(0); setHeaders([]); setRawRows([]); setDrafts([]); setFilterMissing(false);
+      setStep(0);
+      setHeaders([]);
+      setRawRows([]);
+      setDrafts([]);
+      setFilterMissing(false);
     }, 200);
   }
 
@@ -132,7 +151,10 @@ export function ImportCandidatesWizard({
         phone,
         role,
         experienceYears: Math.max(0, Math.min(60, Number(expStr) || 0)),
-        skills: skillsStr.split(/[,;|]/).map((s) => s.trim()).filter(Boolean),
+        skills: skillsStr
+          .split(/[,;|]/)
+          .map((s) => s.trim())
+          .filter(Boolean),
         resumeUrl,
         errors,
       };
@@ -195,13 +217,21 @@ export function ImportCandidatesWizard({
       <DialogContent className="p-0 gap-0 bg-white border border-outline-variant shadow-2xl rounded-2xl overflow-hidden max-w-[1120px] w-[96vw] max-h-[90vh] sm:max-w-[1120px] flex flex-col [&>button]:hidden">
         <header className="px-6 py-3.5 border-b border-outline-variant flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <span className="w-9 h-9 rounded-lg bg-primary text-on-primary flex items-center justify-center"><Icon name="upload_file" /></span>
+            <span className="w-9 h-9 rounded-lg bg-primary text-on-primary flex items-center justify-center">
+              <Icon name="upload_file" />
+            </span>
             <div>
               <h2 className="text-[15px] font-semibold">Import Candidates from CSV</h2>
-              <p className="text-xs text-on-surface-variant">{jobId ? "Importing against selected JD" : "Bulk add candidates to your pipeline"}</p>
+              <p className="text-xs text-on-surface-variant">
+                {jobId ? "Importing against selected JD" : "Bulk add candidates to your pipeline"}
+              </p>
             </div>
           </div>
-          <button onClick={close} className="p-1.5 text-on-surface-variant hover:bg-surface-container rounded-md" aria-label="Close">
+          <button
+            onClick={close}
+            className="p-1.5 text-on-surface-variant hover:bg-surface-container rounded-md"
+            aria-label="Close"
+          >
             <Icon name="close" className="text-base" />
           </button>
         </header>
@@ -214,12 +244,22 @@ export function ImportCandidatesWizard({
               return (
                 <li key={s} className="flex items-center flex-1 last:flex-none min-w-0">
                   <div className={`flex items-center gap-2 min-w-0`}>
-                    <span className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-semibold border ${active ? "bg-primary border-primary text-on-primary" : done ? "bg-secondary border-secondary text-on-primary" : "bg-white border-outline-variant text-outline"}`}>
+                    <span
+                      className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-semibold border ${active ? "bg-primary border-primary text-on-primary" : done ? "bg-secondary border-secondary text-on-primary" : "bg-white border-outline-variant text-outline"}`}
+                    >
                       {done ? <Icon name="check" className="text-[15px]" /> : i + 1}
                     </span>
-                    <span className={`hidden md:inline text-xs font-medium ${active ? "text-on-surface" : "text-on-surface-variant"}`}>{s}</span>
+                    <span
+                      className={`hidden md:inline text-xs font-medium ${active ? "text-on-surface" : "text-on-surface-variant"}`}
+                    >
+                      {s}
+                    </span>
                   </div>
-                  {i < STEPS.length - 1 && <div className={`h-px flex-1 mx-2 ${i < step ? "bg-secondary" : "bg-surface-container-high"}`} />}
+                  {i < STEPS.length - 1 && (
+                    <div
+                      className={`h-px flex-1 mx-2 ${i < step ? "bg-secondary" : "bg-surface-container-high"}`}
+                    />
+                  )}
                 </li>
               );
             })}
@@ -229,19 +269,43 @@ export function ImportCandidatesWizard({
         <div className="flex-1 overflow-y-auto px-6 py-6 bg-white">
           {step === 0 && (
             <div className="max-w-2xl mx-auto text-center py-8">
-              <div className="w-16 h-16 mx-auto rounded-full bg-primary-container text-on-primary-container flex items-center justify-center mb-4"><Icon name="cloud_upload" /></div>
+              <div className="w-16 h-16 mx-auto rounded-full bg-primary-container text-on-primary-container flex items-center justify-center mb-4">
+                <Icon name="cloud_upload" />
+              </div>
               <h3 className="text-headline-sm mb-2">Upload your CSV</h3>
-              <p className="text-body-md text-on-surface-variant mb-6">We'll auto-detect columns like name, email, phone, role, experience, skills, and resume URL.</p>
-              <input ref={fileRef} type="file" accept=".csv,text/csv" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); }} />
-              <button onClick={() => fileRef.current?.click()} className="px-5 py-2.5 bg-primary text-on-primary rounded-lg font-semibold inline-flex items-center gap-2 hover:brightness-110"><Icon name="upload_file" />Choose CSV</button>
-              <p className="text-label-caps uppercase text-on-surface-variant mt-4">Up to 500 rows · UTF-8</p>
+              <p className="text-body-md text-on-surface-variant mb-6">
+                We'll auto-detect columns like name, email, phone, role, experience, skills, and
+                resume URL.
+              </p>
+              <input
+                ref={fileRef}
+                type="file"
+                accept=".csv,text/csv"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) onFile(f);
+                }}
+              />
+              <button
+                onClick={() => fileRef.current?.click()}
+                className="px-5 py-2.5 bg-primary text-on-primary rounded-lg font-semibold inline-flex items-center gap-2 hover:brightness-110"
+              >
+                <Icon name="upload_file" />
+                Choose CSV
+              </button>
+              <p className="text-label-caps uppercase text-on-surface-variant mt-4">
+                Up to 500 rows · UTF-8
+              </p>
             </div>
           )}
 
           {step === 1 && (
             <div>
               <h3 className="text-headline-sm mb-1">Map your columns</h3>
-              <p className="text-body-md text-on-surface-variant mb-4">We auto-mapped what we could. Confirm or change the mapping below.</p>
+              <p className="text-body-md text-on-surface-variant mb-4">
+                We auto-mapped what we could. Confirm or change the mapping below.
+              </p>
               <div className="grid sm:grid-cols-2 gap-4">
                 {(Object.keys(FIELD_LABELS) as FieldKey[]).map((k) => (
                   <label key={k} className="block">
@@ -252,12 +316,18 @@ export function ImportCandidatesWizard({
                       className="w-full px-3 py-2 border border-outline-variant rounded-lg text-sm bg-white"
                     >
                       <option value="">— Not mapped —</option>
-                      {headers.map((h) => <option key={h} value={h}>{h}</option>)}
+                      {headers.map((h) => (
+                        <option key={h} value={h}>
+                          {h}
+                        </option>
+                      ))}
                     </select>
                   </label>
                 ))}
               </div>
-              <p className="text-label-caps uppercase text-on-surface-variant mt-4">Parsed {rawRows.length} row{rawRows.length === 1 ? "" : "s"}</p>
+              <p className="text-label-caps uppercase text-on-surface-variant mt-4">
+                Parsed {rawRows.length} row{rawRows.length === 1 ? "" : "s"}
+              </p>
             </div>
           )}
 
@@ -266,10 +336,17 @@ export function ImportCandidatesWizard({
               <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
                 <div>
                   <h3 className="text-headline-sm">Review candidates</h3>
-                  <p className="text-body-md text-on-surface-variant">{validDrafts.length} valid · {drafts.length - validDrafts.length} with errors · {missingResume} missing resume</p>
+                  <p className="text-body-md text-on-surface-variant">
+                    {validDrafts.length} valid · {drafts.length - validDrafts.length} with errors ·{" "}
+                    {missingResume} missing resume
+                  </p>
                 </div>
                 <label className="flex items-center gap-2 text-body-md">
-                  <input type="checkbox" checked={filterMissing} onChange={(e) => setFilterMissing(e.target.checked)} />
+                  <input
+                    type="checkbox"
+                    checked={filterMissing}
+                    onChange={(e) => setFilterMissing(e.target.checked)}
+                  />
                   Show only missing resume
                 </label>
               </div>
@@ -289,27 +366,90 @@ export function ImportCandidatesWizard({
                     </thead>
                     <tbody className="divide-y divide-outline-variant">
                       {visible.map((d) => (
-                        <tr key={d.id} className={d.errors.length > 0 ? "bg-error-container/30" : ""}>
-                          <td className="p-2"><input className="w-full px-2 py-1 border border-outline-variant rounded text-sm" value={d.name} onChange={(e) => updateDraft(d.id, { name: e.target.value })} /></td>
-                          <td className="p-2"><input className="w-full px-2 py-1 border border-outline-variant rounded text-sm" value={d.email} onChange={(e) => updateDraft(d.id, { email: e.target.value })} /></td>
-                          <td className="p-2"><input className="w-full px-2 py-1 border border-outline-variant rounded text-sm" value={d.phone} onChange={(e) => updateDraft(d.id, { phone: e.target.value })} /></td>
-                          <td className="p-2"><input className="w-full px-2 py-1 border border-outline-variant rounded text-sm" value={d.role} onChange={(e) => updateDraft(d.id, { role: e.target.value })} /></td>
-                          <td className="p-2 w-16"><input type="number" min={0} max={60} className="w-full px-2 py-1 border border-outline-variant rounded text-sm" value={d.experienceYears} onChange={(e) => updateDraft(d.id, { experienceYears: Number(e.target.value) })} /></td>
+                        <tr
+                          key={d.id}
+                          className={d.errors.length > 0 ? "bg-error-container/30" : ""}
+                        >
+                          <td className="p-2">
+                            <input
+                              className="w-full px-2 py-1 border border-outline-variant rounded text-sm"
+                              value={d.name}
+                              onChange={(e) => updateDraft(d.id, { name: e.target.value })}
+                            />
+                          </td>
+                          <td className="p-2">
+                            <input
+                              className="w-full px-2 py-1 border border-outline-variant rounded text-sm"
+                              value={d.email}
+                              onChange={(e) => updateDraft(d.id, { email: e.target.value })}
+                            />
+                          </td>
+                          <td className="p-2">
+                            <input
+                              className="w-full px-2 py-1 border border-outline-variant rounded text-sm"
+                              value={d.phone}
+                              onChange={(e) => updateDraft(d.id, { phone: e.target.value })}
+                            />
+                          </td>
+                          <td className="p-2">
+                            <input
+                              className="w-full px-2 py-1 border border-outline-variant rounded text-sm"
+                              value={d.role}
+                              onChange={(e) => updateDraft(d.id, { role: e.target.value })}
+                            />
+                          </td>
+                          <td className="p-2 w-16">
+                            <input
+                              type="number"
+                              min={0}
+                              max={60}
+                              className="w-full px-2 py-1 border border-outline-variant rounded text-sm"
+                              value={d.experienceYears}
+                              onChange={(e) =>
+                                updateDraft(d.id, { experienceYears: Number(e.target.value) })
+                              }
+                            />
+                          </td>
                           <td className="p-2">
                             {d.resumeUrl ? (
-                              <a href={d.resumeUrl} target="_blank" rel="noreferrer" className="text-primary text-xs underline truncate inline-block max-w-[140px]">Link</a>
+                              <a
+                                href={d.resumeUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-primary text-xs underline truncate inline-block max-w-[140px]"
+                              >
+                                Link
+                              </a>
                             ) : (
-                              <span className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full bg-warning-container text-on-warning-container"><Icon name="warning" className="text-[12px]" />Missing</span>
+                              <span className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full bg-warning-container text-on-warning-container">
+                                <Icon name="warning" className="text-[12px]" />
+                                Missing
+                              </span>
                             )}
-                            <input className="w-full mt-1 px-2 py-1 border border-outline-variant rounded text-xs" placeholder="Paste resume URL…" value={d.resumeUrl} onChange={(e) => updateDraft(d.id, { resumeUrl: e.target.value })} />
+                            <input
+                              className="w-full mt-1 px-2 py-1 border border-outline-variant rounded text-xs"
+                              placeholder="Paste resume URL…"
+                              value={d.resumeUrl}
+                              onChange={(e) => updateDraft(d.id, { resumeUrl: e.target.value })}
+                            />
                           </td>
                           <td className="p-2 text-right">
-                            <button onClick={() => removeDraft(d.id)} className="p-1 text-on-surface-variant hover:text-error" aria-label="Delete"><Icon name="delete" /></button>
+                            <button
+                              onClick={() => removeDraft(d.id)}
+                              className="p-1 text-on-surface-variant hover:text-error"
+                              aria-label="Delete"
+                            >
+                              <Icon name="delete" />
+                            </button>
                           </td>
                         </tr>
                       ))}
                       {visible.length === 0 && (
-                        <tr><td colSpan={7} className="p-6 text-center text-on-surface-variant">No rows to show.</td></tr>
+                        <tr>
+                          <td colSpan={7} className="p-6 text-center text-on-surface-variant">
+                            No rows to show.
+                          </td>
+                        </tr>
                       )}
                     </tbody>
                   </table>
@@ -320,24 +460,51 @@ export function ImportCandidatesWizard({
 
           {step === 3 && (
             <div className="max-w-2xl mx-auto text-center py-8">
-              <div className="w-16 h-16 mx-auto rounded-full bg-primary-container text-on-primary-container flex items-center justify-center mb-4"><Icon name="task_alt" /></div>
+              <div className="w-16 h-16 mx-auto rounded-full bg-primary-container text-on-primary-container flex items-center justify-center mb-4">
+                <Icon name="task_alt" />
+              </div>
               <h3 className="text-headline-sm mb-2">Ready to import</h3>
-              <p className="text-body-md text-on-surface-variant mb-4">{validDrafts.length} candidate{validDrafts.length === 1 ? "" : "s"} will be added.{jobId ? " AI match scoring will run in the background." : ""}</p>
+              <p className="text-body-md text-on-surface-variant mb-4">
+                {validDrafts.length} candidate{validDrafts.length === 1 ? "" : "s"} will be added.
+                {jobId ? " AI match scoring will run in the background." : ""}
+              </p>
               {missingResume > 0 && (
-                <p className="text-body-md text-warning mb-4">{missingResume} candidate{missingResume === 1 ? "" : "s"} have no resume — you can add them later from their profile.</p>
+                <p className="text-body-md text-warning mb-4">
+                  {missingResume} candidate{missingResume === 1 ? "" : "s"} have no resume — you can
+                  add them later from their profile.
+                </p>
               )}
-              <button onClick={doImport} disabled={importMut.isPending || validDrafts.length === 0} className="px-5 py-2.5 bg-primary text-on-primary rounded-lg font-semibold inline-flex items-center gap-2 hover:brightness-110 disabled:opacity-60">
-                <Icon name="cloud_upload" />{importMut.isPending ? "Importing…" : `Import ${validDrafts.length} candidates`}
+              <button
+                onClick={doImport}
+                disabled={importMut.isPending || validDrafts.length === 0}
+                className="px-5 py-2.5 bg-primary text-on-primary rounded-lg font-semibold inline-flex items-center gap-2 hover:brightness-110 disabled:opacity-60"
+              >
+                <Icon name="cloud_upload" />
+                {importMut.isPending ? "Importing…" : `Import ${validDrafts.length} candidates`}
               </button>
             </div>
           )}
         </div>
 
         <footer className="px-6 py-3 border-t border-outline-variant flex items-center justify-between shrink-0">
-          <div className="text-xs text-on-surface-variant">Step {step + 1} of {STEPS.length}</div>
+          <div className="text-xs text-on-surface-variant">
+            Step {step + 1} of {STEPS.length}
+          </div>
           <div className="flex items-center gap-2">
-            <button onClick={close} className="px-3 py-1.5 text-sm font-medium text-on-surface-variant hover:bg-surface-container rounded-md">Cancel</button>
-            <button onClick={() => setStep((s) => Math.max(0, s - 1))} disabled={step === 0} className="px-3 py-1.5 text-sm font-medium border border-outline-variant rounded-md disabled:opacity-40 inline-flex items-center gap-1"><Icon name="arrow_back" className="text-base" />Back</button>
+            <button
+              onClick={close}
+              className="px-3 py-1.5 text-sm font-medium text-on-surface-variant hover:bg-surface-container rounded-md"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => setStep((s) => Math.max(0, s - 1))}
+              disabled={step === 0}
+              className="px-3 py-1.5 text-sm font-medium border border-outline-variant rounded-md disabled:opacity-40 inline-flex items-center gap-1"
+            >
+              <Icon name="arrow_back" className="text-base" />
+              Back
+            </button>
             {step < 3 && (
               <button
                 onClick={() => {

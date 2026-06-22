@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Card, Icon } from "@/components/admin/AdminShell";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { getAdminDashboard, type AdminDashboardDTO } from "@/lib/admin.functions";
 import { listAuditEvents } from "@/lib/governance.functions";
 
@@ -9,13 +10,27 @@ export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminControlCenter,
 });
 
-type AuditRow = { id: string; actor_id: string | null; entity_type: string; entity_id: string; action: string; created_at: string };
+type AuditRow = {
+  id: string;
+  actor_id: string | null;
+  entity_type: string;
+  entity_id: string;
+  action: string;
+  created_at: string;
+};
 
 function AdminControlCenter() {
   const dashFn = useServerFn(getAdminDashboard);
   const auditFn = useServerFn(listAuditEvents);
-  const dashQ = useQuery({ queryKey: ["admin", "dashboard"], queryFn: () => dashFn({}), refetchInterval: 60_000 });
-  const auditQ = useQuery({ queryKey: ["admin", "audit", "recent"], queryFn: () => auditFn({ data: { limit: 6 } }) });
+  const dashQ = useQuery({
+    queryKey: ["admin", "dashboard"],
+    queryFn: () => dashFn({}),
+    refetchInterval: 60_000,
+  });
+  const auditQ = useQuery({
+    queryKey: ["admin", "audit", "recent"],
+    queryFn: () => auditFn({ data: { limit: 6 } }),
+  });
   const d = dashQ.data as AdminDashboardDTO | undefined;
   const audit = (auditQ.data as AuditRow[] | undefined) ?? [];
   const max = Math.max(1, ...(d?.trend ?? []).map((x) => x.count));
@@ -24,10 +39,17 @@ function AdminControlCenter() {
     <div className="space-y-lg">
       <header className="flex items-end justify-between flex-wrap gap-md">
         <div>
-          <h1 className="text-headline-lg font-headline-lg text-on-surface">Admin Control Center</h1>
-          <p className="text-body-lg text-on-surface-variant">Platform-wide health, usage and admin activity.</p>
+          <h1 className="text-headline-lg font-headline-lg text-on-surface">
+            Admin Control Center
+          </h1>
+          <p className="text-body-lg text-on-surface-variant">
+            Platform-wide health, usage and admin activity.
+          </p>
         </div>
-        <Link to="/admin/organizations" className="bg-primary text-on-primary px-4 py-2.5 rounded-lg text-body-md font-semibold hover:brightness-110 transition flex items-center gap-2">
+        <Link
+          to="/admin/organizations"
+          className="bg-primary text-on-primary px-4 py-2.5 rounded-lg text-body-md font-semibold hover:brightness-110 transition flex items-center gap-2"
+        >
           <Icon name="domain" /> Manage organizations
         </Link>
       </header>
@@ -52,14 +74,23 @@ function AdminControlCenter() {
       <div className="grid lg:grid-cols-3 gap-lg">
         <Card className="lg:col-span-2 p-lg">
           <div className="flex items-center justify-between mb-md">
-            <h2 className="text-headline-sm font-headline-sm text-on-surface">Interview volume — last 7 days</h2>
-            <span className="text-body-md text-on-surface-variant">{(d?.trend ?? []).reduce((a, b) => a + b.count, 0)} total</span>
+            <h2 className="text-headline-sm font-headline-sm text-on-surface">
+              Interview volume — last 7 days
+            </h2>
+            <span className="text-body-md text-on-surface-variant">
+              {(d?.trend ?? []).reduce((a, b) => a + b.count, 0)} total
+            </span>
           </div>
           <div className="flex items-end gap-3 h-48">
             {(d?.trend ?? []).map((day) => (
               <div key={day.day} className="flex-1 flex flex-col items-center gap-2">
-                <div className="w-full bg-primary-container rounded-t-lg relative" style={{ height: `${(day.count / max) * 100}%` }}>
-                  <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-label-caps text-on-surface-variant">{day.count}</span>
+                <div
+                  className="w-full bg-primary-container rounded-t-lg relative"
+                  style={{ height: `${(day.count / max) * 100}%` }}
+                >
+                  <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-label-caps text-on-surface-variant">
+                    {day.count}
+                  </span>
                 </div>
                 <span className="text-label-caps text-on-surface-variant">{day.day}</span>
               </div>
@@ -70,7 +101,9 @@ function AdminControlCenter() {
         <Card className="p-lg">
           <div className="flex items-center justify-between mb-md">
             <h3 className="text-headline-sm font-headline-sm text-on-surface">System health</h3>
-            <Link to="/admin/security" className="text-body-md text-primary hover:underline">View security →</Link>
+            <Link to="/admin/security" className="text-body-md text-primary hover:underline">
+              View security →
+            </Link>
           </div>
           <div className="space-y-3">
             <Row label="Errors (24h)" value={d?.errorCount24h ?? "—"} />
@@ -83,11 +116,20 @@ function AdminControlCenter() {
 
       <Card className="p-lg">
         <div className="flex items-center justify-between mb-md">
-          <h3 className="text-headline-sm font-headline-sm text-on-surface">Recent admin activity</h3>
-          <Link to="/admin/security" className="text-body-md text-primary hover:underline">Full audit log →</Link>
+          <h3 className="text-headline-sm font-headline-sm text-on-surface">
+            Recent admin activity
+          </h3>
+          <Link to="/admin/security" className="text-body-md text-primary hover:underline">
+            Full audit log →
+          </Link>
         </div>
         {audit.length === 0 ? (
-          <p className="text-body-md text-on-surface-variant">No audit events yet.</p>
+          <EmptyState
+            icon="history"
+            title="No audit events yet"
+            description="System logs and administrative actions will populate here."
+            className="py-12"
+          />
         ) : (
           <ul className="space-y-3">
             {audit.map((a) => (
@@ -97,9 +139,12 @@ function AdminControlCenter() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-body-md text-on-surface truncate">
-                    <span className="font-semibold">{a.action}</span> on <span className="text-on-surface-variant">{a.entity_type}</span>
+                    <span className="font-semibold">{a.action}</span> on{" "}
+                    <span className="text-on-surface-variant">{a.entity_type}</span>
                   </p>
-                  <p className="text-label-caps text-on-surface-variant">{new Date(a.created_at).toLocaleString()}</p>
+                  <p className="text-label-caps text-on-surface-variant">
+                    {new Date(a.created_at).toLocaleString()}
+                  </p>
                 </div>
               </li>
             ))}

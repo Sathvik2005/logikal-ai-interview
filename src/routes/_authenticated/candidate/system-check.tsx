@@ -44,7 +44,9 @@ function SystemCheckPage() {
 
     // 1. Browser check
     const hasMedia = !!(navigator.mediaDevices && window.MediaRecorder);
-    const hasSpeech = !!((window as any).webkitSpeechRecognition || (window as any).SpeechRecognition);
+    const hasSpeech = !!(
+      (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition
+    );
     const browserOk = hasMedia && hasSpeech;
     setChecks((s) => ({ ...s, browser: browserOk ? "ok" : "fail" }));
     if (!browserOk) {
@@ -119,8 +121,8 @@ function SystemCheckPage() {
       <header>
         <h1 className="text-headline-lg font-headline-lg text-on-surface">System Check</h1>
         <p className="text-body-lg text-on-surface-variant mt-1">
-          We're verifying your device, browser, and connection. All checks must pass before you can enter the
-          interview room.
+          We're verifying your device, browser, and connection. All checks must pass before you can
+          enter the interview room.
         </p>
       </header>
 

@@ -105,8 +105,9 @@ function PreparePage() {
           <Icon name="warning" /> Expectations
         </h2>
         <p className="text-body-md text-on-primary-container">
-          Be honest and authentic. The AI evaluates communication, technical knowledge, and problem-solving. Any
-          attempt to circumvent the interview process may disqualify your application.
+          Be honest and authentic. The AI evaluates communication, technical knowledge, and
+          problem-solving. Any attempt to circumvent the interview process may disqualify your
+          application.
         </p>
       </Card>
 

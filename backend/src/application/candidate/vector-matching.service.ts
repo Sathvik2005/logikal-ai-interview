@@ -1,8 +1,11 @@
-import { Injectable, Inject, Logger, forwardRef } from '@nestjs/common';
-import { PrismaService } from '../../infrastructure/database/prisma.service';
-import { IAIOrchestrator, IAIOrchestratorToken } from '../common/ai/ai-orchestrator.interface';
-import { CandidateWorkflowService } from './candidate-workflow.service';
-import { ICandidateRepository, ICandidateRepositoryToken } from '../../domain/candidate/candidate.repository.interface';
+import { Injectable, Inject, Logger, forwardRef } from "@nestjs/common";
+import { PrismaService } from "../../infrastructure/database/prisma.service";
+import { IAIOrchestrator, IAIOrchestratorToken } from "../common/ai/ai-orchestrator.interface";
+import { CandidateWorkflowService } from "./candidate-workflow.service";
+import {
+  ICandidateRepository,
+  ICandidateRepositoryToken,
+} from "../../domain/candidate/candidate.repository.interface";
 
 @Injectable()
 export class VectorMatchingService {
@@ -25,7 +28,7 @@ export class VectorMatchingService {
     const jds = await this.prisma.jobDescription.findMany({
       where: {
         org_id: candidate.orgId,
-        status: 'open',
+        status: "open",
         deleted_at: null,
       },
     });
@@ -34,19 +37,19 @@ export class VectorMatchingService {
       this.logger.log(`No open job descriptions found in organization: ${candidate.orgId}`);
       await this.workflow.transition(
         candidateId,
-        'jd_matched',
-        'JD compatibility matching complete. No active roles currently published.',
-        { matchesCount: 0 }
+        "jd_matched",
+        "JD compatibility matching complete. No active roles currently published.",
+        { matchesCount: 0 },
       );
       return;
     }
 
     let highestScore = 0;
-    let bestMatchJobTitle = '';
+    let bestMatchJobTitle = "";
 
     for (const jd of jds) {
-      const jdRequirements = `${jd.title}\nRequirements: ${jd.requirements || ''}\nDescription: ${jd.description || ''}`;
-      
+      const jdRequirements = `${jd.title}\nRequirements: ${jd.requirements || ""}\nDescription: ${jd.description || ""}`;
+
       const candidateProfile = {
         name: candidate.name,
         skills: candidate.skills,
@@ -80,17 +83,17 @@ export class VectorMatchingService {
 
     await this.workflow.transition(
       candidateId,
-      'jd_matched',
+      "jd_matched",
       `Calculated match metrics. Best fit: "${bestMatchJobTitle}" (${highestScore}% match score).`,
-      { highestScore, bestMatchJobTitle }
+      { highestScore, bestMatchJobTitle },
     );
 
     // Auto-shortlist threshold
     if (highestScore >= 80) {
       await this.workflow.transition(
         candidateId,
-        'shortlisted',
-        `Auto-shortlisted candidate due to highly compatible skill vector score of ${highestScore}% for "${bestMatchJobTitle}".`
+        "shortlisted",
+        `Auto-shortlisted candidate due to highly compatible skill vector score of ${highestScore}% for "${bestMatchJobTitle}".`,
       );
     }
   }

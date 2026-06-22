@@ -11,7 +11,11 @@ export function ErrorState({
 }) {
   const router = useRouter();
   const message =
-    error instanceof Error ? error.message : typeof error === "string" ? error : "An unexpected error occurred.";
+    error instanceof Error
+      ? error.message
+      : typeof error === "string"
+        ? error
+        : "An unexpected error occurred.";
 
   const retry = () => {
     router.invalidate();
@@ -21,7 +25,9 @@ export function ErrorState({
   return (
     <div className="flex flex-col items-center text-center py-xl px-md">
       <div className="w-14 h-14 rounded-full bg-error-container text-on-error-container flex items-center justify-center mb-md">
-        <span className="material-symbols-outlined" aria-hidden>error</span>
+        <span className="material-symbols-outlined" aria-hidden>
+          error
+        </span>
       </div>
       <h3 className="text-headline-sm font-headline-sm text-on-surface">{title}</h3>
       <p className="text-body-md text-on-surface-variant mt-1 max-w-md">{message}</p>

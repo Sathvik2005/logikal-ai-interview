@@ -1,539 +1,724 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Interview Transcript Viewer</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Geist:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              "colors": {
-                      "secondary-fixed": "#acedff",
-                      "on-tertiary": "#ffffff",
-                      "on-surface-variant": "#464555",
-                      "outline-variant": "#c7c4d8",
-                      "on-surface": "#0b1c30",
-                      "on-secondary-container": "#006172",
-                      "on-primary-fixed": "#0f0069",
-                      "on-error-container": "#93000a",
-                      "on-tertiary-container": "#ffd2be",
-                      "on-primary": "#ffffff",
-                      "surface-container-highest": "#d3e4fe",
-                      "error-container": "#ffdad6",
-                      "on-tertiary-fixed-variant": "#7b2f00",
-                      "surface-variant": "#d3e4fe",
-                      "primary-container": "#4f46e5",
-                      "on-secondary-fixed-variant": "#004e5c",
-                      "surface-container-low": "#eff4ff",
-                      "inverse-primary": "#c3c0ff",
-                      "on-primary-fixed-variant": "#3323cc",
-                      "on-primary-container": "#dad7ff",
-                      "on-background": "#0b1c30",
-                      "surface-container-lowest": "#ffffff",
-                      "on-error": "#ffffff",
-                      "error": "#ba1a1a",
-                      "surface-dim": "#cbdbf5",
-                      "on-secondary-fixed": "#001f26",
-                      "outline": "#777587",
-                      "on-tertiary-fixed": "#351000",
-                      "primary-fixed-dim": "#c3c0ff",
-                      "on-secondary": "#ffffff",
-                      "tertiary": "#7e3000",
-                      "surface-tint": "#4d44e3",
-                      "surface": "#f8f9ff",
-                      "surface-container": "#e5eeff",
-                      "surface-bright": "#f8f9ff",
-                      "background": "#f8f9ff",
-                      "secondary-fixed-dim": "#4cd7f6",
-                      "primary": "#3525cd",
-                      "tertiary-fixed-dim": "#ffb695",
-                      "tertiary-container": "#a44100",
-                      "tertiary-fixed": "#ffdbcc",
-                      "secondary-container": "#57dffe",
-                      "surface-container-high": "#dce9ff",
-                      "secondary": "#00687a",
-                      "inverse-on-surface": "#eaf1ff",
-                      "primary-fixed": "#e2dfff",
-                      "inverse-surface": "#213145"
-              },
-              "borderRadius": {
-                      "DEFAULT": "0.25rem",
-                      "lg": "0.5rem",
-                      "xl": "0.75rem",
-                      "full": "9999px"
-              },
-              "spacing": {
-                      "lg": "24px",
-                      "base": "4px",
-                      "md": "16px",
-                      "xs": "4px",
-                      "gutter": "24px",
-                      "sm": "8px",
-                      "xl": "40px",
-                      "container-max": "1440px"
-              },
-              "fontFamily": {
-                      "body-md": [
-                              "Inter"
-                      ],
-                      "headline-lg": [
-                              "Geist"
-                      ],
-                      "body-lg": [
-                              "Inter"
-                      ],
-                      "headline-sm": [
-                              "Geist"
-                      ],
-                      "label-caps": [
-                              "Inter"
-                      ],
-                      "headline-md": [
-                              "Geist"
-                      ],
-                      "headline-lg-mobile": [
-                              "Geist"
-                      ],
-                      "display-lg": [
-                              "Geist"
-                      ],
-                      "data-mono": [
-                              "JetBrains Mono"
-                      ]
-              },
-              "fontSize": {
-                      "body-md": [
-                              "14px",
-                              {
-                                      "lineHeight": "1.5",
-                                      "fontWeight": "400"
-                              }
-                      ],
-                      "headline-lg": [
-                              "32px",
-                              {
-                                      "lineHeight": "1.2",
-                                      "letterSpacing": "-0.02em",
-                                      "fontWeight": "600"
-                              }
-                      ],
-                      "body-lg": [
-                              "16px",
-                              {
-                                      "lineHeight": "1.6",
-                                      "fontWeight": "400"
-                              }
-                      ],
-                      "headline-sm": [
-                              "18px",
-                              {
-                                      "lineHeight": "1.4",
-                                      "fontWeight": "600"
-                              }
-                      ],
-                      "label-caps": [
-                              "12px",
-                              {
-                                      "lineHeight": "1",
-                                      "letterSpacing": "0.05em",
-                                      "fontWeight": "600"
-                              }
-                      ],
-                      "headline-md": [
-                              "24px",
-                              {
-                                      "lineHeight": "1.3",
-                                      "fontWeight": "600"
-                              }
-                      ],
-                      "headline-lg-mobile": [
-                              "24px",
-                              {
-                                      "lineHeight": "1.2",
-                                      "fontWeight": "600"
-                              }
-                      ],
-                      "display-lg": [
-                              "48px",
-                              {
-                                      "lineHeight": "1.1",
-                                      "letterSpacing": "-0.04em",
-                                      "fontWeight": "700"
-                              }
-                      ],
-                      "data-mono": [
-                              "13px",
-                              {
-                                      "lineHeight": "1.4",
-                                      "fontWeight": "450"
-                              }
-                      ]
-              }
-      },
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Interview Transcript Viewer</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Geist:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-fixed": "#acedff",
+              "on-tertiary": "#ffffff",
+              "on-surface-variant": "#464555",
+              "outline-variant": "#c7c4d8",
+              "on-surface": "#0b1c30",
+              "on-secondary-container": "#006172",
+              "on-primary-fixed": "#0f0069",
+              "on-error-container": "#93000a",
+              "on-tertiary-container": "#ffd2be",
+              "on-primary": "#ffffff",
+              "surface-container-highest": "#d3e4fe",
+              "error-container": "#ffdad6",
+              "on-tertiary-fixed-variant": "#7b2f00",
+              "surface-variant": "#d3e4fe",
+              "primary-container": "#4f46e5",
+              "on-secondary-fixed-variant": "#004e5c",
+              "surface-container-low": "#eff4ff",
+              "inverse-primary": "#c3c0ff",
+              "on-primary-fixed-variant": "#3323cc",
+              "on-primary-container": "#dad7ff",
+              "on-background": "#0b1c30",
+              "surface-container-lowest": "#ffffff",
+              "on-error": "#ffffff",
+              error: "#ba1a1a",
+              "surface-dim": "#cbdbf5",
+              "on-secondary-fixed": "#001f26",
+              outline: "#777587",
+              "on-tertiary-fixed": "#351000",
+              "primary-fixed-dim": "#c3c0ff",
+              "on-secondary": "#ffffff",
+              tertiary: "#7e3000",
+              "surface-tint": "#4d44e3",
+              surface: "#f8f9ff",
+              "surface-container": "#e5eeff",
+              "surface-bright": "#f8f9ff",
+              background: "#f8f9ff",
+              "secondary-fixed-dim": "#4cd7f6",
+              primary: "#3525cd",
+              "tertiary-fixed-dim": "#ffb695",
+              "tertiary-container": "#a44100",
+              "tertiary-fixed": "#ffdbcc",
+              "secondary-container": "#57dffe",
+              "surface-container-high": "#dce9ff",
+              secondary: "#00687a",
+              "inverse-on-surface": "#eaf1ff",
+              "primary-fixed": "#e2dfff",
+              "inverse-surface": "#213145",
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+            spacing: {
+              lg: "24px",
+              base: "4px",
+              md: "16px",
+              xs: "4px",
+              gutter: "24px",
+              sm: "8px",
+              xl: "40px",
+              "container-max": "1440px",
+            },
+            fontFamily: {
+              "body-md": ["Inter"],
+              "headline-lg": ["Geist"],
+              "body-lg": ["Inter"],
+              "headline-sm": ["Geist"],
+              "label-caps": ["Inter"],
+              "headline-md": ["Geist"],
+              "headline-lg-mobile": ["Geist"],
+              "display-lg": ["Geist"],
+              "data-mono": ["JetBrains Mono"],
+            },
+            fontSize: {
+              "body-md": [
+                "14px",
+                {
+                  lineHeight: "1.5",
+                  fontWeight: "400",
+                },
+              ],
+              "headline-lg": [
+                "32px",
+                {
+                  lineHeight: "1.2",
+                  letterSpacing: "-0.02em",
+                  fontWeight: "600",
+                },
+              ],
+              "body-lg": [
+                "16px",
+                {
+                  lineHeight: "1.6",
+                  fontWeight: "400",
+                },
+              ],
+              "headline-sm": [
+                "18px",
+                {
+                  lineHeight: "1.4",
+                  fontWeight: "600",
+                },
+              ],
+              "label-caps": [
+                "12px",
+                {
+                  lineHeight: "1",
+                  letterSpacing: "0.05em",
+                  fontWeight: "600",
+                },
+              ],
+              "headline-md": [
+                "24px",
+                {
+                  lineHeight: "1.3",
+                  fontWeight: "600",
+                },
+              ],
+              "headline-lg-mobile": [
+                "24px",
+                {
+                  lineHeight: "1.2",
+                  fontWeight: "600",
+                },
+              ],
+              "display-lg": [
+                "48px",
+                {
+                  lineHeight: "1.1",
+                  letterSpacing: "-0.04em",
+                  fontWeight: "700",
+                },
+              ],
+              "data-mono": [
+                "13px",
+                {
+                  lineHeight: "1.4",
+                  fontWeight: "450",
+                },
+              ],
+            },
           },
-        }
-      </script>
-<style>
-        .material-symbols-outlined {
-          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        .icon-filled {
-            font-variation-settings: 'FILL' 1;
-        }
-        
-        /* Custom Scrollbar for Transcript */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background-color: #c7c4d8;
-            border-radius: 10px;
-        }
-      </style>
-</head>
-<body class="bg-background text-on-surface font-body-md h-screen overflow-hidden flex">
-<!-- SideNavBar (Shared Component) -->
-<nav class="bg-surface h-screen w-64 fixed left-0 top-0 border-r border-outline-variant shadow-sm flex flex-col py-md px-md z-50">
-<!-- Brand Header -->
-<div class="flex items-center gap-sm mb-lg px-sm">
-<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold overflow-hidden shrink-0">
-<img class="w-full h-full object-cover" data-alt="A clean, minimalist 3D geometric rendering of a cube in pristine white and indigo, representing artificial intelligence precision. Set against a soft studio lighting backdrop. Modern corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMKl_Z-9fLKPB3-VXoYnPu3aH_LaubCaltqqBvfjE8i6MpfFgLZ1xJ1W0Tu3fxjuIx9R5xU657KR7qCAQIzNmhUY5tAvoQcglmEAvTItV_sXSYS67nCjLOrKLtP1Ky6ORmaAEE8gW7KtpcHGNcCMCCaz4f-lX_P4R1OWc9pJLA0CaI_OyEVmQr1ScT2mvAjukcBVajmoj39QEocLuInffzXwXZKXDW4wutEwvfdUN2RaBsSK2USI8VPJqHGp0b_wDNiaOKKJuvGLGD"/>
-</div>
-<div>
-<h1 class="font-headline-md text-headline-md font-bold text-on-surface">Logikality AI</h1>
-<p class="font-label-caps text-label-caps text-on-surface-variant mt-xs">Enterprise Recruitment</p>
-</div>
-</div>
-<!-- CTA Button -->
-<button class="w-full bg-primary text-on-primary hover:brightness-110 transition-all duration-200 py-2 rounded-lg font-body-md font-semibold mb-lg flex items-center justify-center gap-sm shadow-sm">
-<span class="material-symbols-outlined text-[18px]">add</span>
-            New Requisition
+        },
+      };
+    </script>
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      .icon-filled {
+        font-variation-settings: "FILL" 1;
+      }
+
+      /* Custom Scrollbar for Transcript */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: #c7c4d8;
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+  <body class="bg-background text-on-surface font-body-md h-screen overflow-hidden flex">
+    <!-- SideNavBar (Shared Component) -->
+    <nav
+      class="bg-surface h-screen w-64 fixed left-0 top-0 border-r border-outline-variant shadow-sm flex flex-col py-md px-md z-50"
+    >
+      <!-- Brand Header -->
+      <div class="flex items-center gap-sm mb-lg px-sm">
+        <div
+          class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold overflow-hidden shrink-0"
+        >
+          <img
+            class="w-full h-full object-cover"
+            data-alt="A clean, minimalist 3D geometric rendering of a cube in pristine white and indigo, representing artificial intelligence precision. Set against a soft studio lighting backdrop. Modern corporate aesthetic."
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMKl_Z-9fLKPB3-VXoYnPu3aH_LaubCaltqqBvfjE8i6MpfFgLZ1xJ1W0Tu3fxjuIx9R5xU657KR7qCAQIzNmhUY5tAvoQcglmEAvTItV_sXSYS67nCjLOrKLtP1Ky6ORmaAEE8gW7KtpcHGNcCMCCaz4f-lX_P4R1OWc9pJLA0CaI_OyEVmQr1ScT2mvAjukcBVajmoj39QEocLuInffzXwXZKXDW4wutEwvfdUN2RaBsSK2USI8VPJqHGp0b_wDNiaOKKJuvGLGD"
+          />
+        </div>
+        <div>
+          <h1 class="font-headline-md text-headline-md font-bold text-on-surface">Logikality AI</h1>
+          <p class="font-label-caps text-label-caps text-on-surface-variant mt-xs">
+            Enterprise Recruitment
+          </p>
+        </div>
+      </div>
+      <!-- CTA Button -->
+      <button
+        class="w-full bg-primary text-on-primary hover:brightness-110 transition-all duration-200 py-2 rounded-lg font-body-md font-semibold mb-lg flex items-center justify-center gap-sm shadow-sm"
+      >
+        <span class="material-symbols-outlined text-[18px]">add</span>
+        New Requisition
+      </button>
+      <!-- Navigation Links -->
+      <div class="flex-1 flex flex-col gap-xs">
+        <a
+          class="flex items-center gap-md px-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-200"
+          href="#"
+        >
+          <span class="material-symbols-outlined">dashboard</span>
+          <span>Dashboard</span>
+        </a>
+        <!-- Active State: Candidates -->
+        <a
+          class="flex items-center gap-md px-sm py-2 rounded-lg text-primary font-bold bg-surface-container-low transition-transform hover:scale-[0.98]"
+          href="#"
+        >
+          <span class="material-symbols-outlined icon-filled">group</span>
+          <span>Candidates</span>
+        </a>
+        <a
+          class="flex items-center gap-md px-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-200"
+          href="#"
+        >
+          <span class="material-symbols-outlined">work</span>
+          <span>Jobs</span>
+        </a>
+        <a
+          class="flex items-center gap-md px-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-200"
+          href="#"
+        >
+          <span class="material-symbols-outlined">account_tree</span>
+          <span>Pipelines</span>
+        </a>
+        <a
+          class="flex items-center gap-md px-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-200"
+          href="#"
+        >
+          <span class="material-symbols-outlined">analytics</span>
+          <span>Analytics</span>
+        </a>
+        <a
+          class="flex items-center gap-md px-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-200"
+          href="#"
+        >
+          <span class="material-symbols-outlined">settings</span>
+          <span>Settings</span>
+        </a>
+      </div>
+      <!-- Footer Links -->
+      <div class="mt-auto flex flex-col gap-xs pt-md border-t border-outline-variant">
+        <a
+          class="flex items-center gap-md px-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-200"
+          href="#"
+        >
+          <span class="material-symbols-outlined">help</span>
+          <span>Help Center</span>
+        </a>
+        <a
+          class="flex items-center gap-md px-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-200"
+          href="#"
+        >
+          <span class="material-symbols-outlined">logout</span>
+          <span>Log Out</span>
+        </a>
+      </div>
+    </nav>
+    <!-- TopAppBar (Shared Component) -->
+    <header
+      class="fixed top-0 right-0 w-[calc(100%-16rem)] h-16 bg-surface/80 backdrop-blur-md border-b border-outline-variant flex items-center justify-between px-lg z-40"
+    >
+      <!-- Navigation Links (Leftish) -->
+      <div class="flex items-center gap-md">
+        <a
+          class="text-primary border-b-2 border-primary pb-1 font-body-md font-semibold focus-within:ring-2 focus-within:ring-primary/20"
+          href="#"
+          >Direct Hire</a
+        >
+        <a
+          class="text-on-surface-variant hover:text-primary transition-colors font-body-md pb-1 focus-within:ring-2 focus-within:ring-primary/20"
+          href="#"
+          >Contracting</a
+        >
+        <a
+          class="text-on-surface-variant hover:text-primary transition-colors font-body-md pb-1 focus-within:ring-2 focus-within:ring-primary/20"
+          href="#"
+          >Internal</a
+        >
+      </div>
+      <!-- Trailing Actions -->
+      <div class="flex items-center gap-sm text-on-surface-variant">
+        <button
+          class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container-low transition-colors"
+        >
+          <span class="material-symbols-outlined">notifications</span>
         </button>
-<!-- Navigation Links -->
-<div class="flex-1 flex flex-col gap-xs">
-<a class="flex items-center gap-md px-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-200" href="#">
-<span class="material-symbols-outlined">dashboard</span>
-<span>Dashboard</span>
-</a>
-<!-- Active State: Candidates -->
-<a class="flex items-center gap-md px-sm py-2 rounded-lg text-primary font-bold bg-surface-container-low transition-transform hover:scale-[0.98]" href="#">
-<span class="material-symbols-outlined icon-filled">group</span>
-<span>Candidates</span>
-</a>
-<a class="flex items-center gap-md px-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-200" href="#">
-<span class="material-symbols-outlined">work</span>
-<span>Jobs</span>
-</a>
-<a class="flex items-center gap-md px-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-200" href="#">
-<span class="material-symbols-outlined">account_tree</span>
-<span>Pipelines</span>
-</a>
-<a class="flex items-center gap-md px-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-200" href="#">
-<span class="material-symbols-outlined">analytics</span>
-<span>Analytics</span>
-</a>
-<a class="flex items-center gap-md px-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-200" href="#">
-<span class="material-symbols-outlined">settings</span>
-<span>Settings</span>
-</a>
-</div>
-<!-- Footer Links -->
-<div class="mt-auto flex flex-col gap-xs pt-md border-t border-outline-variant">
-<a class="flex items-center gap-md px-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-200" href="#">
-<span class="material-symbols-outlined">help</span>
-<span>Help Center</span>
-</a>
-<a class="flex items-center gap-md px-sm py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors duration-200" href="#">
-<span class="material-symbols-outlined">logout</span>
-<span>Log Out</span>
-</a>
-</div>
-</nav>
-<!-- TopAppBar (Shared Component) -->
-<header class="fixed top-0 right-0 w-[calc(100%-16rem)] h-16 bg-surface/80 backdrop-blur-md border-b border-outline-variant flex items-center justify-between px-lg z-40">
-<!-- Navigation Links (Leftish) -->
-<div class="flex items-center gap-md">
-<a class="text-primary border-b-2 border-primary pb-1 font-body-md font-semibold focus-within:ring-2 focus-within:ring-primary/20" href="#">Direct Hire</a>
-<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md pb-1 focus-within:ring-2 focus-within:ring-primary/20" href="#">Contracting</a>
-<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md pb-1 focus-within:ring-2 focus-within:ring-primary/20" href="#">Internal</a>
-</div>
-<!-- Trailing Actions -->
-<div class="flex items-center gap-sm text-on-surface-variant">
-<button class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container-low transition-colors">
-<span class="material-symbols-outlined">notifications</span>
-</button>
-<button class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container-low transition-colors text-primary">
-<span class="material-symbols-outlined">colors_spark</span>
-</button>
-<button class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container-low transition-colors ml-sm">
-<img class="w-8 h-8 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of an executive recruiter, slightly smiling, set against a bright, out-of-focus modern office background. Lighting is soft and flattering, emphasizing a trustworthy and capable persona." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjBUvH1n5KDVbhsHxy9ZaTS6dhpDwImFBvyaqg0JCNd375CLP3Mkaad91dmOTOQsJH7wDMq7YIV23cqijIWtNGliDP8BObuviC4Q4_MuEWH0GxzOgo4qv8rb_5X8rG6dCsKJQgl-w50B3Lcb8cAkI7JIeOE1rSxchimHUatrX1gJjOrU60RmCkoi2-ds-E1QOn8xeC1gUVBrsggkX4KGGmbag_cr9L6YJhGL_tmNGG5Zan_MozWfYlz45jxwQ9F-JOLnMNegyiasgv"/>
-</button>
-</div>
-</header>
-<!-- Main Workspace (The Canvas) -->
-<main class="ml-64 mt-16 p-lg flex-1 h-[calc(100vh-4rem)] overflow-hidden flex flex-col bg-background">
-<!-- Workspace Header -->
-<div class="flex items-end justify-between mb-md shrink-0">
-<div>
-<div class="flex items-center gap-sm mb-xs">
-<a class="text-on-surface-variant hover:text-primary font-body-md flex items-center gap-xs text-sm" href="#">
-<span class="material-symbols-outlined text-[16px]">arrow_back</span>
-                        Back to Pipeline
-                    </a>
-<span class="text-outline-variant">/</span>
-<span class="font-label-caps text-label-caps text-outline">Interview Review</span>
-</div>
-<h2 class="font-headline-lg text-headline-lg text-on-surface flex items-center gap-sm">
-                    Elena Rodriguez
-                    <span class="px-2 py-1 bg-surface-container text-on-surface rounded text-sm font-body-md border border-outline-variant ml-sm flex items-center gap-xs">
-<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        Strong Fit
-                    </span>
-</h2>
-<p class="font-body-md text-on-surface-variant mt-xs">Senior Machine Learning Engineer • Technical Screen • Oct 24, 2024</p>
-</div>
-<div class="flex gap-sm">
-<button class="px-4 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-on-surface font-body-md font-semibold hover:bg-surface-container-low transition-colors shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
-                    Share Insight
-                </button>
-<button class="px-4 py-2 bg-primary text-on-primary rounded-lg font-body-md font-semibold hover:brightness-110 transition-colors shadow-sm">
-                    Advance Candidate
-                </button>
-</div>
-</div>
-<!-- Split View Layout -->
-<div class="flex gap-md h-full overflow-hidden pb-lg">
-<!-- Left Column: Video & AI Assessment (Flex 3) -->
-<div class="w-[65%] flex flex-col gap-md h-full overflow-y-auto custom-scrollbar pr-xs">
-<!-- Video Player Card -->
-<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-sm shadow-[0_1px_3px_0_rgba(0,0,0,0.02),_0_1px_2px_-1px_rgba(0,0,0,0.03)] flex flex-col shrink-0">
-<!-- Video Area (Simulated) -->
-<div class="relative w-full aspect-video bg-inverse-surface rounded-lg overflow-hidden group">
-<img class="w-full h-full object-cover opacity-90" data-alt="A medium shot from a webcam perspective of a professional woman presenting in a well-lit home office. The environment is minimalist with a blurred background showing a bookshelf. Lighting highlights her face, conveying focus and articulation during a remote interview." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3Ek_tsn_MWKdNNQ1ogNiS2qzMxdShm70pCejK6GKZROZ-47Gbnns0rBSOAmHNHJ1GZTKEfvhtB2vANPYpV5gHZCyA8WgXfAB6iZaXWbUZXEr5JHAv9ZhZoJ1bI8-9ZAYh2427PNYcC0tDS_qLn-LClT4EApixBnIMsxyXSKgn5r3ijuduxkPM5HoqobbuXA_TlxJmZb0S5Coamv-cSJPndlblau93Q_3LuoJQhGOPxy1VlfLAlCCssUS-5dsPi5Xxn2NTCwA1cU5E"/>
-<!-- Overlay Controls -->
-<div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-md">
-<div class="flex items-center justify-between text-white">
-<div class="flex items-center gap-md">
-<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors">
-<span class="material-symbols-outlined icon-filled text-[28px]">pause</span>
-</button>
-<div class="font-data-mono text-sm">14:23 / 45:00</div>
-</div>
-<div class="flex items-center gap-sm">
-<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors">
-<span class="material-symbols-outlined text-[20px]">volume_up</span>
-</button>
-<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors">
-<span class="material-symbols-outlined text-[20px]">closed_caption</span>
-</button>
-<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors">
-<span class="material-symbols-outlined text-[20px]">fullscreen</span>
-</button>
-</div>
-</div>
-</div>
-</div>
-<!-- Advanced Timeline Scrub Bar -->
-<div class="mt-md px-sm pb-sm">
-<div class="flex justify-between items-center mb-xs">
-<span class="font-label-caps text-label-caps text-on-surface-variant flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]">timeline</span> Sentiment &amp; Events
-                            </span>
-<span class="font-data-mono text-[11px] text-outline">Auto-scrolling</span>
-</div>
-<!-- The Bar -->
-<div class="relative w-full h-2 bg-surface-container-high rounded-full cursor-pointer group">
-<!-- Progress fill -->
-<div class="absolute left-0 top-0 h-full bg-outline w-[32%] rounded-l-full"></div>
-<!-- Sentiment Segments (Simulated) -->
-<div class="absolute left-[10%] top-0 h-full w-[15%] bg-primary-container opacity-40"></div>
-<div class="absolute left-[35%] top-0 h-full w-[8%] bg-error-container opacity-60"></div>
-<div class="absolute left-[50%] top-0 h-full w-[25%] bg-primary-container opacity-40"></div>
-<!-- Playhead -->
-<div class="absolute top-1/2 -translate-y-1/2 left-[32%] w-3 h-3 bg-primary rounded-full shadow-md scale-0 group-hover:scale-100 transition-transform"></div>
-<!-- Insight Markers (Dots) -->
-<div class="absolute top-1/2 -translate-y-1/2 left-[12%] w-2.5 h-2.5 bg-primary border border-white rounded-full z-10 hover:scale-150 transition-transform" title="Strong Technical Detail"></div>
-<div class="absolute top-1/2 -translate-y-1/2 left-[38%] w-2.5 h-2.5 bg-error border border-white rounded-full z-10 hover:scale-150 transition-transform" title="Hesitation on Architecture"></div>
-<div class="absolute top-1/2 -translate-y-1/2 left-[65%] w-2.5 h-2.5 bg-primary border border-white rounded-full z-10 hover:scale-150 transition-transform" title="Excellent Leadership Example"></div>
-</div>
-</div>
-</div>
-<!-- AI Assessment Bento Grid -->
-<div class="grid grid-cols-2 gap-md shrink-0">
-<!-- Tech Assessment -->
-<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-md shadow-[0_1px_3px_0_rgba(0,0,0,0.02),_0_1px_2px_-1px_rgba(0,0,0,0.03)]">
-<div class="flex items-center justify-between mb-sm border-b border-outline-variant pb-2">
-<h3 class="font-headline-sm text-headline-sm text-on-surface">Technical Breadth</h3>
-<span class="font-data-mono text-primary font-bold">92/100</span>
-</div>
-<div class="space-y-3 mt-sm">
-<div>
-<div class="flex justify-between font-label-caps text-label-caps text-on-surface-variant mb-1">
-<span>Python / PyTorch</span>
-<span>Expert</span>
-</div>
-<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
-<div class="w-[95%] h-full bg-primary rounded-full"></div>
-</div>
-</div>
-<div>
-<div class="flex justify-between font-label-caps text-label-caps text-on-surface-variant mb-1">
-<span>System Design</span>
-<span>Advanced</span>
-</div>
-<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
-<div class="w-[85%] h-full bg-primary rounded-full"></div>
-</div>
-</div>
-</div>
-</div>
-<!-- Culture / Soft Skills (AI Highlight styled) -->
-<div class="bg-surface-container border-l-4 border-secondary rounded-xl p-md shadow-[0_1px_3px_0_rgba(0,0,0,0.02)] relative overflow-hidden">
-<!-- AI Background spark effect -->
-<div class="absolute -right-4 -top-4 text-secondary/10 pointer-events-none">
-<span class="material-symbols-outlined icon-filled text-[120px]">colors_spark</span>
-</div>
-<div class="flex items-center gap-xs mb-sm relative z-10">
-<span class="material-symbols-outlined text-secondary text-[18px]">psychology</span>
-<h3 class="font-headline-sm text-headline-sm text-on-secondary-container">Behavioral Synthesis</h3>
-</div>
-<p class="font-body-md text-sm text-on-secondary-fixed-variant leading-relaxed relative z-10">
-                            Demonstrates highly structured problem solving. Exhibits proactive communication during ambiguous requirements. Shows strong alignment with core value "Ownership".
-                        </p>
-<div class="flex flex-wrap gap-2 mt-sm relative z-10">
-<span class="px-2 py-1 bg-white/50 rounded text-xs font-label-caps text-on-secondary-fixed-variant border border-secondary/20">Analytical</span>
-<span class="px-2 py-1 bg-white/50 rounded text-xs font-label-caps text-on-secondary-fixed-variant border border-secondary/20">Mentorship</span>
-</div>
-</div>
-</div>
-</div>
-<!-- Right Column: Synchronized Transcript (Flex 1.5) -->
-<div class="w-[35%] h-full bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0_1px_3px_0_rgba(0,0,0,0.02)] flex flex-col overflow-hidden">
-<!-- Transcript Header -->
-<div class="p-md border-b border-outline-variant bg-surface/50 shrink-0 flex items-center justify-between">
-<h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-sm">
-<span class="material-symbols-outlined text-[20px] text-outline">subtitles</span>
-                        Transcript
-                    </h3>
-<div class="flex gap-sm">
-<button class="w-8 h-8 flex items-center justify-center text-outline hover:text-on-surface hover:bg-surface-container-low rounded-md transition-colors">
-<span class="material-symbols-outlined text-[18px]">search</span>
-</button>
-<button class="w-8 h-8 flex items-center justify-center text-outline hover:text-on-surface hover:bg-surface-container-low rounded-md transition-colors">
-<span class="material-symbols-outlined text-[18px]">filter_list</span>
-</button>
-</div>
-</div>
-<!-- Transcript Scroll Area -->
-<div class="flex-1 overflow-y-auto custom-scrollbar p-md flex flex-col gap-lg">
-<!-- Segment 1 (Interviewer) -->
-<div class="flex gap-md group">
-<div class="shrink-0 flex flex-col items-center gap-1">
-<div class="w-8 h-8 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-label-caps text-xs">IR</div>
-<span class="font-data-mono text-[10px] text-outline">12:05</span>
-</div>
-<div class="flex-1 pt-1">
-<p class="font-label-caps text-[10px] text-outline-variant mb-1">Interviewer</p>
-<p class="font-body-md text-on-surface-variant text-sm">
-                                That makes sense. So following up on the data pipeline restructuring, can you walk me through how you handled the latency issues you mentioned earlier during peak loads?
-                            </p>
-</div>
-</div>
-<!-- Segment 2 (Candidate - Active/Highlighted by AI) -->
-<div class="flex gap-md bg-surface-container-low -mx-md px-md py-sm border-l-2 border-primary relative group cursor-pointer transition-colors hover:bg-surface-container">
-<!-- AI Insight Badge overlapping -->
-<div class="absolute -left-[1px] top-4 -translate-x-full pr-2 opacity-0 group-hover:opacity-100 transition-opacity">
-<div class="bg-primary text-on-primary text-[10px] font-label-caps px-2 py-1 rounded shadow-md whitespace-nowrap flex items-center gap-1">
-<span class="material-symbols-outlined text-[12px]">lightbulb</span> Strong Answer
-                             </div>
-</div>
-<div class="shrink-0 flex flex-col items-center gap-1">
-<img class="w-8 h-8 rounded-full object-cover" data-alt="Small circular thumbnail avatar of the candidate, a professional woman looking forward." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHllfRZUBzaTVCKf07XlE4JuhWo7pNCYJGma2ddfnoooPnS50LBUytbxXtfD5AwjKrf3nRlOTZvaCFyQWqDU_at14X91tFqwaTjMde4uen3oy8z-0Kc3FrzAZMViitcBDZCwsUaOP7LbnVCFbrDjcaooP72NL8iDWAeSyrifegyhNi8JJ3KwVTNNZWETQQyUt-Kck1F0fMxo_PxtOHLuazH4L4aiKILOtHwzFTQaH20V9rSP823v_M0CXEbqVxanfqhJCDOfQVzaQ1"/>
-<span class="font-data-mono text-[10px] text-primary">12:18</span>
-</div>
-<div class="flex-1 pt-1">
-<p class="font-label-caps text-[10px] text-primary mb-1">Elena Rodriguez</p>
-<p class="font-body-md text-on-surface text-sm leading-relaxed">
-                                Absolutely. The core bottleneck wasn't actually the transformation logic itself, but how we were serializing the data between microservices. We were initially using JSON over REST for everything.
-                            </p>
-<p class="font-body-md text-on-surface text-sm leading-relaxed mt-2">
-                                I advocated for migrating the high-throughput, internal data paths to gRPC using Protocol Buffers. It required rewriting some of the serialization layers, but by doing so, we reduced payload size by about 60% and deserialization overhead plummeted.
-                            </p>
-<!-- Inline Insight Tag -->
-<div class="mt-3 inline-flex items-center gap-1.5 px-2 py-1 bg-primary/10 border border-primary/20 rounded text-xs font-body-md text-primary">
-<span class="material-symbols-outlined text-[14px]">check_circle</span>
-                                Demonstrates deep architectural understanding
-                            </div>
-</div>
-</div>
-<!-- Segment 3 (Interviewer) -->
-<div class="flex gap-md group">
-<div class="shrink-0 flex flex-col items-center gap-1">
-<div class="w-8 h-8 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-label-caps text-xs">IR</div>
-<span class="font-data-mono text-[10px] text-outline">13:45</span>
-</div>
-<div class="flex-1 pt-1">
-<p class="font-label-caps text-[10px] text-outline-variant mb-1">Interviewer</p>
-<p class="font-body-md text-on-surface-variant text-sm">
-                                That's a solid approach. Did you face any pushback from the team regarding the learning curve for gRPC?
-                            </p>
-</div>
-</div>
-<!-- Segment 4 (Candidate - Red Flag example) -->
-<div class="flex gap-md relative group mt-sm">
-<!-- AI Insight Badge overlapping -->
-<div class="absolute -left-[1px] top-4 -translate-x-full pr-2 opacity-0 group-hover:opacity-100 transition-opacity">
-<div class="bg-error text-on-error text-[10px] font-label-caps px-2 py-1 rounded shadow-md whitespace-nowrap flex items-center gap-1">
-<span class="material-symbols-outlined text-[12px]">warning</span> Evasive
-                            </div>
-</div>
-<div class="shrink-0 flex flex-col items-center gap-1">
-<img class="w-8 h-8 rounded-full object-cover" data-alt="Small circular thumbnail avatar of the candidate." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPpNtwGNIkRJgccAsIS0U_CmhB37fcPuXY73ZNMCpIaGDKHSh3rp8AdthMmuCYO6RYOef0OAnr7BjaNsRNTVtErBIy1WEqj2F5iIwyLJdHZWt6pkzex9kU402qJTNLXrf9pyGdwK7mEcL29TSrzWR_N58MSHHTt-monmMcUgb_Kpgs_k9D1BDejk4Saa8qmo_Cskdw6y4pEchZIEFR4d7wFGmuqy1Tq9CwgS-ZrEZl5uL9Ve3XmKfS3owGzXXgncuvnWSrBZnxir-W"/>
-<span class="font-data-mono text-[10px] text-outline">13:52</span>
-</div>
-<div class="flex-1 pt-1">
-<p class="font-label-caps text-[10px] text-outline-variant mb-1">Elena Rodriguez</p>
-<p class="font-body-md text-on-surface-variant text-sm leading-relaxed">
-                                Um, not really. I mean, there's always some friction when changing tooling, but I just went ahead and implemented the proof of concept myself to show the performance gains. People usually get on board when the numbers are there.
-                            </p>
-<!-- Inline Insight Tag -->
-<div class="mt-2 inline-flex items-center gap-1.5 px-2 py-1 bg-error/10 border border-error/20 rounded text-xs font-body-md text-error">
-<span class="material-symbols-outlined text-[14px]">flag</span>
-                                Missed opportunity to discuss collaborative change management.
-                            </div>
-</div>
-</div>
-<!-- Segment 5 (Interviewer) -->
-<div class="flex gap-md group mt-sm">
-<div class="shrink-0 flex flex-col items-center gap-1">
-<div class="w-8 h-8 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-label-caps text-xs">IR</div>
-<span class="font-data-mono text-[10px] text-outline">14:20</span>
-</div>
-<div class="flex-1 pt-1">
-<p class="font-label-caps text-[10px] text-outline-variant mb-1">Interviewer</p>
-<p class="font-body-md text-on-surface-variant text-sm">
-                                I see. Let's shift gears slightly and talk about model deployment...
-                            </p>
-</div>
-</div>
-</div>
-<!-- Typing Indicator / Current Status -->
-<div class="p-sm border-t border-outline-variant bg-surface-container-lowest text-center">
-<span class="font-data-mono text-xs text-outline flex items-center justify-center gap-1">
-<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-                        Syncing playback
-                    </span>
-</div>
-</div>
-</div>
-</main>
-</body></html>
+        <button
+          class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container-low transition-colors text-primary"
+        >
+          <span class="material-symbols-outlined">colors_spark</span>
+        </button>
+        <button
+          class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container-low transition-colors ml-sm"
+        >
+          <img
+            class="w-8 h-8 rounded-full object-cover border border-outline-variant"
+            data-alt="A professional headshot of an executive recruiter, slightly smiling, set against a bright, out-of-focus modern office background. Lighting is soft and flattering, emphasizing a trustworthy and capable persona."
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjBUvH1n5KDVbhsHxy9ZaTS6dhpDwImFBvyaqg0JCNd375CLP3Mkaad91dmOTOQsJH7wDMq7YIV23cqijIWtNGliDP8BObuviC4Q4_MuEWH0GxzOgo4qv8rb_5X8rG6dCsKJQgl-w50B3Lcb8cAkI7JIeOE1rSxchimHUatrX1gJjOrU60RmCkoi2-ds-E1QOn8xeC1gUVBrsggkX4KGGmbag_cr9L6YJhGL_tmNGG5Zan_MozWfYlz45jxwQ9F-JOLnMNegyiasgv"
+          />
+        </button>
+      </div>
+    </header>
+    <!-- Main Workspace (The Canvas) -->
+    <main
+      class="ml-64 mt-16 p-lg flex-1 h-[calc(100vh-4rem)] overflow-hidden flex flex-col bg-background"
+    >
+      <!-- Workspace Header -->
+      <div class="flex items-end justify-between mb-md shrink-0">
+        <div>
+          <div class="flex items-center gap-sm mb-xs">
+            <a
+              class="text-on-surface-variant hover:text-primary font-body-md flex items-center gap-xs text-sm"
+              href="#"
+            >
+              <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+              Back to Pipeline
+            </a>
+            <span class="text-outline-variant">/</span>
+            <span class="font-label-caps text-label-caps text-outline">Interview Review</span>
+          </div>
+          <h2 class="font-headline-lg text-headline-lg text-on-surface flex items-center gap-sm">
+            Elena Rodriguez
+            <span
+              class="px-2 py-1 bg-surface-container text-on-surface rounded text-sm font-body-md border border-outline-variant ml-sm flex items-center gap-xs"
+            >
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              Strong Fit
+            </span>
+          </h2>
+          <p class="font-body-md text-on-surface-variant mt-xs">
+            Senior Machine Learning Engineer • Technical Screen • Oct 24, 2024
+          </p>
+        </div>
+        <div class="flex gap-sm">
+          <button
+            class="px-4 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-on-surface font-body-md font-semibold hover:bg-surface-container-low transition-colors shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+          >
+            Share Insight
+          </button>
+          <button
+            class="px-4 py-2 bg-primary text-on-primary rounded-lg font-body-md font-semibold hover:brightness-110 transition-colors shadow-sm"
+          >
+            Advance Candidate
+          </button>
+        </div>
+      </div>
+      <!-- Split View Layout -->
+      <div class="flex gap-md h-full overflow-hidden pb-lg">
+        <!-- Left Column: Video & AI Assessment (Flex 3) -->
+        <div class="w-[65%] flex flex-col gap-md h-full overflow-y-auto custom-scrollbar pr-xs">
+          <!-- Video Player Card -->
+          <div
+            class="bg-surface-container-lowest rounded-xl border border-outline-variant p-sm shadow-[0_1px_3px_0_rgba(0,0,0,0.02),_0_1px_2px_-1px_rgba(0,0,0,0.03)] flex flex-col shrink-0"
+          >
+            <!-- Video Area (Simulated) -->
+            <div
+              class="relative w-full aspect-video bg-inverse-surface rounded-lg overflow-hidden group"
+            >
+              <img
+                class="w-full h-full object-cover opacity-90"
+                data-alt="A medium shot from a webcam perspective of a professional woman presenting in a well-lit home office. The environment is minimalist with a blurred background showing a bookshelf. Lighting highlights her face, conveying focus and articulation during a remote interview."
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3Ek_tsn_MWKdNNQ1ogNiS2qzMxdShm70pCejK6GKZROZ-47Gbnns0rBSOAmHNHJ1GZTKEfvhtB2vANPYpV5gHZCyA8WgXfAB6iZaXWbUZXEr5JHAv9ZhZoJ1bI8-9ZAYh2427PNYcC0tDS_qLn-LClT4EApixBnIMsxyXSKgn5r3ijuduxkPM5HoqobbuXA_TlxJmZb0S5Coamv-cSJPndlblau93Q_3LuoJQhGOPxy1VlfLAlCCssUS-5dsPi5Xxn2NTCwA1cU5E"
+              />
+              <!-- Overlay Controls -->
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-md"
+              >
+                <div class="flex items-center justify-between text-white">
+                  <div class="flex items-center gap-md">
+                    <button
+                      class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors"
+                    >
+                      <span class="material-symbols-outlined icon-filled text-[28px]">pause</span>
+                    </button>
+                    <div class="font-data-mono text-sm">14:23 / 45:00</div>
+                  </div>
+                  <div class="flex items-center gap-sm">
+                    <button
+                      class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors"
+                    >
+                      <span class="material-symbols-outlined text-[20px]">volume_up</span>
+                    </button>
+                    <button
+                      class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors"
+                    >
+                      <span class="material-symbols-outlined text-[20px]">closed_caption</span>
+                    </button>
+                    <button
+                      class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors"
+                    >
+                      <span class="material-symbols-outlined text-[20px]">fullscreen</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Advanced Timeline Scrub Bar -->
+            <div class="mt-md px-sm pb-sm">
+              <div class="flex justify-between items-center mb-xs">
+                <span
+                  class="font-label-caps text-label-caps text-on-surface-variant flex items-center gap-1"
+                >
+                  <span class="material-symbols-outlined text-[14px]">timeline</span> Sentiment
+                  &amp; Events
+                </span>
+                <span class="font-data-mono text-[11px] text-outline">Auto-scrolling</span>
+              </div>
+              <!-- The Bar -->
+              <div
+                class="relative w-full h-2 bg-surface-container-high rounded-full cursor-pointer group"
+              >
+                <!-- Progress fill -->
+                <div class="absolute left-0 top-0 h-full bg-outline w-[32%] rounded-l-full"></div>
+                <!-- Sentiment Segments (Simulated) -->
+                <div
+                  class="absolute left-[10%] top-0 h-full w-[15%] bg-primary-container opacity-40"
+                ></div>
+                <div
+                  class="absolute left-[35%] top-0 h-full w-[8%] bg-error-container opacity-60"
+                ></div>
+                <div
+                  class="absolute left-[50%] top-0 h-full w-[25%] bg-primary-container opacity-40"
+                ></div>
+                <!-- Playhead -->
+                <div
+                  class="absolute top-1/2 -translate-y-1/2 left-[32%] w-3 h-3 bg-primary rounded-full shadow-md scale-0 group-hover:scale-100 transition-transform"
+                ></div>
+                <!-- Insight Markers (Dots) -->
+                <div
+                  class="absolute top-1/2 -translate-y-1/2 left-[12%] w-2.5 h-2.5 bg-primary border border-white rounded-full z-10 hover:scale-150 transition-transform"
+                  title="Strong Technical Detail"
+                ></div>
+                <div
+                  class="absolute top-1/2 -translate-y-1/2 left-[38%] w-2.5 h-2.5 bg-error border border-white rounded-full z-10 hover:scale-150 transition-transform"
+                  title="Hesitation on Architecture"
+                ></div>
+                <div
+                  class="absolute top-1/2 -translate-y-1/2 left-[65%] w-2.5 h-2.5 bg-primary border border-white rounded-full z-10 hover:scale-150 transition-transform"
+                  title="Excellent Leadership Example"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <!-- AI Assessment Bento Grid -->
+          <div class="grid grid-cols-2 gap-md shrink-0">
+            <!-- Tech Assessment -->
+            <div
+              class="bg-surface-container-lowest rounded-xl border border-outline-variant p-md shadow-[0_1px_3px_0_rgba(0,0,0,0.02),_0_1px_2px_-1px_rgba(0,0,0,0.03)]"
+            >
+              <div
+                class="flex items-center justify-between mb-sm border-b border-outline-variant pb-2"
+              >
+                <h3 class="font-headline-sm text-headline-sm text-on-surface">Technical Breadth</h3>
+                <span class="font-data-mono text-primary font-bold">92/100</span>
+              </div>
+              <div class="space-y-3 mt-sm">
+                <div>
+                  <div
+                    class="flex justify-between font-label-caps text-label-caps text-on-surface-variant mb-1"
+                  >
+                    <span>Python / PyTorch</span>
+                    <span>Expert</span>
+                  </div>
+                  <div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+                    <div class="w-[95%] h-full bg-primary rounded-full"></div>
+                  </div>
+                </div>
+                <div>
+                  <div
+                    class="flex justify-between font-label-caps text-label-caps text-on-surface-variant mb-1"
+                  >
+                    <span>System Design</span>
+                    <span>Advanced</span>
+                  </div>
+                  <div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+                    <div class="w-[85%] h-full bg-primary rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Culture / Soft Skills (AI Highlight styled) -->
+            <div
+              class="bg-surface-container border-l-4 border-secondary rounded-xl p-md shadow-[0_1px_3px_0_rgba(0,0,0,0.02)] relative overflow-hidden"
+            >
+              <!-- AI Background spark effect -->
+              <div class="absolute -right-4 -top-4 text-secondary/10 pointer-events-none">
+                <span class="material-symbols-outlined icon-filled text-[120px]">colors_spark</span>
+              </div>
+              <div class="flex items-center gap-xs mb-sm relative z-10">
+                <span class="material-symbols-outlined text-secondary text-[18px]">psychology</span>
+                <h3 class="font-headline-sm text-headline-sm text-on-secondary-container">
+                  Behavioral Synthesis
+                </h3>
+              </div>
+              <p
+                class="font-body-md text-sm text-on-secondary-fixed-variant leading-relaxed relative z-10"
+              >
+                Demonstrates highly structured problem solving. Exhibits proactive communication
+                during ambiguous requirements. Shows strong alignment with core value "Ownership".
+              </p>
+              <div class="flex flex-wrap gap-2 mt-sm relative z-10">
+                <span
+                  class="px-2 py-1 bg-white/50 rounded text-xs font-label-caps text-on-secondary-fixed-variant border border-secondary/20"
+                  >Analytical</span
+                >
+                <span
+                  class="px-2 py-1 bg-white/50 rounded text-xs font-label-caps text-on-secondary-fixed-variant border border-secondary/20"
+                  >Mentorship</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Right Column: Synchronized Transcript (Flex 1.5) -->
+        <div
+          class="w-[35%] h-full bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0_1px_3px_0_rgba(0,0,0,0.02)] flex flex-col overflow-hidden"
+        >
+          <!-- Transcript Header -->
+          <div
+            class="p-md border-b border-outline-variant bg-surface/50 shrink-0 flex items-center justify-between"
+          >
+            <h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-sm">
+              <span class="material-symbols-outlined text-[20px] text-outline">subtitles</span>
+              Transcript
+            </h3>
+            <div class="flex gap-sm">
+              <button
+                class="w-8 h-8 flex items-center justify-center text-outline hover:text-on-surface hover:bg-surface-container-low rounded-md transition-colors"
+              >
+                <span class="material-symbols-outlined text-[18px]">search</span>
+              </button>
+              <button
+                class="w-8 h-8 flex items-center justify-center text-outline hover:text-on-surface hover:bg-surface-container-low rounded-md transition-colors"
+              >
+                <span class="material-symbols-outlined text-[18px]">filter_list</span>
+              </button>
+            </div>
+          </div>
+          <!-- Transcript Scroll Area -->
+          <div class="flex-1 overflow-y-auto custom-scrollbar p-md flex flex-col gap-lg">
+            <!-- Segment 1 (Interviewer) -->
+            <div class="flex gap-md group">
+              <div class="shrink-0 flex flex-col items-center gap-1">
+                <div
+                  class="w-8 h-8 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-label-caps text-xs"
+                >
+                  IR
+                </div>
+                <span class="font-data-mono text-[10px] text-outline">12:05</span>
+              </div>
+              <div class="flex-1 pt-1">
+                <p class="font-label-caps text-[10px] text-outline-variant mb-1">Interviewer</p>
+                <p class="font-body-md text-on-surface-variant text-sm">
+                  That makes sense. So following up on the data pipeline restructuring, can you walk
+                  me through how you handled the latency issues you mentioned earlier during peak
+                  loads?
+                </p>
+              </div>
+            </div>
+            <!-- Segment 2 (Candidate - Active/Highlighted by AI) -->
+            <div
+              class="flex gap-md bg-surface-container-low -mx-md px-md py-sm border-l-2 border-primary relative group cursor-pointer transition-colors hover:bg-surface-container"
+            >
+              <!-- AI Insight Badge overlapping -->
+              <div
+                class="absolute -left-[1px] top-4 -translate-x-full pr-2 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <div
+                  class="bg-primary text-on-primary text-[10px] font-label-caps px-2 py-1 rounded shadow-md whitespace-nowrap flex items-center gap-1"
+                >
+                  <span class="material-symbols-outlined text-[12px]">lightbulb</span> Strong Answer
+                </div>
+              </div>
+              <div class="shrink-0 flex flex-col items-center gap-1">
+                <img
+                  class="w-8 h-8 rounded-full object-cover"
+                  data-alt="Small circular thumbnail avatar of the candidate, a professional woman looking forward."
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHllfRZUBzaTVCKf07XlE4JuhWo7pNCYJGma2ddfnoooPnS50LBUytbxXtfD5AwjKrf3nRlOTZvaCFyQWqDU_at14X91tFqwaTjMde4uen3oy8z-0Kc3FrzAZMViitcBDZCwsUaOP7LbnVCFbrDjcaooP72NL8iDWAeSyrifegyhNi8JJ3KwVTNNZWETQQyUt-Kck1F0fMxo_PxtOHLuazH4L4aiKILOtHwzFTQaH20V9rSP823v_M0CXEbqVxanfqhJCDOfQVzaQ1"
+                />
+                <span class="font-data-mono text-[10px] text-primary">12:18</span>
+              </div>
+              <div class="flex-1 pt-1">
+                <p class="font-label-caps text-[10px] text-primary mb-1">Elena Rodriguez</p>
+                <p class="font-body-md text-on-surface text-sm leading-relaxed">
+                  Absolutely. The core bottleneck wasn't actually the transformation logic itself,
+                  but how we were serializing the data between microservices. We were initially
+                  using JSON over REST for everything.
+                </p>
+                <p class="font-body-md text-on-surface text-sm leading-relaxed mt-2">
+                  I advocated for migrating the high-throughput, internal data paths to gRPC using
+                  Protocol Buffers. It required rewriting some of the serialization layers, but by
+                  doing so, we reduced payload size by about 60% and deserialization overhead
+                  plummeted.
+                </p>
+                <!-- Inline Insight Tag -->
+                <div
+                  class="mt-3 inline-flex items-center gap-1.5 px-2 py-1 bg-primary/10 border border-primary/20 rounded text-xs font-body-md text-primary"
+                >
+                  <span class="material-symbols-outlined text-[14px]">check_circle</span>
+                  Demonstrates deep architectural understanding
+                </div>
+              </div>
+            </div>
+            <!-- Segment 3 (Interviewer) -->
+            <div class="flex gap-md group">
+              <div class="shrink-0 flex flex-col items-center gap-1">
+                <div
+                  class="w-8 h-8 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-label-caps text-xs"
+                >
+                  IR
+                </div>
+                <span class="font-data-mono text-[10px] text-outline">13:45</span>
+              </div>
+              <div class="flex-1 pt-1">
+                <p class="font-label-caps text-[10px] text-outline-variant mb-1">Interviewer</p>
+                <p class="font-body-md text-on-surface-variant text-sm">
+                  That's a solid approach. Did you face any pushback from the team regarding the
+                  learning curve for gRPC?
+                </p>
+              </div>
+            </div>
+            <!-- Segment 4 (Candidate - Red Flag example) -->
+            <div class="flex gap-md relative group mt-sm">
+              <!-- AI Insight Badge overlapping -->
+              <div
+                class="absolute -left-[1px] top-4 -translate-x-full pr-2 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <div
+                  class="bg-error text-on-error text-[10px] font-label-caps px-2 py-1 rounded shadow-md whitespace-nowrap flex items-center gap-1"
+                >
+                  <span class="material-symbols-outlined text-[12px]">warning</span> Evasive
+                </div>
+              </div>
+              <div class="shrink-0 flex flex-col items-center gap-1">
+                <img
+                  class="w-8 h-8 rounded-full object-cover"
+                  data-alt="Small circular thumbnail avatar of the candidate."
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPpNtwGNIkRJgccAsIS0U_CmhB37fcPuXY73ZNMCpIaGDKHSh3rp8AdthMmuCYO6RYOef0OAnr7BjaNsRNTVtErBIy1WEqj2F5iIwyLJdHZWt6pkzex9kU402qJTNLXrf9pyGdwK7mEcL29TSrzWR_N58MSHHTt-monmMcUgb_Kpgs_k9D1BDejk4Saa8qmo_Cskdw6y4pEchZIEFR4d7wFGmuqy1Tq9CwgS-ZrEZl5uL9Ve3XmKfS3owGzXXgncuvnWSrBZnxir-W"
+                />
+                <span class="font-data-mono text-[10px] text-outline">13:52</span>
+              </div>
+              <div class="flex-1 pt-1">
+                <p class="font-label-caps text-[10px] text-outline-variant mb-1">Elena Rodriguez</p>
+                <p class="font-body-md text-on-surface-variant text-sm leading-relaxed">
+                  Um, not really. I mean, there's always some friction when changing tooling, but I
+                  just went ahead and implemented the proof of concept myself to show the
+                  performance gains. People usually get on board when the numbers are there.
+                </p>
+                <!-- Inline Insight Tag -->
+                <div
+                  class="mt-2 inline-flex items-center gap-1.5 px-2 py-1 bg-error/10 border border-error/20 rounded text-xs font-body-md text-error"
+                >
+                  <span class="material-symbols-outlined text-[14px]">flag</span>
+                  Missed opportunity to discuss collaborative change management.
+                </div>
+              </div>
+            </div>
+            <!-- Segment 5 (Interviewer) -->
+            <div class="flex gap-md group mt-sm">
+              <div class="shrink-0 flex flex-col items-center gap-1">
+                <div
+                  class="w-8 h-8 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-label-caps text-xs"
+                >
+                  IR
+                </div>
+                <span class="font-data-mono text-[10px] text-outline">14:20</span>
+              </div>
+              <div class="flex-1 pt-1">
+                <p class="font-label-caps text-[10px] text-outline-variant mb-1">Interviewer</p>
+                <p class="font-body-md text-on-surface-variant text-sm">
+                  I see. Let's shift gears slightly and talk about model deployment...
+                </p>
+              </div>
+            </div>
+          </div>
+          <!-- Typing Indicator / Current Status -->
+          <div class="p-sm border-t border-outline-variant bg-surface-container-lowest text-center">
+            <span
+              class="font-data-mono text-xs text-outline flex items-center justify-center gap-1"
+            >
+              <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+              Syncing playback
+            </span>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

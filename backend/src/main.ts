@@ -1,17 +1,17 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { ValidationPipe, Logger } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { NestFactory } from "@nestjs/core";
+import { AppModule } from "./app.module";
+import { ValidationPipe, Logger } from "@nestjs/common";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
 async function bootstrap() {
-  const logger = new Logger('Bootstrap');
+  const logger = new Logger("Bootstrap");
   const app = await NestFactory.create(AppModule);
 
   // Global prefixes and versioning
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix("api");
   app.enableCors({
-    origin: process.env.FRONTEND_URL || '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    origin: process.env.FRONTEND_URL || "*",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     credentials: true,
   });
 
@@ -26,13 +26,13 @@ async function bootstrap() {
 
   // Setup Swagger API documentation
   const config = new DocumentBuilder()
-    .setTitle('Lokality AI Recruitment Platform API')
-    .setDescription('Enterprise Workflow-Driven Recruitment Intelligence Platform API')
-    .setVersion('1.0')
+    .setTitle("Lokality AI Recruitment Platform API")
+    .setDescription("Enterprise Workflow-Driven Recruitment Intelligence Platform API")
+    .setVersion("1.0")
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+  SwaggerModule.setup("api/docs", app, document);
 
   const port = process.env.PORT || 3000;
   await app.listen(port);

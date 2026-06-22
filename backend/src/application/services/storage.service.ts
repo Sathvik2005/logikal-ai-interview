@@ -1,35 +1,47 @@
-import { Injectable, Logger } from '@nestjs/common';
-import * as fs from 'fs';
-import * as path from 'path';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { Injectable, Logger } from "@nestjs/common";
+import * as fs from "fs";
+import * as path from "path";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 @Injectable()
 export class StorageService {
   private readonly logger = new Logger(StorageService.name);
   private supabaseClient: SupabaseClient | null = null;
   private isLocal = true;
-  private localStorageDir = path.join(process.cwd(), 'local-storage');
+  private localStorageDir = path.join(process.cwd(), "local-storage");
 
   constructor() {
     const supabaseUrl = process.env.SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    if (supabaseUrl && serviceRoleKey && serviceRoleKey !== 'your-service-role-key-here' && serviceRoleKey.length > 50) {
+    if (
+      supabaseUrl &&
+      serviceRoleKey &&
+      serviceRoleKey !== "your-service-role-key-here" &&
+      serviceRoleKey.length > 50
+    ) {
       this.supabaseClient = createClient(supabaseUrl, serviceRoleKey, {
         auth: { persistSession: false },
       });
       this.isLocal = false;
-      this.logger.log('Storage Service initialized with Supabase storage.');
+      this.logger.log("Storage Service initialized with Supabase storage.");
     } else {
       this.isLocal = true;
       if (!fs.existsSync(this.localStorageDir)) {
         fs.mkdirSync(this.localStorageDir, { recursive: true });
       }
-      this.logger.log(`Storage Service initialized in local mode. Directory: ${this.localStorageDir}`);
+      this.logger.log(
+        `Storage Service initialized in local mode. Directory: ${this.localStorageDir}`,
+      );
     }
   }
 
-  async uploadFile(bucket: string, fileKey: string, fileBuffer: Buffer, mimeType: string): Promise<string> {
+  async uploadFile(
+    bucket: string,
+    fileKey: string,
+    fileBuffer: Buffer,
+    mimeType: string,
+  ): Promise<string> {
     if (this.isLocal || !this.supabaseClient) {
       const filePath = path.join(this.localStorageDir, bucket, fileKey);
       const dirPath = path.dirname(filePath);
@@ -41,21 +53,17 @@ export class StorageService {
       return `http://localhost:${process.env.PORT || 3000}/api/storage/${bucket}/${fileKey}`;
     }
 
-    const { error } = await this.supabaseClient.storage
-      .from(bucket)
-      .upload(fileKey, fileBuffer, {
-        contentType: mimeType,
-        upsert: true,
-      });
+    const { error } = await this.supabaseClient.storage.from(bucket).upload(fileKey, fileBuffer, {
+      contentType: mimeType,
+      upsert: true,
+    });
 
     if (error) {
       this.logger.error(`Supabase upload error: ${error.message}`);
       throw error;
     }
 
-    const { data: urlData } = this.supabaseClient.storage
-      .from(bucket)
-      .getPublicUrl(fileKey);
+    const { data: urlData } = this.supabaseClient.storage.from(bucket).getPublicUrl(fileKey);
 
     return urlData.publicUrl;
   }
@@ -69,9 +77,7 @@ export class StorageService {
       return fs.readFileSync(filePath);
     }
 
-    const { data, error } = await this.supabaseClient.storage
-      .from(bucket)
-      .download(fileKey);
+    const { data, error } = await this.supabaseClient.storage.from(bucket).download(fileKey);
 
     if (error) {
       this.logger.error(`Supabase download error: ${error.message}`);
@@ -80,5 +86,21 @@ export class StorageService {
 
     const arrayBuffer = await data.arrayBuffer();
     return Buffer.from(arrayBuffer);
+  }
+
+  async getFileSignedUrl(bucket: string, fileKey: string): Promise<string> {
+    if (this.isLocal || !this.supabaseClient) {
+      return `http://localhost:${process.env.PORT || 3000}/api/storage/${bucket}/${fileKey}`;
+    }
+    const { data, error } = await this.supabaseClient.storage
+      .from(bucket)
+      .createSignedUrl(fileKey, 3600);
+
+    if (error) {
+      this.logger.error(`Supabase createSignedUrl error: ${error.message}`);
+      throw error;
+    }
+
+    return data.signedUrl;
   }
 }

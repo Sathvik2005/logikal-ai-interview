@@ -1,11 +1,11 @@
-import { DomainEvent } from '../common/domain-event.base';
+import { DomainEvent } from "../common/domain-event.base";
 
 export type InterviewStatus =
-  | 'scheduled'
-  | 'in_progress'
-  | 'evaluation_pending'
-  | 'completed'
-  | 'failed';
+  | "scheduled"
+  | "in_progress"
+  | "evaluation_pending"
+  | "completed"
+  | "failed";
 
 export class Interview {
   private readonly events: DomainEvent[] = [];
@@ -36,16 +36,18 @@ export class Interview {
 
   transitionTo(newStatus: InterviewStatus): void {
     const validTransitions: Record<InterviewStatus, InterviewStatus[]> = {
-      scheduled: ['in_progress', 'failed'],
-      in_progress: ['evaluation_pending', 'failed'],
-      evaluation_pending: ['completed', 'failed'],
+      scheduled: ["in_progress", "failed"],
+      in_progress: ["evaluation_pending", "failed"],
+      evaluation_pending: ["completed", "failed"],
       completed: [],
-      failed: ['scheduled'],
+      failed: ["scheduled"],
     };
 
     const allowed = validTransitions[this.status] ?? [];
     if (!allowed.includes(newStatus) && this.status !== newStatus) {
-      throw new Error(`Invalid interview workflow transition from '${this.status}' to '${newStatus}'`);
+      throw new Error(
+        `Invalid interview workflow transition from '${this.status}' to '${newStatus}'`,
+      );
     }
 
     this.status = newStatus;

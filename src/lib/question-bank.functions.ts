@@ -22,7 +22,10 @@ export const bulkUpsertQuestions = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => BulkUpsert.parse(d))
   .handler(async ({ data, context }) => {
     const { data: prof } = await context.supabase
-      .from("profiles").select("org_id").eq("id", context.userId).maybeSingle();
+      .from("profiles")
+      .select("org_id")
+      .eq("id", context.userId)
+      .maybeSingle();
     const orgId = prof?.org_id;
     if (!orgId) throw new Error("Missing organization");
 
@@ -81,7 +84,7 @@ export const parseQuestionsFromPdf = createServerFn({ method: "POST" })
           {
             role: "system",
             content:
-              "You extract interview questions from documents and return STRICT JSON. Output schema: {\"questions\":[{\"prompt\":string,\"category\":\"Technical\"|\"Behavioral\"|\"Compliance\"|\"Situational\"|\"Coding\",\"difficulty\":\"easy\"|\"medium\"|\"hard\",\"mandatory\":boolean,\"hints\":string[]}]}. Return ONLY JSON, no prose.",
+              'You extract interview questions from documents and return STRICT JSON. Output schema: {"questions":[{"prompt":string,"category":"Technical"|"Behavioral"|"Compliance"|"Situational"|"Coding","difficulty":"easy"|"medium"|"hard","mandatory":boolean,"hints":string[]}]}. Return ONLY JSON, no prose.',
           },
           {
             role: "user",
@@ -98,30 +101,46 @@ export const parseQuestionsFromPdf = createServerFn({ method: "POST" })
     if (!res.ok) {
       const txt = await res.text();
       if (res.status === 429) throw new Error("AI rate limit reached. Try again shortly.");
-      if (res.status === 402) throw new Error("AI credits exhausted. Add credits in workspace settings.");
+      if (res.status === 402)
+        throw new Error("AI credits exhausted. Add credits in workspace settings.");
       throw new Error(`PDF parse failed: ${res.status} ${txt.slice(0, 200)}`);
     }
     const j = await res.json();
     const txt = j.choices?.[0]?.message?.content ?? "{}";
     let parsed: unknown;
-    try { parsed = JSON.parse(txt); } catch { parsed = {}; }
+    try {
+      parsed = JSON.parse(txt);
+    } catch {
+      parsed = {};
+    }
     const list = (parsed as { questions?: unknown }).questions;
     if (!Array.isArray(list)) return { questions: [] as QuestionItemDTO[] };
 
-    type ParsedQ = { prompt: string; category: string; difficulty: "easy" | "medium" | "hard"; mandatory: boolean; hints: string[] };
+    type ParsedQ = {
+      prompt: string;
+      category: string;
+      difficulty: "easy" | "medium" | "hard";
+      mandatory: boolean;
+      hints: string[];
+    };
     const out: ParsedQ[] = list
       .map((q: unknown): ParsedQ | null => {
         const o = q as Record<string, unknown>;
         const promptStr = typeof o.prompt === "string" ? o.prompt.trim() : "";
         if (!promptStr) return null;
         const cat = typeof o.category === "string" ? o.category : "Technical";
-        const diff = (typeof o.difficulty === "string" ? o.difficulty.toLowerCase() : "medium");
+        const diff = typeof o.difficulty === "string" ? o.difficulty.toLowerCase() : "medium";
         return {
           prompt: promptStr.slice(0, 4000),
           category: cat.slice(0, 60),
-          difficulty: (["easy", "medium", "hard"].includes(diff) ? diff : "medium") as "easy" | "medium" | "hard",
+          difficulty: (["easy", "medium", "hard"].includes(diff) ? diff : "medium") as
+            | "easy"
+            | "medium"
+            | "hard",
           mandatory: Boolean(o.mandatory),
-          hints: Array.isArray(o.hints) ? (o.hints as unknown[]).filter((h) => typeof h === "string").slice(0, 10) as string[] : [],
+          hints: Array.isArray(o.hints)
+            ? ((o.hints as unknown[]).filter((h) => typeof h === "string").slice(0, 10) as string[])
+            : [],
         };
       })
       .filter((q): q is ParsedQ => q !== null)
@@ -129,4 +148,3 @@ export const parseQuestionsFromPdf = createServerFn({ method: "POST" })
 
     return { questions: out };
   });
-

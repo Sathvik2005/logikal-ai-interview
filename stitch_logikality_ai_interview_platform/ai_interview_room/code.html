@@ -1,287 +1,412 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Candidate Interview Room</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "primary-container": "#4f46e5",
-                        "tertiary-fixed-dim": "#ffb695",
-                        "on-tertiary-fixed-variant": "#7b2f00",
-                        "on-background": "#0b1c30",
-                        "surface-tint": "#4d44e3",
-                        "inverse-on-surface": "#eaf1ff",
-                        "on-surface-variant": "#464555",
-                        "on-tertiary-container": "#ffd2be",
-                        "on-primary": "#ffffff",
-                        "surface-bright": "#f8f9ff",
-                        "primary": "#3525cd",
-                        "tertiary": "#7e3000",
-                        "surface-container-high": "#dce9ff",
-                        "secondary-container": "#57dffe",
-                        "on-primary-fixed": "#0f0069",
-                        "surface-variant": "#d3e4fe",
-                        "on-secondary-fixed-variant": "#004e5c",
-                        "tertiary-fixed": "#ffdbcc",
-                        "surface": "#f8f9ff",
-                        "surface-dim": "#cbdbf5",
-                        "secondary-fixed-dim": "#4cd7f6",
-                        "on-secondary": "#ffffff",
-                        "on-tertiary": "#ffffff",
-                        "error-container": "#ffdad6",
-                        "tertiary-container": "#a44100",
-                        "surface-container-low": "#eff4ff",
-                        "outline-variant": "#c7c4d8",
-                        "surface-container": "#e5eeff",
-                        "on-error": "#ffffff",
-                        "primary-fixed": "#e2dfff",
-                        "on-error-container": "#93000a",
-                        "secondary": "#00687a",
-                        "inverse-primary": "#c3c0ff",
-                        "error": "#ba1a1a",
-                        "secondary-fixed": "#acedff",
-                        "on-primary-container": "#dad7ff",
-                        "background": "#f8f9ff",
-                        "surface-container-lowest": "#ffffff",
-                        "on-tertiary-fixed": "#351000",
-                        "on-primary-fixed-variant": "#3323cc",
-                        "inverse-surface": "#213145",
-                        "on-secondary-fixed": "#001f26",
-                        "on-surface": "#0b1c30",
-                        "surface-container-highest": "#d3e4fe",
-                        "outline": "#777587",
-                        "primary-fixed-dim": "#c3c0ff",
-                        "on-secondary-container": "#006172"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                    "spacing": {
-                        "xl": "40px",
-                        "xs": "4px",
-                        "md": "16px",
-                        "gutter": "24px",
-                        "lg": "24px",
-                        "base": "4px",
-                        "sm": "8px",
-                        "container-max": "1440px"
-                    },
-                    "fontFamily": {
-                        "headline-md": ["Geist"],
-                        "headline-sm": ["Geist"],
-                        "body-lg": ["Inter"],
-                        "label-caps": ["Inter"],
-                        "headline-lg-mobile": ["Geist"],
-                        "headline-lg": ["Geist"],
-                        "body-md": ["Inter"],
-                        "data-mono": ["JetBrains Mono"],
-                        "display-lg": ["Geist"]
-                    },
-                    "fontSize": {
-                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
-                        "headline-sm": ["18px", { "lineHeight": "1.4", "fontWeight": "600" }],
-                        "body-lg": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
-                        "label-caps": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600" }],
-                        "headline-lg-mobile": ["24px", { "lineHeight": "1.2", "fontWeight": "600" }],
-                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
-                        "body-md": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
-                        "data-mono": ["13px", { "lineHeight": "1.4", "fontWeight": "450" }],
-                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700" }]
-                    }
-                }
-            }
-        }
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Candidate Interview Room</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-container": "#4f46e5",
+              "tertiary-fixed-dim": "#ffb695",
+              "on-tertiary-fixed-variant": "#7b2f00",
+              "on-background": "#0b1c30",
+              "surface-tint": "#4d44e3",
+              "inverse-on-surface": "#eaf1ff",
+              "on-surface-variant": "#464555",
+              "on-tertiary-container": "#ffd2be",
+              "on-primary": "#ffffff",
+              "surface-bright": "#f8f9ff",
+              primary: "#3525cd",
+              tertiary: "#7e3000",
+              "surface-container-high": "#dce9ff",
+              "secondary-container": "#57dffe",
+              "on-primary-fixed": "#0f0069",
+              "surface-variant": "#d3e4fe",
+              "on-secondary-fixed-variant": "#004e5c",
+              "tertiary-fixed": "#ffdbcc",
+              surface: "#f8f9ff",
+              "surface-dim": "#cbdbf5",
+              "secondary-fixed-dim": "#4cd7f6",
+              "on-secondary": "#ffffff",
+              "on-tertiary": "#ffffff",
+              "error-container": "#ffdad6",
+              "tertiary-container": "#a44100",
+              "surface-container-low": "#eff4ff",
+              "outline-variant": "#c7c4d8",
+              "surface-container": "#e5eeff",
+              "on-error": "#ffffff",
+              "primary-fixed": "#e2dfff",
+              "on-error-container": "#93000a",
+              secondary: "#00687a",
+              "inverse-primary": "#c3c0ff",
+              error: "#ba1a1a",
+              "secondary-fixed": "#acedff",
+              "on-primary-container": "#dad7ff",
+              background: "#f8f9ff",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary-fixed": "#351000",
+              "on-primary-fixed-variant": "#3323cc",
+              "inverse-surface": "#213145",
+              "on-secondary-fixed": "#001f26",
+              "on-surface": "#0b1c30",
+              "surface-container-highest": "#d3e4fe",
+              outline: "#777587",
+              "primary-fixed-dim": "#c3c0ff",
+              "on-secondary-container": "#006172",
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+            spacing: {
+              xl: "40px",
+              xs: "4px",
+              md: "16px",
+              gutter: "24px",
+              lg: "24px",
+              base: "4px",
+              sm: "8px",
+              "container-max": "1440px",
+            },
+            fontFamily: {
+              "headline-md": ["Geist"],
+              "headline-sm": ["Geist"],
+              "body-lg": ["Inter"],
+              "label-caps": ["Inter"],
+              "headline-lg-mobile": ["Geist"],
+              "headline-lg": ["Geist"],
+              "body-md": ["Inter"],
+              "data-mono": ["JetBrains Mono"],
+              "display-lg": ["Geist"],
+            },
+            fontSize: {
+              "headline-md": ["24px", { lineHeight: "1.3", fontWeight: "600" }],
+              "headline-sm": ["18px", { lineHeight: "1.4", fontWeight: "600" }],
+              "body-lg": ["16px", { lineHeight: "1.6", fontWeight: "400" }],
+              "label-caps": [
+                "12px",
+                { lineHeight: "1", letterSpacing: "0.05em", fontWeight: "600" },
+              ],
+              "headline-lg-mobile": ["24px", { lineHeight: "1.2", fontWeight: "600" }],
+              "headline-lg": [
+                "32px",
+                { lineHeight: "1.2", letterSpacing: "-0.02em", fontWeight: "600" },
+              ],
+              "body-md": ["14px", { lineHeight: "1.5", fontWeight: "400" }],
+              "data-mono": ["13px", { lineHeight: "1.4", fontWeight: "450" }],
+              "display-lg": [
+                "48px",
+                { lineHeight: "1.1", letterSpacing: "-0.04em", fontWeight: "700" },
+              ],
+            },
+          },
+        },
+      };
     </script>
-<style>
-        body { background-color: #f8f9ff; }
-        .recording-pulse { animation: pulse 2s infinite; }
-        @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+    <style>
+      body {
+        background-color: #f8f9ff;
+      }
+      .recording-pulse {
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0% {
+          transform: scale(0.95);
+          box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
         }
-        .waveform-bar {
-            width: 4px;
-            background-color: #3525cd;
-            border-radius: 2px;
-            margin: 0 2px;
-            animation: wave 1s infinite alternate;
+        70% {
+          transform: scale(1);
+          box-shadow: 0 0 0 10px rgba(220, 38, 38, 0);
         }
-        .waveform-bar:nth-child(even) { animation-duration: 0.8s; }
-        .waveform-bar:nth-child(3n) { animation-duration: 1.2s; }
-        @keyframes wave {
-            0% { height: 8px; }
-            100% { height: 24px; }
+        100% {
+          transform: scale(0.95);
+          box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
         }
+      }
+      .waveform-bar {
+        width: 4px;
+        background-color: #3525cd;
+        border-radius: 2px;
+        margin: 0 2px;
+        animation: wave 1s infinite alternate;
+      }
+      .waveform-bar:nth-child(even) {
+        animation-duration: 0.8s;
+      }
+      .waveform-bar:nth-child(3n) {
+        animation-duration: 1.2s;
+      }
+      @keyframes wave {
+        0% {
+          height: 8px;
+        }
+        100% {
+          height: 24px;
+        }
+      }
     </style>
-</head>
-<body class="bg-background text-on-background h-screen overflow-hidden flex flex-col font-body-md">
-<!-- Top Bar -->
-<header class="flex justify-between items-center h-16 px-gutter border-b border-outline-variant bg-surface shrink-0">
-<div class="flex items-center gap-sm">
-<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">graphic_eq</span>
-<span class="font-headline-sm text-headline-sm text-primary">Logikality AI</span>
-<span class="text-outline mx-xs">|</span>
-<span class="font-body-md text-on-surface-variant">Senior Frontend Engineer Interview</span>
-</div>
-<div class="flex items-center gap-md">
-<div class="flex items-center gap-xs text-error font-label-caps text-label-caps">
-<div class="w-3 h-3 bg-error rounded-full recording-pulse"></div>
-                REC 12:45
+  </head>
+  <body
+    class="bg-background text-on-background h-screen overflow-hidden flex flex-col font-body-md"
+  >
+    <!-- Top Bar -->
+    <header
+      class="flex justify-between items-center h-16 px-gutter border-b border-outline-variant bg-surface shrink-0"
+    >
+      <div class="flex items-center gap-sm">
+        <span
+          class="material-symbols-outlined text-primary"
+          style="font-variation-settings: &quot;FILL&quot; 1"
+          >graphic_eq</span
+        >
+        <span class="font-headline-sm text-headline-sm text-primary">Logikality AI</span>
+        <span class="text-outline mx-xs">|</span>
+        <span class="font-body-md text-on-surface-variant">Senior Frontend Engineer Interview</span>
+      </div>
+      <div class="flex items-center gap-md">
+        <div class="flex items-center gap-xs text-error font-label-caps text-label-caps">
+          <div class="w-3 h-3 bg-error rounded-full recording-pulse"></div>
+          REC 12:45
+        </div>
+        <button
+          class="bg-error text-on-error px-md py-xs rounded-lg font-body-md shadow-sm hover:opacity-90 transition-opacity flex items-center gap-xs"
+        >
+          <span class="material-symbols-outlined text-[18px]">stop_circle</span>
+          End Interview
+        </button>
+      </div>
+    </header>
+    <!-- Main Content Area -->
+    <main class="flex-1 flex overflow-hidden p-md gap-md">
+      <!-- Left Column: Video Feeds -->
+      <div class="flex-1 flex flex-col gap-md min-w-0">
+        <!-- Active Question Card -->
+        <div
+          class="bg-surface-container-lowest rounded-xl p-lg border border-outline-variant shadow-sm shrink-0"
+        >
+          <div class="flex items-start gap-md">
+            <div class="bg-surface-container-low p-sm rounded-lg text-primary">
+              <span class="material-symbols-outlined">help_center</span>
             </div>
-<button class="bg-error text-on-error px-md py-xs rounded-lg font-body-md shadow-sm hover:opacity-90 transition-opacity flex items-center gap-xs">
-<span class="material-symbols-outlined text-[18px]">stop_circle</span>
-                End Interview
-            </button>
-</div>
-</header>
-<!-- Main Content Area -->
-<main class="flex-1 flex overflow-hidden p-md gap-md">
-<!-- Left Column: Video Feeds -->
-<div class="flex-1 flex flex-col gap-md min-w-0">
-<!-- Active Question Card -->
-<div class="bg-surface-container-lowest rounded-xl p-lg border border-outline-variant shadow-sm shrink-0">
-<div class="flex items-start gap-md">
-<div class="bg-surface-container-low p-sm rounded-lg text-primary">
-<span class="material-symbols-outlined">help_center</span>
-</div>
-<div class="flex-1">
-<h2 class="font-label-caps text-label-caps text-on-surface-variant mb-xs">Current Question</h2>
-<p class="font-headline-md text-headline-md text-on-background">Can you describe a time when you had to optimize the performance of a complex React application? What specific metrics did you focus on?</p>
-</div>
-</div>
-</div>
-<!-- Video Grid -->
-<div class="flex-1 flex gap-md min-h-0 relative">
-<!-- AI Interviewer -->
-<div class="flex-1 bg-surface-container-highest rounded-xl border border-outline-variant overflow-hidden relative shadow-sm">
-<img alt="AI Interviewer" class="w-full h-full object-cover" data-alt="A highly realistic, professional AI avatar of an interviewer in a modern, well-lit corporate setting. The avatar has a calm, attentive expression. The lighting is bright and high-key, creating a clean, crisp, corporate light-mode aesthetic. The background is a subtly blurred modern office with glass partitions." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUZkOQMDduZRE6t-zWuA5trQS52sxhwuzgvjjYHDOg1k8-bPxvM2lXqrMnARvKR1lygnr4SqJ1D4KjTFFyhf7d7BUWLr5N6NmJh4nj7rGJTii-DxJMK_etMIwYVbtKix7Aw43KIErZ1d88WwnVWrpnuO3RyaL72GgEu3mx41p51tuQyilcpxEGeFbxdO1k_1i_NWfkMfcAEQU6X82OMPt8i_yTt1o_VYEl5WqrVQqYeUXMojHd2lo_qR8vEcmIwjI1eLuQED7CePLB"/>
-<!-- AI Insight Overlay -->
-<div class="absolute bottom-md left-md right-md bg-[#ECFEFF] border-l-2 border-[#06B6D4] p-md rounded-lg shadow-sm flex items-start gap-sm backdrop-blur-sm bg-opacity-90">
-<span class="material-symbols-outlined text-[#06B6D4]">bolt</span>
-<div>
-<span class="font-label-caps text-label-caps text-[#006172] block mb-xs">AI Analysis</span>
-<span class="font-body-md text-body-md text-on-background">Candidate is discussing virtual DOM reconciliation. Suggest probing on specific tools like React Profiler.</span>
-</div>
-</div>
-<div class="absolute top-md left-md bg-surface-container-lowest/80 backdrop-blur px-sm py-xs rounded text-on-surface-variant font-label-caps text-label-caps flex items-center gap-xs">
-<span class="material-symbols-outlined text-[14px]">smart_toy</span>
-                        Logikality AI
-                    </div>
-</div>
-<!-- Candidate Feed (Picture-in-Picture style but docked) -->
-<div class="w-1/3 bg-surface-container-highest rounded-xl border border-outline-variant overflow-hidden relative shadow-sm">
-<img alt="Candidate" class="w-full h-full object-cover" data-alt="A focused candidate sitting in front of a laptop webcam in a home office. The lighting is soft and natural, suggesting a daytime interview. The setting is neat and professional. The image fits the overarching light-mode, modern corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBy5t34SpZPKEsdBj-wHW3czRl0zb6MD4cqXXG3qqgDcHn3heliMIsW1Ep-gcMlLw_iTe01nCSGecKQC_woi-iOkrPofAWQRBdg30Ufo9CFX71Q6CLQ4K8CkPQw6x1re7J6Ms2gpGAGi0ggRpMPxN8hUro6TWTMdfeEEcO-vrO4yrcAurLWGnhaSeBIj7Z8Z23CmPSwb_5ZBgQyjTFzuPw4xzWgL5tJLDkIwBsDkry9D-_NitGGYDU06O3_KnsHb8eiVv3Q4CY3c-U"/>
-<div class="absolute bottom-md left-0 w-full flex justify-center">
-<div class="bg-surface-container-lowest/90 backdrop-blur rounded-full px-md py-sm flex items-center gap-sm shadow-sm border border-outline-variant">
-<span class="material-symbols-outlined text-primary">mic</span>
-<div class="flex items-end h-[24px]">
-<div class="waveform-bar"></div>
-<div class="waveform-bar" style="height: 16px;"></div>
-<div class="waveform-bar" style="height: 20px;"></div>
-<div class="waveform-bar" style="height: 12px;"></div>
-<div class="waveform-bar" style="height: 24px;"></div>
-<div class="waveform-bar" style="height: 18px;"></div>
-</div>
-</div>
-</div>
-<div class="absolute top-md left-md bg-surface-container-lowest/80 backdrop-blur px-sm py-xs rounded text-on-surface-variant font-label-caps text-label-caps flex items-center gap-xs">
-<span class="material-symbols-outlined text-[14px]">person</span>
-                        You
-                    </div>
-</div>
-</div>
-</div>
-<!-- Right Column: Live Transcript -->
-<div class="w-80 bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm flex flex-col shrink-0">
-<div class="p-md border-b border-outline-variant flex justify-between items-center bg-surface/50 rounded-t-xl">
-<h3 class="font-headline-sm text-headline-sm text-on-background flex items-center gap-xs">
-<span class="material-symbols-outlined text-[18px] text-primary">closed_caption</span>
-                    Live Transcript
-                </h3>
-<span class="bg-surface-container text-on-surface-variant font-data-mono text-data-mono px-xs py-base rounded">ENG</span>
-</div>
-<div class="flex-1 overflow-y-auto p-md space-y-md">
-<!-- AI Message -->
-<div class="flex gap-sm">
-<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center shrink-0 text-primary">
-<span class="material-symbols-outlined text-[18px]">smart_toy</span>
-</div>
-<div>
-<div class="flex items-baseline gap-xs mb-xs">
-<span class="font-label-caps text-label-caps text-on-surface-variant">Logikality AI</span>
-<span class="text-[10px] text-outline">12:40</span>
-</div>
-<p class="font-body-md text-body-md text-on-background bg-surface-container-low p-sm rounded-lg rounded-tl-none border border-outline-variant/50">
-                            Welcome, Alex. Thank you for taking the time to speak with me today for the Senior Frontend Engineer position. Let's dive right in.
-                        </p>
-</div>
-</div>
-<!-- Candidate Message -->
-<div class="flex gap-sm flex-row-reverse">
-<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center shrink-0 text-secondary">
-<span class="material-symbols-outlined text-[18px]">person</span>
-</div>
-<div class="text-right">
-<div class="flex items-baseline gap-xs mb-xs justify-end">
-<span class="text-[10px] text-outline">12:41</span>
-<span class="font-label-caps text-label-caps text-on-surface-variant">Alex (Candidate)</span>
-</div>
-<p class="font-body-md text-body-md text-on-background bg-surface-variant p-sm rounded-lg rounded-tr-none text-left border border-outline-variant/50">
-                            Thanks for having me. I'm excited to be here and discuss my experience.
-                        </p>
-</div>
-</div>
-<!-- AI Message -->
-<div class="flex gap-sm">
-<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center shrink-0 text-primary">
-<span class="material-symbols-outlined text-[18px]">smart_toy</span>
-</div>
-<div>
-<div class="flex items-baseline gap-xs mb-xs">
-<span class="font-label-caps text-label-caps text-on-surface-variant">Logikality AI</span>
-<span class="text-[10px] text-outline">12:42</span>
-</div>
-<p class="font-body-md text-body-md text-on-background bg-surface-container-low p-sm rounded-lg rounded-tl-none border border-outline-variant/50">
-                            Great. Can you describe a time when you had to optimize the performance of a complex React application? What specific metrics did you focus on?
-                        </p>
-</div>
-</div>
-<!-- Candidate Message (Active) -->
-<div class="flex gap-sm flex-row-reverse">
-<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center shrink-0 text-secondary">
-<span class="material-symbols-outlined text-[18px]">person</span>
-</div>
-<div class="text-right">
-<div class="flex items-baseline gap-xs mb-xs justify-end">
-<span class="text-[10px] text-outline">12:42</span>
-<span class="font-label-caps text-label-caps text-on-surface-variant">Alex (Candidate)</span>
-</div>
-<p class="font-body-md text-body-md text-on-background bg-surface-variant p-sm rounded-lg rounded-tr-none text-left border border-outline-variant/50">
-                            Certainly. In my last role at TechCorp, we had a large dashboard rendering hundreds of data points. We were seeing significant lag during updates. I focused primarily on reducing unnecessary re-renders... <span class="animate-pulse text-outline">|</span>
-</p>
-</div>
-</div>
-</div>
-<!-- Subtitle Settings -->
-<div class="p-sm border-t border-outline-variant bg-surface-container-low flex justify-between items-center rounded-b-xl">
-<button class="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-xs font-label-caps text-label-caps">
-<span class="material-symbols-outlined text-[16px]">settings</span>
-                    Transcript Settings
-                </button>
-</div>
-</div>
-</main>
-</body></html>
+            <div class="flex-1">
+              <h2 class="font-label-caps text-label-caps text-on-surface-variant mb-xs">
+                Current Question
+              </h2>
+              <p class="font-headline-md text-headline-md text-on-background">
+                Can you describe a time when you had to optimize the performance of a complex React
+                application? What specific metrics did you focus on?
+              </p>
+            </div>
+          </div>
+        </div>
+        <!-- Video Grid -->
+        <div class="flex-1 flex gap-md min-h-0 relative">
+          <!-- AI Interviewer -->
+          <div
+            class="flex-1 bg-surface-container-highest rounded-xl border border-outline-variant overflow-hidden relative shadow-sm"
+          >
+            <img
+              alt="AI Interviewer"
+              class="w-full h-full object-cover"
+              data-alt="A highly realistic, professional AI avatar of an interviewer in a modern, well-lit corporate setting. The avatar has a calm, attentive expression. The lighting is bright and high-key, creating a clean, crisp, corporate light-mode aesthetic. The background is a subtly blurred modern office with glass partitions."
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUZkOQMDduZRE6t-zWuA5trQS52sxhwuzgvjjYHDOg1k8-bPxvM2lXqrMnARvKR1lygnr4SqJ1D4KjTFFyhf7d7BUWLr5N6NmJh4nj7rGJTii-DxJMK_etMIwYVbtKix7Aw43KIErZ1d88WwnVWrpnuO3RyaL72GgEu3mx41p51tuQyilcpxEGeFbxdO1k_1i_NWfkMfcAEQU6X82OMPt8i_yTt1o_VYEl5WqrVQqYeUXMojHd2lo_qR8vEcmIwjI1eLuQED7CePLB"
+            />
+            <!-- AI Insight Overlay -->
+            <div
+              class="absolute bottom-md left-md right-md bg-[#ECFEFF] border-l-2 border-[#06B6D4] p-md rounded-lg shadow-sm flex items-start gap-sm backdrop-blur-sm bg-opacity-90"
+            >
+              <span class="material-symbols-outlined text-[#06B6D4]">bolt</span>
+              <div>
+                <span class="font-label-caps text-label-caps text-[#006172] block mb-xs"
+                  >AI Analysis</span
+                >
+                <span class="font-body-md text-body-md text-on-background"
+                  >Candidate is discussing virtual DOM reconciliation. Suggest probing on specific
+                  tools like React Profiler.</span
+                >
+              </div>
+            </div>
+            <div
+              class="absolute top-md left-md bg-surface-container-lowest/80 backdrop-blur px-sm py-xs rounded text-on-surface-variant font-label-caps text-label-caps flex items-center gap-xs"
+            >
+              <span class="material-symbols-outlined text-[14px]">smart_toy</span>
+              Logikality AI
+            </div>
+          </div>
+          <!-- Candidate Feed (Picture-in-Picture style but docked) -->
+          <div
+            class="w-1/3 bg-surface-container-highest rounded-xl border border-outline-variant overflow-hidden relative shadow-sm"
+          >
+            <img
+              alt="Candidate"
+              class="w-full h-full object-cover"
+              data-alt="A focused candidate sitting in front of a laptop webcam in a home office. The lighting is soft and natural, suggesting a daytime interview. The setting is neat and professional. The image fits the overarching light-mode, modern corporate aesthetic."
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBy5t34SpZPKEsdBj-wHW3czRl0zb6MD4cqXXG3qqgDcHn3heliMIsW1Ep-gcMlLw_iTe01nCSGecKQC_woi-iOkrPofAWQRBdg30Ufo9CFX71Q6CLQ4K8CkPQw6x1re7J6Ms2gpGAGi0ggRpMPxN8hUro6TWTMdfeEEcO-vrO4yrcAurLWGnhaSeBIj7Z8Z23CmPSwb_5ZBgQyjTFzuPw4xzWgL5tJLDkIwBsDkry9D-_NitGGYDU06O3_KnsHb8eiVv3Q4CY3c-U"
+            />
+            <div class="absolute bottom-md left-0 w-full flex justify-center">
+              <div
+                class="bg-surface-container-lowest/90 backdrop-blur rounded-full px-md py-sm flex items-center gap-sm shadow-sm border border-outline-variant"
+              >
+                <span class="material-symbols-outlined text-primary">mic</span>
+                <div class="flex items-end h-[24px]">
+                  <div class="waveform-bar"></div>
+                  <div class="waveform-bar" style="height: 16px"></div>
+                  <div class="waveform-bar" style="height: 20px"></div>
+                  <div class="waveform-bar" style="height: 12px"></div>
+                  <div class="waveform-bar" style="height: 24px"></div>
+                  <div class="waveform-bar" style="height: 18px"></div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="absolute top-md left-md bg-surface-container-lowest/80 backdrop-blur px-sm py-xs rounded text-on-surface-variant font-label-caps text-label-caps flex items-center gap-xs"
+            >
+              <span class="material-symbols-outlined text-[14px]">person</span>
+              You
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Right Column: Live Transcript -->
+      <div
+        class="w-80 bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm flex flex-col shrink-0"
+      >
+        <div
+          class="p-md border-b border-outline-variant flex justify-between items-center bg-surface/50 rounded-t-xl"
+        >
+          <h3 class="font-headline-sm text-headline-sm text-on-background flex items-center gap-xs">
+            <span class="material-symbols-outlined text-[18px] text-primary">closed_caption</span>
+            Live Transcript
+          </h3>
+          <span
+            class="bg-surface-container text-on-surface-variant font-data-mono text-data-mono px-xs py-base rounded"
+            >ENG</span
+          >
+        </div>
+        <div class="flex-1 overflow-y-auto p-md space-y-md">
+          <!-- AI Message -->
+          <div class="flex gap-sm">
+            <div
+              class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center shrink-0 text-primary"
+            >
+              <span class="material-symbols-outlined text-[18px]">smart_toy</span>
+            </div>
+            <div>
+              <div class="flex items-baseline gap-xs mb-xs">
+                <span class="font-label-caps text-label-caps text-on-surface-variant"
+                  >Logikality AI</span
+                >
+                <span class="text-[10px] text-outline">12:40</span>
+              </div>
+              <p
+                class="font-body-md text-body-md text-on-background bg-surface-container-low p-sm rounded-lg rounded-tl-none border border-outline-variant/50"
+              >
+                Welcome, Alex. Thank you for taking the time to speak with me today for the Senior
+                Frontend Engineer position. Let's dive right in.
+              </p>
+            </div>
+          </div>
+          <!-- Candidate Message -->
+          <div class="flex gap-sm flex-row-reverse">
+            <div
+              class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center shrink-0 text-secondary"
+            >
+              <span class="material-symbols-outlined text-[18px]">person</span>
+            </div>
+            <div class="text-right">
+              <div class="flex items-baseline gap-xs mb-xs justify-end">
+                <span class="text-[10px] text-outline">12:41</span>
+                <span class="font-label-caps text-label-caps text-on-surface-variant"
+                  >Alex (Candidate)</span
+                >
+              </div>
+              <p
+                class="font-body-md text-body-md text-on-background bg-surface-variant p-sm rounded-lg rounded-tr-none text-left border border-outline-variant/50"
+              >
+                Thanks for having me. I'm excited to be here and discuss my experience.
+              </p>
+            </div>
+          </div>
+          <!-- AI Message -->
+          <div class="flex gap-sm">
+            <div
+              class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center shrink-0 text-primary"
+            >
+              <span class="material-symbols-outlined text-[18px]">smart_toy</span>
+            </div>
+            <div>
+              <div class="flex items-baseline gap-xs mb-xs">
+                <span class="font-label-caps text-label-caps text-on-surface-variant"
+                  >Logikality AI</span
+                >
+                <span class="text-[10px] text-outline">12:42</span>
+              </div>
+              <p
+                class="font-body-md text-body-md text-on-background bg-surface-container-low p-sm rounded-lg rounded-tl-none border border-outline-variant/50"
+              >
+                Great. Can you describe a time when you had to optimize the performance of a complex
+                React application? What specific metrics did you focus on?
+              </p>
+            </div>
+          </div>
+          <!-- Candidate Message (Active) -->
+          <div class="flex gap-sm flex-row-reverse">
+            <div
+              class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center shrink-0 text-secondary"
+            >
+              <span class="material-symbols-outlined text-[18px]">person</span>
+            </div>
+            <div class="text-right">
+              <div class="flex items-baseline gap-xs mb-xs justify-end">
+                <span class="text-[10px] text-outline">12:42</span>
+                <span class="font-label-caps text-label-caps text-on-surface-variant"
+                  >Alex (Candidate)</span
+                >
+              </div>
+              <p
+                class="font-body-md text-body-md text-on-background bg-surface-variant p-sm rounded-lg rounded-tr-none text-left border border-outline-variant/50"
+              >
+                Certainly. In my last role at TechCorp, we had a large dashboard rendering hundreds
+                of data points. We were seeing significant lag during updates. I focused primarily
+                on reducing unnecessary re-renders...
+                <span class="animate-pulse text-outline">|</span>
+              </p>
+            </div>
+          </div>
+        </div>
+        <!-- Subtitle Settings -->
+        <div
+          class="p-sm border-t border-outline-variant bg-surface-container-low flex justify-between items-center rounded-b-xl"
+        >
+          <button
+            class="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-xs font-label-caps text-label-caps"
+          >
+            <span class="material-symbols-outlined text-[16px]">settings</span>
+            Transcript Settings
+          </button>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

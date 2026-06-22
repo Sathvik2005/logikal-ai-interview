@@ -70,7 +70,6 @@ async function enqueueNotification(opts: {
     recipient_email: opts.recipientEmail,
     payload: opts.payload as never,
   });
-
 }
 
 async function loadOrgForCandidate(candidateId: string) {
@@ -142,14 +141,20 @@ export const scheduleInterview = createServerFn({ method: "POST" })
     // --- Cross-org ownership checks: prevent passing another org's persona/job ids
     if (data.personaId) {
       const { data: pOwn } = await supabaseAdmin
-        .from("personas").select("org_id").eq("id", data.personaId).maybeSingle();
+        .from("personas")
+        .select("org_id")
+        .eq("id", data.personaId)
+        .maybeSingle();
       if (!pOwn || (pOwn as { org_id: string | null }).org_id !== candidate.org_id) {
         throw new Error("Persona does not belong to this organization");
       }
     }
     if (data.jobId) {
       const { data: jOwn } = await supabaseAdmin
-        .from("job_descriptions").select("org_id").eq("id", data.jobId).maybeSingle();
+        .from("job_descriptions")
+        .select("org_id")
+        .eq("id", data.jobId)
+        .maybeSingle();
       if (!jOwn || (jOwn as { org_id: string | null }).org_id !== candidate.org_id) {
         throw new Error("Job does not belong to this organization");
       }
@@ -170,7 +175,10 @@ export const scheduleInterview = createServerFn({ method: "POST" })
         personaVersionId = (latest as { id: string }).id;
       } else {
         const { data: persona } = await supabaseAdmin
-          .from("personas").select("prompt").eq("id", data.personaId).maybeSingle();
+          .from("personas")
+          .select("prompt")
+          .eq("id", data.personaId)
+          .maybeSingle();
         const sys = (persona as { prompt: string | null } | null)?.prompt ?? "";
         const { data: snap } = await supabaseAdmin
           .from("persona_versions")
@@ -209,7 +217,9 @@ export const scheduleInterview = createServerFn({ method: "POST" })
 
     if (error) {
       if (isOverlapError(error)) {
-        throw new Error("That time conflicts with another interview for the recruiter or candidate.");
+        throw new Error(
+          "That time conflicts with another interview for the recruiter or candidate.",
+        );
       }
       throw error;
     }
@@ -240,10 +250,7 @@ export const scheduleInterview = createServerFn({ method: "POST" })
       customQuestionIds = (createdQ ?? []).map((q) => q.id);
     }
 
-    const finalQuestionIds = [
-      ...(data.questionIds ?? []),
-      ...customQuestionIds,
-    ];
+    const finalQuestionIds = [...(data.questionIds ?? []), ...customQuestionIds];
 
     let curated: { question_id: string; ordering: number; source: string }[] = [];
     if (finalQuestionIds.length > 0) {
@@ -263,17 +270,24 @@ export const scheduleInterview = createServerFn({ method: "POST" })
         .select("question_id, ordering")
         .eq("persona_version_id", personaVersionId)
         .order("ordering", { ascending: true });
-      curated = (pq ?? []).map((p: { question_id: string; ordering: number | null }, i: number) => ({
-        question_id: p.question_id,
-        ordering: p.ordering ?? i,
-        source: "persona",
-        interview_id: row.id,
-      }));
+      curated = (pq ?? []).map(
+        (p: { question_id: string; ordering: number | null }, i: number) => ({
+          question_id: p.question_id,
+          ordering: p.ordering ?? i,
+          source: "persona",
+          interview_id: row.id,
+        }),
+      );
     }
     if (curated.length > 0) {
-      const { error: qErr } = await supabaseAdmin
-        .from("interview_questions")
-        .insert(curated.map((c) => ({ interview_id: row.id, question_id: c.question_id, ordering: c.ordering, source: c.source })) as never);
+      const { error: qErr } = await supabaseAdmin.from("interview_questions").insert(
+        curated.map((c) => ({
+          interview_id: row.id,
+          question_id: c.question_id,
+          ordering: c.ordering,
+          source: c.source,
+        })) as never,
+      );
       if (qErr) console.error("[scheduleInterview] interview_questions insert failed", qErr);
     }
 
@@ -300,11 +314,11 @@ export const scheduleInterview = createServerFn({ method: "POST" })
       console.error("[scheduleInterview] invitation create failed", e);
     }
 
-    return mapRow({ ...(row as Row), candidates: { full_name: candidate.full_name, email: candidate.email } });
+    return mapRow({
+      ...(row as Row),
+      candidates: { full_name: candidate.full_name, email: candidate.email },
+    });
   });
-
-
-
 
 // ---------- reschedule ----------
 const rescheduleInput = z.object({
@@ -332,7 +346,9 @@ export const rescheduleInterview = createServerFn({ method: "POST" })
     const orgId = existing.org_id;
 
     if (existing.status === "completed" || existing.status === "evaluation_pending") {
-      throw new Error(`Cannot reschedule a completed or pending evaluation interview (current status: ${existing.status})`);
+      throw new Error(
+        `Cannot reschedule a completed or pending evaluation interview (current status: ${existing.status})`,
+      );
     }
 
     const newDuration = data.durationMinutes ?? existing.duration_minutes ?? 45;
@@ -348,7 +364,9 @@ export const rescheduleInterview = createServerFn({ method: "POST" })
 
     if (updErr) {
       if (isOverlapError(updErr)) {
-        throw new Error("That time conflicts with another interview for the recruiter or candidate.");
+        throw new Error(
+          "That time conflicts with another interview for the recruiter or candidate.",
+        );
       }
       throw updErr;
     }
@@ -413,7 +431,9 @@ export const cancelInterview = createServerFn({ method: "POST" })
     const orgId = existing.org_id;
 
     if (existing.status === "completed" || existing.status === "evaluation_pending") {
-      throw new Error(`Cannot cancel a completed or pending evaluation interview (current status: ${existing.status})`);
+      throw new Error(
+        `Cannot cancel a completed or pending evaluation interview (current status: ${existing.status})`,
+      );
     }
 
     const { error: updErr } = await supabaseAdmin

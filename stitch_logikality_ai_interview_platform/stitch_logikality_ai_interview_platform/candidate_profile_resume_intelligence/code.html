@@ -1,477 +1,731 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Candidate Profile - Logikality AI</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              "colors": {
-                      "secondary-fixed": "#acedff",
-                      "on-tertiary": "#ffffff",
-                      "on-surface-variant": "#464555",
-                      "outline-variant": "#c7c4d8",
-                      "on-surface": "#0b1c30",
-                      "on-secondary-container": "#006172",
-                      "on-primary-fixed": "#0f0069",
-                      "on-error-container": "#93000a",
-                      "on-tertiary-container": "#ffd2be",
-                      "on-primary": "#ffffff",
-                      "surface-container-highest": "#d3e4fe",
-                      "error-container": "#ffdad6",
-                      "on-tertiary-fixed-variant": "#7b2f00",
-                      "surface-variant": "#d3e4fe",
-                      "primary-container": "#4f46e5",
-                      "on-secondary-fixed-variant": "#004e5c",
-                      "surface-container-low": "#eff4ff",
-                      "inverse-primary": "#c3c0ff",
-                      "on-primary-fixed-variant": "#3323cc",
-                      "on-primary-container": "#dad7ff",
-                      "on-background": "#0b1c30",
-                      "surface-container-lowest": "#ffffff",
-                      "on-error": "#ffffff",
-                      "error": "#ba1a1a",
-                      "surface-dim": "#cbdbf5",
-                      "on-secondary-fixed": "#001f26",
-                      "outline": "#777587",
-                      "on-tertiary-fixed": "#351000",
-                      "primary-fixed-dim": "#c3c0ff",
-                      "on-secondary": "#ffffff",
-                      "tertiary": "#7e3000",
-                      "surface-tint": "#4d44e3",
-                      "surface": "#f8f9ff",
-                      "surface-container": "#e5eeff",
-                      "surface-bright": "#f8f9ff",
-                      "background": "#f8f9ff",
-                      "secondary-fixed-dim": "#4cd7f6",
-                      "primary": "#3525cd",
-                      "tertiary-fixed-dim": "#ffb695",
-                      "tertiary-container": "#a44100",
-                      "tertiary-fixed": "#ffdbcc",
-                      "secondary-container": "#57dffe",
-                      "surface-container-high": "#dce9ff",
-                      "secondary": "#00687a",
-                      "inverse-on-surface": "#eaf1ff",
-                      "primary-fixed": "#e2dfff",
-                      "inverse-surface": "#213145"
-              },
-              "borderRadius": {
-                      "DEFAULT": "0.25rem",
-                      "lg": "0.5rem",
-                      "xl": "0.75rem",
-                      "full": "9999px"
-              },
-              "spacing": {
-                      "lg": "24px",
-                      "base": "4px",
-                      "md": "16px",
-                      "xs": "4px",
-                      "gutter": "24px",
-                      "sm": "8px",
-                      "xl": "40px",
-                      "container-max": "1440px"
-              },
-              "fontFamily": {
-                      "body-md": ["Inter"],
-                      "headline-lg": ["Geist"],
-                      "body-lg": ["Inter"],
-                      "headline-sm": ["Geist"],
-                      "label-caps": ["Inter"],
-                      "headline-md": ["Geist"],
-                      "headline-lg-mobile": ["Geist"],
-                      "display-lg": ["Geist"],
-                      "data-mono": ["JetBrains Mono"]
-              },
-              "fontSize": {
-                      "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
-                      "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
-                      "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
-                      "headline-sm": ["18px", {"lineHeight": "1.4", "fontWeight": "600"}],
-                      "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
-                      "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
-                      "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
-                      "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
-                      "data-mono": ["13px", {"lineHeight": "1.4", "fontWeight": "450"}]
-              }
-            }
-          }
-        }
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Candidate Profile - Logikality AI</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-fixed": "#acedff",
+              "on-tertiary": "#ffffff",
+              "on-surface-variant": "#464555",
+              "outline-variant": "#c7c4d8",
+              "on-surface": "#0b1c30",
+              "on-secondary-container": "#006172",
+              "on-primary-fixed": "#0f0069",
+              "on-error-container": "#93000a",
+              "on-tertiary-container": "#ffd2be",
+              "on-primary": "#ffffff",
+              "surface-container-highest": "#d3e4fe",
+              "error-container": "#ffdad6",
+              "on-tertiary-fixed-variant": "#7b2f00",
+              "surface-variant": "#d3e4fe",
+              "primary-container": "#4f46e5",
+              "on-secondary-fixed-variant": "#004e5c",
+              "surface-container-low": "#eff4ff",
+              "inverse-primary": "#c3c0ff",
+              "on-primary-fixed-variant": "#3323cc",
+              "on-primary-container": "#dad7ff",
+              "on-background": "#0b1c30",
+              "surface-container-lowest": "#ffffff",
+              "on-error": "#ffffff",
+              error: "#ba1a1a",
+              "surface-dim": "#cbdbf5",
+              "on-secondary-fixed": "#001f26",
+              outline: "#777587",
+              "on-tertiary-fixed": "#351000",
+              "primary-fixed-dim": "#c3c0ff",
+              "on-secondary": "#ffffff",
+              tertiary: "#7e3000",
+              "surface-tint": "#4d44e3",
+              surface: "#f8f9ff",
+              "surface-container": "#e5eeff",
+              "surface-bright": "#f8f9ff",
+              background: "#f8f9ff",
+              "secondary-fixed-dim": "#4cd7f6",
+              primary: "#3525cd",
+              "tertiary-fixed-dim": "#ffb695",
+              "tertiary-container": "#a44100",
+              "tertiary-fixed": "#ffdbcc",
+              "secondary-container": "#57dffe",
+              "surface-container-high": "#dce9ff",
+              secondary: "#00687a",
+              "inverse-on-surface": "#eaf1ff",
+              "primary-fixed": "#e2dfff",
+              "inverse-surface": "#213145",
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+            spacing: {
+              lg: "24px",
+              base: "4px",
+              md: "16px",
+              xs: "4px",
+              gutter: "24px",
+              sm: "8px",
+              xl: "40px",
+              "container-max": "1440px",
+            },
+            fontFamily: {
+              "body-md": ["Inter"],
+              "headline-lg": ["Geist"],
+              "body-lg": ["Inter"],
+              "headline-sm": ["Geist"],
+              "label-caps": ["Inter"],
+              "headline-md": ["Geist"],
+              "headline-lg-mobile": ["Geist"],
+              "display-lg": ["Geist"],
+              "data-mono": ["JetBrains Mono"],
+            },
+            fontSize: {
+              "body-md": ["14px", { lineHeight: "1.5", fontWeight: "400" }],
+              "headline-lg": [
+                "32px",
+                { lineHeight: "1.2", letterSpacing: "-0.02em", fontWeight: "600" },
+              ],
+              "body-lg": ["16px", { lineHeight: "1.6", fontWeight: "400" }],
+              "headline-sm": ["18px", { lineHeight: "1.4", fontWeight: "600" }],
+              "label-caps": [
+                "12px",
+                { lineHeight: "1", letterSpacing: "0.05em", fontWeight: "600" },
+              ],
+              "headline-md": ["24px", { lineHeight: "1.3", fontWeight: "600" }],
+              "headline-lg-mobile": ["24px", { lineHeight: "1.2", fontWeight: "600" }],
+              "display-lg": [
+                "48px",
+                { lineHeight: "1.1", letterSpacing: "-0.04em", fontWeight: "700" },
+              ],
+              "data-mono": ["13px", { lineHeight: "1.4", fontWeight: "450" }],
+            },
+          },
+        },
+      };
     </script>
-<style>
-        /* Level 1 Surface Shadow */
-        .shadow-level-1 {
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
-        }
-        .shadow-level-2 {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
-        
-        /* AI Insights Pattern */
-        .ai-pattern {
-            background-color: #ECFEFF;
-            background-image: radial-gradient(#06B6D4 0.5px, transparent 0.5px);
-            background-size: 12px 12px;
-        }
+    <style>
+      /* Level 1 Surface Shadow */
+      .shadow-level-1 {
+        box-shadow:
+          0 1px 3px 0 rgba(0, 0, 0, 0.02),
+          0 1px 2px -1px rgba(0, 0, 0, 0.03);
+      }
+      .shadow-level-2 {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      }
+
+      /* AI Insights Pattern */
+      .ai-pattern {
+        background-color: #ecfeff;
+        background-image: radial-gradient(#06b6d4 0.5px, transparent 0.5px);
+        background-size: 12px 12px;
+      }
     </style>
-</head>
-<body class="bg-background text-on-surface font-body-md h-screen overflow-hidden flex">
-<!-- SideNavBar -->
-<nav class="h-screen sticky left-0 top-0 w-64 bg-surface border-r border-outline-variant flex flex-col p-md hidden md:flex shrink-0 z-50">
-<div class="mb-lg px-4">
-<h1 class="font-headline-md text-headline-md font-bold text-primary">Logikality AI</h1>
-<p class="font-label-caps text-label-caps text-on-surface-variant mt-1">Enterprise Plan</p>
-</div>
-<button class="w-full bg-primary text-on-primary hover:brightness-110 transition-all rounded-lg py-3 px-4 font-body-md font-semibold mb-lg flex justify-center items-center gap-2 shadow-sm">
-<span class="material-symbols-outlined text-[18px]">add</span>
-            New Interview
-        </button>
-<div class="flex-1 overflow-y-auto space-y-1">
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg font-body-md" href="#">
-<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-                Dashboard
-            </a>
-<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-semibold font-body-md shadow-sm transition-transform opacity-90 scale-95" href="#">
-<span class="material-symbols-outlined" data-icon="groups">groups</span>
-                Candidates
-            </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg font-body-md" href="#">
-<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
-                Persona Builder
-            </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg font-body-md" href="#">
-<span class="material-symbols-outlined" data-icon="description">description</span>
-                JD Builder
-            </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg font-body-md" href="#">
-<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
-                Scheduling
-            </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg font-body-md" href="#">
-<span class="material-symbols-outlined" data-icon="video_chat">video_chat</span>
-                Interview Room
-            </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg font-body-md" href="#">
-<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
-                AI Reports
-            </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg font-body-md" href="#">
-<span class="material-symbols-outlined" data-icon="monitoring">monitoring</span>
-                Analytics
-            </a>
-</div>
-<div class="mt-auto border-t border-outline-variant pt-4 space-y-1">
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg font-body-md" href="#">
-<span class="material-symbols-outlined" data-icon="settings">settings</span>
-                Settings
-            </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg font-body-md" href="#">
-<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
-                Support
-            </a>
-</div>
-</nav>
-<!-- Main Content Area -->
-<div class="flex-1 flex flex-col h-screen overflow-hidden bg-[#F8FAFC]">
-<!-- TopAppBar -->
-<header class="sticky top-0 z-40 w-full bg-surface/80 backdrop-blur-md border-b border-outline-variant shadow-sm flex justify-between items-center h-16 px-lg shrink-0">
-<div class="flex items-center gap-4">
-<div class="md:hidden">
-<span class="font-headline-sm text-headline-sm font-black text-on-surface">Logikality AI</span>
-</div>
-<!-- Breadcrumbs / Context -->
-<div class="hidden md:flex items-center gap-2 text-on-surface-variant font-body-md">
-<span class="hover:text-primary cursor-pointer transition-colors">Candidates</span>
-<span class="material-symbols-outlined text-[16px]">chevron_right</span>
-<span class="text-on-surface font-semibold">Sarah Jenkins - Sr. Frontend Engineer</span>
-</div>
-</div>
-<div class="flex items-center gap-md">
-<button class="p-2 text-on-surface-variant hover:bg-surface-container-low transition-all rounded-full flex items-center justify-center">
-<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
-</button>
-<button class="p-2 text-on-surface-variant hover:bg-surface-container-low transition-all rounded-full flex items-center justify-center">
-<span class="material-symbols-outlined" data-icon="history">history</span>
-</button>
-<button class="p-2 text-on-surface-variant hover:bg-surface-container-low transition-all rounded-full flex items-center justify-center">
-<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
-</button>
-<div class="w-px h-6 bg-outline-variant mx-2 hidden sm:block"></div>
-<button class="hidden sm:flex items-center gap-2 bg-white border border-slate-200 text-slate-900 hover:bg-slate-50 transition-colors px-4 py-2 rounded-lg font-body-md shadow-sm">
-                    Switch Org
-                    <span class="material-symbols-outlined text-[16px]">swap_horiz</span>
-</button>
-</div>
-</header>
-<!-- Split View Container -->
-<main class="flex-1 flex flex-col lg:flex-row overflow-hidden max-w-[1600px] w-full mx-auto">
-<!-- Left Pane: Parsed Profile (Scrollable) -->
-<div class="w-full lg:w-[45%] xl:w-[40%] flex flex-col h-full border-r border-outline-variant bg-[#F8FAFC] z-10 shrink-0">
-<div class="p-lg overflow-y-auto h-full space-y-lg custom-scrollbar">
-<!-- Candidate Header Card -->
-<div class="bg-white rounded-xl p-lg border border-slate-200 shadow-level-1">
-<div class="flex items-start gap-md">
-<div class="w-20 h-20 rounded-full bg-surface-container overflow-hidden shrink-0 border-2 border-white shadow-sm">
-<img alt="Sarah Jenkins Profile" class="w-full h-full object-cover" data-alt="A professional headshot of a young woman in a well-lit, modern corporate environment. She has a confident, approachable expression, wearing business casual attire. The lighting is high-key and flattering, contributing to a clean, bright aesthetic consistent with a modern light-mode user interface. The color palette emphasizes crisp whites and subtle, neutral skin tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBB5hyjM8_RSkoVRalGTwgSEavh1KFjVltUuLrmA8KqyyBv0F-DIrcuLcIrCLbpwApl_j470GoYJWfhiq7jhIIpesGzpTRVd_EutAAafFxMx0mkGP3P987wlD3mYk1N-JY0YLq36fY2zIDCOQ9keGcRmtJ_eBLMZfgRWmoPonqVfj4aqNBduxYGouLDUVNLFGtjJsRpf62xudiKhU1Ecrsc_G9xspzPifFtEgykhl0oOps9ccgXZQisq42SImYES5yYpO0Kn1rdSeDh"/>
-</div>
-<div class="flex-1 min-w-0">
-<div class="flex justify-between items-start">
-<div>
-<h2 class="font-headline-md text-headline-md text-on-surface mb-1 truncate">Sarah Jenkins</h2>
-<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1">
-<span class="material-symbols-outlined text-[16px]">work</span>
-                                            Senior Frontend Engineer
-                                        </p>
-</div>
-<div class="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full border border-emerald-200 font-label-caps text-label-caps flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]">check_circle</span>
-                                        Match 92%
-                                    </div>
-</div>
-<div class="mt-4 flex flex-wrap gap-2 font-body-md text-body-md text-on-surface-variant">
-<div class="flex items-center gap-1 bg-surface py-1 px-2 rounded-md border border-slate-100">
-<span class="material-symbols-outlined text-[14px]">location_on</span> San Francisco, CA
-                                    </div>
-<div class="flex items-center gap-1 bg-surface py-1 px-2 rounded-md border border-slate-100">
-<span class="material-symbols-outlined text-[14px]">mail</span> sarah.j@example.com
-                                    </div>
-<div class="flex items-center gap-1 bg-surface py-1 px-2 rounded-md border border-slate-100">
-<span class="material-symbols-outlined text-[14px]">link</span> github.com/sjenkins
-                                    </div>
-</div>
-</div>
-</div>
-<div class="mt-lg pt-md border-t border-slate-200 flex gap-3">
-<button class="flex-1 bg-primary text-on-primary hover:brightness-110 transition-all py-2 rounded-lg font-body-md font-semibold shadow-sm">
-                                Advance to Interview
-                            </button>
-<button class="flex-1 bg-white border border-slate-200 text-slate-900 hover:bg-slate-50 transition-colors py-2 rounded-lg font-body-md font-semibold shadow-sm flex justify-center items-center gap-2">
-<span class="material-symbols-outlined text-[18px]">thumb_down</span> Reject
-                            </button>
-<button class="w-10 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors rounded-lg flex justify-center items-center shadow-sm">
-<span class="material-symbols-outlined text-[20px]">more_vert</span>
-</button>
-</div>
-</div>
-<!-- AI Insights Component -->
-<div class="rounded-xl p-lg border-l-2 border-l-[#06B6D4] ai-pattern shadow-level-1 relative overflow-hidden group">
-<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-<span class="material-symbols-outlined text-[64px] text-[#06B6D4]">auto_awesome</span>
-</div>
-<h3 class="font-headline-sm text-headline-sm text-on-surface mb-3 flex items-center gap-2 relative z-10">
-<span class="material-symbols-outlined text-[#06B6D4]" data-icon="auto_awesome" data-weight="fill">auto_awesome</span>
-                            Logikality AI Synthesis
-                        </h3>
-<p class="font-body-md text-body-md text-slate-700 leading-relaxed relative z-10">
-                            Strong candidate for the Senior Frontend role. Deep expertise in React and modern state management (Zustand, Redux). Demonstrates excellent architectural thinking in past roles, specifically leading the migration to Next.js at Acme Corp. 
-                            <span class="block mt-2 font-semibold text-slate-900">Potential Gap:</span> Limited explicit mention of GraphQL experience, which is a secondary requirement for this JD. Probe during technical screen.
-                        </p>
-</div>
-<!-- Skills & Keywords -->
-<div class="bg-white rounded-xl p-lg border border-slate-200 shadow-level-1">
-<h3 class="font-headline-sm text-headline-sm text-on-surface mb-md pb-2 border-b border-slate-100 flex items-center justify-between">
-                            Technical Skills
-                            <span class="material-symbols-outlined text-slate-400 text-[18px]">code</span>
-</h3>
-<div class="space-y-4">
-<div>
-<h4 class="font-label-caps text-label-caps text-slate-500 mb-2">Core Competencies</h4>
-<div class="flex flex-wrap gap-2">
-<span class="px-3 py-1 bg-slate-100 text-slate-800 rounded-md font-data-mono text-data-mono border border-slate-200">React.js</span>
-<span class="px-3 py-1 bg-slate-100 text-slate-800 rounded-md font-data-mono text-data-mono border border-slate-200">TypeScript</span>
-<span class="px-3 py-1 bg-slate-100 text-slate-800 rounded-md font-data-mono text-data-mono border border-slate-200">Next.js</span>
-<span class="px-3 py-1 bg-slate-100 text-slate-800 rounded-md font-data-mono text-data-mono border border-slate-200">Tailwind CSS</span>
-<span class="px-3 py-1 bg-slate-100 text-slate-800 rounded-md font-data-mono text-data-mono border border-slate-200">Node.js</span>
-</div>
-</div>
-<div>
-<h4 class="font-label-caps text-label-caps text-slate-500 mb-2">Tools &amp; Practices</h4>
-<div class="flex flex-wrap gap-2">
-<span class="px-3 py-1 bg-white text-slate-600 rounded-md font-data-mono text-data-mono border border-slate-200">CI/CD</span>
-<span class="px-3 py-1 bg-white text-slate-600 rounded-md font-data-mono text-data-mono border border-slate-200">Jest</span>
-<span class="px-3 py-1 bg-white text-slate-600 rounded-md font-data-mono text-data-mono border border-slate-200">Cypress</span>
-<span class="px-3 py-1 bg-white text-slate-600 rounded-md font-data-mono text-data-mono border border-slate-200">AWS</span>
-</div>
-</div>
-</div>
-</div>
-<!-- Experience Timeline -->
-<div class="bg-white rounded-xl p-lg border border-slate-200 shadow-level-1">
-<h3 class="font-headline-sm text-headline-sm text-on-surface mb-md pb-2 border-b border-slate-100 flex items-center justify-between">
-                            Experience Timeline
-                            <span class="material-symbols-outlined text-slate-400 text-[18px]">timeline</span>
-</h3>
-<div class="relative border-l-2 border-slate-100 ml-3 space-y-6 mt-4">
-<!-- Job 1 -->
-<div class="relative pl-6">
-<div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-primary ring-4 ring-white"></div>
-<div class="flex justify-between items-start mb-1">
-<h4 class="font-body-md font-semibold text-slate-900">Lead Frontend Engineer</h4>
-<span class="font-data-mono text-data-mono text-slate-500 bg-slate-50 px-2 py-0.5 rounded">2021 - Present</span>
-</div>
-<p class="font-body-md text-slate-600 mb-2">Acme Corp • San Francisco, CA</p>
-<ul class="font-body-md text-slate-700 space-y-1 list-disc list-inside marker:text-slate-300">
-<li>Architected and led the migration of a legacy SPA to Next.js, improving LCP by 45%.</li>
-<li>Managed a team of 4 frontend developers, conducting code reviews and mentoring.</li>
-<li>Implemented a robust design system using Tailwind CSS and Storybook.</li>
-</ul>
-</div>
-<!-- Job 2 -->
-<div class="relative pl-6">
-<div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-slate-300 ring-4 ring-white"></div>
-<div class="flex justify-between items-start mb-1">
-<h4 class="font-body-md font-semibold text-slate-900">Frontend Developer</h4>
-<span class="font-data-mono text-data-mono text-slate-500 bg-slate-50 px-2 py-0.5 rounded">2018 - 2021</span>
-</div>
-<p class="font-body-md text-slate-600 mb-2">TechFlow Solutions • Austin, TX</p>
-<ul class="font-body-md text-slate-700 space-y-1 list-disc list-inside marker:text-slate-300">
-<li>Developed responsive user interfaces for SaaS dashboards using React and Redux.</li>
-<li>Collaborated closely with UX designers to ensure pixel-perfect implementation.</li>
-</ul>
-</div>
-</div>
-</div>
-</div>
-</div>
-<!-- Right Pane: PDF/Resume Viewer -->
-<div class="w-full lg:w-[55%] xl:w-[60%] flex flex-col h-full bg-slate-800 relative z-0">
-<!-- Viewer Toolbar -->
-<div class="h-14 bg-slate-900 border-b border-slate-700 flex justify-between items-center px-4 shrink-0">
-<div class="flex items-center gap-3">
-<span class="text-white font-body-md font-medium flex items-center gap-2">
-<span class="material-symbols-outlined text-slate-400 text-[18px]">picture_as_pdf</span>
-                            Sarah_Jenkins_Resume_2024.pdf
-                        </span>
-</div>
-<div class="flex items-center gap-1">
-<button class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors" title="Zoom Out">
-<span class="material-symbols-outlined text-[20px]">remove</span>
-</button>
-<span class="text-slate-300 font-data-mono text-data-mono px-2">100%</span>
-<button class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors" title="Zoom In">
-<span class="material-symbols-outlined text-[20px]">add</span>
-</button>
-<div class="w-px h-4 bg-slate-700 mx-2"></div>
-<button class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors" title="Download">
-<span class="material-symbols-outlined text-[20px]">download</span>
-</button>
-<button class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors" title="Print">
-<span class="material-symbols-outlined text-[20px]">print</span>
-</button>
-</div>
-</div>
-<!-- Document Canvas Container -->
-<div class="flex-1 overflow-auto p-lg flex justify-center custom-scrollbar bg-slate-800 relative">
-<!-- The "PDF" Page -->
-<div class="bg-white w-full max-w-[850px] min-h-[1100px] shadow-2xl relative">
-<!-- AI Overlay Highlights (Absolute positioned over the document) -->
-<div class="absolute top-[280px] left-[40px] w-[770px] h-[120px] border-2 border-[#06B6D4] bg-[#06B6D4]/5 rounded pointer-events-none z-10 flex items-start">
-<div class="absolute -right-3 -top-3 bg-white border border-[#06B6D4] rounded-full p-1 shadow-md pointer-events-auto cursor-help group">
-<span class="material-symbols-outlined text-[#06B6D4] text-[16px] block">auto_awesome</span>
-<!-- Tooltip -->
-<div class="absolute right-full mr-2 top-1/2 -translate-y-1/2 w-64 bg-slate-900 text-white text-sm p-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl border border-slate-700 font-body-md z-50">
-<strong class="block text-[#06B6D4] mb-1">High JD Match</strong>
-                                    Experience leading Next.js migration directly aligns with our Q3 roadmap requirements.
-                                </div>
-</div>
-</div>
-<!-- Mock Resume Content (To simulate the PDF) -->
-<div class="p-12 font-body-md text-slate-800 space-y-8 select-text">
-<!-- Header -->
-<div class="text-center border-b-2 border-slate-200 pb-6">
-<h1 class="text-4xl font-headline-lg text-slate-900 mb-2">SARAH JENKINS</h1>
-<p class="text-slate-600 flex justify-center gap-4 text-sm">
-<span>sarah.j@example.com</span>
-<span>•</span>
-<span>(555) 123-4567</span>
-<span>•</span>
-<span>San Francisco, CA</span>
-</p>
-</div>
-<!-- Summary -->
-<div>
-<h2 class="text-lg font-bold text-slate-900 uppercase tracking-wider mb-3 border-b border-slate-200 pb-1">Professional Summary</h2>
-<p class="text-sm leading-relaxed text-slate-700">
-                                    Results-driven Senior Frontend Engineer with 6+ years of experience building scalable, high-performance web applications. Expert in React ecosystem and modern JavaScript architectures. Proven track record of leading technical initiatives, mentoring teams, and collaborating with cross-functional stakeholders to deliver exceptional user experiences.
-                                </p>
-</div>
-<!-- Experience -->
-<div>
-<h2 class="text-lg font-bold text-slate-900 uppercase tracking-wider mb-4 border-b border-slate-200 pb-1">Experience</h2>
-<div class="mb-6">
-<div class="flex justify-between items-baseline mb-2">
-<h3 class="font-bold text-slate-900 text-base">Acme Corp</h3>
-<span class="text-sm font-semibold text-slate-600">Jan 2021 - Present</span>
-</div>
-<p class="text-sm italic text-slate-600 mb-2">Lead Frontend Engineer | San Francisco, CA</p>
-<ul class="list-disc list-outside ml-4 text-sm space-y-2 text-slate-700 leading-relaxed">
-<li>Spearheaded the architectural design and execution of migrating a monolithic React SPA to Next.js, resulting in a 45% improvement in Largest Contentful Paint (LCP) and significant SEO gains.</li>
-<li>Manage and mentor a squad of 4 frontend engineers, establishing coding standards, conducting rigorous code reviews, and fostering a culture of technical excellence.</li>
-<li>Engineered a comprehensive, accessible component library using React, Tailwind CSS, and Storybook, adopted by 3 internal product teams to ensure UI consistency.</li>
-<li>Optimized complex data visualization dashboards utilizing WebGL and Canvas APIs to handle massive datasets with 60fps rendering performance.</li>
-</ul>
-</div>
-<div class="mb-6">
-<div class="flex justify-between items-baseline mb-2">
-<h3 class="font-bold text-slate-900 text-base">TechFlow Solutions</h3>
-<span class="text-sm font-semibold text-slate-600">Jun 2018 - Dec 2020</span>
-</div>
-<p class="text-sm italic text-slate-600 mb-2">Frontend Developer | Austin, TX</p>
-<ul class="list-disc list-outside ml-4 text-sm space-y-2 text-slate-700 leading-relaxed">
-<li>Developed and maintained core features for a B2B SaaS platform using React, Redux, and styled-components.</li>
-<li>Integrated RESTful APIs and WebSocket connections for real-time data updates across the application.</li>
-<li>Implemented comprehensive unit and integration testing strategies using Jest and React Testing Library, increasing test coverage from 40% to 85%.</li>
-</ul>
-</div>
-</div>
-<!-- Education -->
-<div>
-<h2 class="text-lg font-bold text-slate-900 uppercase tracking-wider mb-3 border-b border-slate-200 pb-1">Education</h2>
-<div class="flex justify-between items-baseline">
-<div>
-<h3 class="font-bold text-slate-900">University of Texas at Austin</h3>
-<p class="text-sm text-slate-700">Bachelor of Science in Computer Science</p>
-</div>
-<span class="text-sm text-slate-600 font-semibold">May 2018</span>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</main>
-</div>
-<style>
-        /* Custom scrollbar for inner containers */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1;
-            border-radius: 20px;
-            border: 2px solid transparent;
-            background-clip: content-box;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background-color: #94a3b8;
-        }
-        
-        /* Darker scrollbar for the PDF viewer side */
-        .bg-slate-800.custom-scrollbar::-webkit-scrollbar-thumb {
-            background-color: #475569;
-        }
-        .bg-slate-800.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background-color: #64748b;
-        }
+  </head>
+  <body class="bg-background text-on-surface font-body-md h-screen overflow-hidden flex">
+    <!-- SideNavBar -->
+    <nav
+      class="h-screen sticky left-0 top-0 w-64 bg-surface border-r border-outline-variant flex flex-col p-md hidden md:flex shrink-0 z-50"
+    >
+      <div class="mb-lg px-4">
+        <h1 class="font-headline-md text-headline-md font-bold text-primary">Logikality AI</h1>
+        <p class="font-label-caps text-label-caps text-on-surface-variant mt-1">Enterprise Plan</p>
+      </div>
+      <button
+        class="w-full bg-primary text-on-primary hover:brightness-110 transition-all rounded-lg py-3 px-4 font-body-md font-semibold mb-lg flex justify-center items-center gap-2 shadow-sm"
+      >
+        <span class="material-symbols-outlined text-[18px]">add</span>
+        New Interview
+      </button>
+      <div class="flex-1 overflow-y-auto space-y-1">
+        <a
+          class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg font-body-md"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+          Dashboard
+        </a>
+        <a
+          class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-semibold font-body-md shadow-sm transition-transform opacity-90 scale-95"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-icon="groups">groups</span>
+          Candidates
+        </a>
+        <a
+          class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg font-body-md"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+          Persona Builder
+        </a>
+        <a
+          class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg font-body-md"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-icon="description">description</span>
+          JD Builder
+        </a>
+        <a
+          class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg font-body-md"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+          Scheduling
+        </a>
+        <a
+          class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg font-body-md"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-icon="video_chat">video_chat</span>
+          Interview Room
+        </a>
+        <a
+          class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg font-body-md"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+          AI Reports
+        </a>
+        <a
+          class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg font-body-md"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-icon="monitoring">monitoring</span>
+          Analytics
+        </a>
+      </div>
+      <div class="mt-auto border-t border-outline-variant pt-4 space-y-1">
+        <a
+          class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg font-body-md"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-icon="settings">settings</span>
+          Settings
+        </a>
+        <a
+          class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg font-body-md"
+          href="#"
+        >
+          <span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+          Support
+        </a>
+      </div>
+    </nav>
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col h-screen overflow-hidden bg-[#F8FAFC]">
+      <!-- TopAppBar -->
+      <header
+        class="sticky top-0 z-40 w-full bg-surface/80 backdrop-blur-md border-b border-outline-variant shadow-sm flex justify-between items-center h-16 px-lg shrink-0"
+      >
+        <div class="flex items-center gap-4">
+          <div class="md:hidden">
+            <span class="font-headline-sm text-headline-sm font-black text-on-surface"
+              >Logikality AI</span
+            >
+          </div>
+          <!-- Breadcrumbs / Context -->
+          <div class="hidden md:flex items-center gap-2 text-on-surface-variant font-body-md">
+            <span class="hover:text-primary cursor-pointer transition-colors">Candidates</span>
+            <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+            <span class="text-on-surface font-semibold">Sarah Jenkins - Sr. Frontend Engineer</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-md">
+          <button
+            class="p-2 text-on-surface-variant hover:bg-surface-container-low transition-all rounded-full flex items-center justify-center"
+          >
+            <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+          </button>
+          <button
+            class="p-2 text-on-surface-variant hover:bg-surface-container-low transition-all rounded-full flex items-center justify-center"
+          >
+            <span class="material-symbols-outlined" data-icon="history">history</span>
+          </button>
+          <button
+            class="p-2 text-on-surface-variant hover:bg-surface-container-low transition-all rounded-full flex items-center justify-center"
+          >
+            <span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+          </button>
+          <div class="w-px h-6 bg-outline-variant mx-2 hidden sm:block"></div>
+          <button
+            class="hidden sm:flex items-center gap-2 bg-white border border-slate-200 text-slate-900 hover:bg-slate-50 transition-colors px-4 py-2 rounded-lg font-body-md shadow-sm"
+          >
+            Switch Org
+            <span class="material-symbols-outlined text-[16px]">swap_horiz</span>
+          </button>
+        </div>
+      </header>
+      <!-- Split View Container -->
+      <main class="flex-1 flex flex-col lg:flex-row overflow-hidden max-w-[1600px] w-full mx-auto">
+        <!-- Left Pane: Parsed Profile (Scrollable) -->
+        <div
+          class="w-full lg:w-[45%] xl:w-[40%] flex flex-col h-full border-r border-outline-variant bg-[#F8FAFC] z-10 shrink-0"
+        >
+          <div class="p-lg overflow-y-auto h-full space-y-lg custom-scrollbar">
+            <!-- Candidate Header Card -->
+            <div class="bg-white rounded-xl p-lg border border-slate-200 shadow-level-1">
+              <div class="flex items-start gap-md">
+                <div
+                  class="w-20 h-20 rounded-full bg-surface-container overflow-hidden shrink-0 border-2 border-white shadow-sm"
+                >
+                  <img
+                    alt="Sarah Jenkins Profile"
+                    class="w-full h-full object-cover"
+                    data-alt="A professional headshot of a young woman in a well-lit, modern corporate environment. She has a confident, approachable expression, wearing business casual attire. The lighting is high-key and flattering, contributing to a clean, bright aesthetic consistent with a modern light-mode user interface. The color palette emphasizes crisp whites and subtle, neutral skin tones."
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBB5hyjM8_RSkoVRalGTwgSEavh1KFjVltUuLrmA8KqyyBv0F-DIrcuLcIrCLbpwApl_j470GoYJWfhiq7jhIIpesGzpTRVd_EutAAafFxMx0mkGP3P987wlD3mYk1N-JY0YLq36fY2zIDCOQ9keGcRmtJ_eBLMZfgRWmoPonqVfj4aqNBduxYGouLDUVNLFGtjJsRpf62xudiKhU1Ecrsc_G9xspzPifFtEgykhl0oOps9ccgXZQisq42SImYES5yYpO0Kn1rdSeDh"
+                  />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <h2 class="font-headline-md text-headline-md text-on-surface mb-1 truncate">
+                        Sarah Jenkins
+                      </h2>
+                      <p
+                        class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1"
+                      >
+                        <span class="material-symbols-outlined text-[16px]">work</span>
+                        Senior Frontend Engineer
+                      </p>
+                    </div>
+                    <div
+                      class="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full border border-emerald-200 font-label-caps text-label-caps flex items-center gap-1"
+                    >
+                      <span class="material-symbols-outlined text-[14px]">check_circle</span>
+                      Match 92%
+                    </div>
+                  </div>
+                  <div
+                    class="mt-4 flex flex-wrap gap-2 font-body-md text-body-md text-on-surface-variant"
+                  >
+                    <div
+                      class="flex items-center gap-1 bg-surface py-1 px-2 rounded-md border border-slate-100"
+                    >
+                      <span class="material-symbols-outlined text-[14px]">location_on</span> San
+                      Francisco, CA
+                    </div>
+                    <div
+                      class="flex items-center gap-1 bg-surface py-1 px-2 rounded-md border border-slate-100"
+                    >
+                      <span class="material-symbols-outlined text-[14px]">mail</span>
+                      sarah.j@example.com
+                    </div>
+                    <div
+                      class="flex items-center gap-1 bg-surface py-1 px-2 rounded-md border border-slate-100"
+                    >
+                      <span class="material-symbols-outlined text-[14px]">link</span>
+                      github.com/sjenkins
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-lg pt-md border-t border-slate-200 flex gap-3">
+                <button
+                  class="flex-1 bg-primary text-on-primary hover:brightness-110 transition-all py-2 rounded-lg font-body-md font-semibold shadow-sm"
+                >
+                  Advance to Interview
+                </button>
+                <button
+                  class="flex-1 bg-white border border-slate-200 text-slate-900 hover:bg-slate-50 transition-colors py-2 rounded-lg font-body-md font-semibold shadow-sm flex justify-center items-center gap-2"
+                >
+                  <span class="material-symbols-outlined text-[18px]">thumb_down</span> Reject
+                </button>
+                <button
+                  class="w-10 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors rounded-lg flex justify-center items-center shadow-sm"
+                >
+                  <span class="material-symbols-outlined text-[20px]">more_vert</span>
+                </button>
+              </div>
+            </div>
+            <!-- AI Insights Component -->
+            <div
+              class="rounded-xl p-lg border-l-2 border-l-[#06B6D4] ai-pattern shadow-level-1 relative overflow-hidden group"
+            >
+              <div
+                class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"
+              >
+                <span class="material-symbols-outlined text-[64px] text-[#06B6D4]"
+                  >auto_awesome</span
+                >
+              </div>
+              <h3
+                class="font-headline-sm text-headline-sm text-on-surface mb-3 flex items-center gap-2 relative z-10"
+              >
+                <span
+                  class="material-symbols-outlined text-[#06B6D4]"
+                  data-icon="auto_awesome"
+                  data-weight="fill"
+                  >auto_awesome</span
+                >
+                Logikality AI Synthesis
+              </h3>
+              <p class="font-body-md text-body-md text-slate-700 leading-relaxed relative z-10">
+                Strong candidate for the Senior Frontend role. Deep expertise in React and modern
+                state management (Zustand, Redux). Demonstrates excellent architectural thinking in
+                past roles, specifically leading the migration to Next.js at Acme Corp.
+                <span class="block mt-2 font-semibold text-slate-900">Potential Gap:</span> Limited
+                explicit mention of GraphQL experience, which is a secondary requirement for this
+                JD. Probe during technical screen.
+              </p>
+            </div>
+            <!-- Skills & Keywords -->
+            <div class="bg-white rounded-xl p-lg border border-slate-200 shadow-level-1">
+              <h3
+                class="font-headline-sm text-headline-sm text-on-surface mb-md pb-2 border-b border-slate-100 flex items-center justify-between"
+              >
+                Technical Skills
+                <span class="material-symbols-outlined text-slate-400 text-[18px]">code</span>
+              </h3>
+              <div class="space-y-4">
+                <div>
+                  <h4 class="font-label-caps text-label-caps text-slate-500 mb-2">
+                    Core Competencies
+                  </h4>
+                  <div class="flex flex-wrap gap-2">
+                    <span
+                      class="px-3 py-1 bg-slate-100 text-slate-800 rounded-md font-data-mono text-data-mono border border-slate-200"
+                      >React.js</span
+                    >
+                    <span
+                      class="px-3 py-1 bg-slate-100 text-slate-800 rounded-md font-data-mono text-data-mono border border-slate-200"
+                      >TypeScript</span
+                    >
+                    <span
+                      class="px-3 py-1 bg-slate-100 text-slate-800 rounded-md font-data-mono text-data-mono border border-slate-200"
+                      >Next.js</span
+                    >
+                    <span
+                      class="px-3 py-1 bg-slate-100 text-slate-800 rounded-md font-data-mono text-data-mono border border-slate-200"
+                      >Tailwind CSS</span
+                    >
+                    <span
+                      class="px-3 py-1 bg-slate-100 text-slate-800 rounded-md font-data-mono text-data-mono border border-slate-200"
+                      >Node.js</span
+                    >
+                  </div>
+                </div>
+                <div>
+                  <h4 class="font-label-caps text-label-caps text-slate-500 mb-2">
+                    Tools &amp; Practices
+                  </h4>
+                  <div class="flex flex-wrap gap-2">
+                    <span
+                      class="px-3 py-1 bg-white text-slate-600 rounded-md font-data-mono text-data-mono border border-slate-200"
+                      >CI/CD</span
+                    >
+                    <span
+                      class="px-3 py-1 bg-white text-slate-600 rounded-md font-data-mono text-data-mono border border-slate-200"
+                      >Jest</span
+                    >
+                    <span
+                      class="px-3 py-1 bg-white text-slate-600 rounded-md font-data-mono text-data-mono border border-slate-200"
+                      >Cypress</span
+                    >
+                    <span
+                      class="px-3 py-1 bg-white text-slate-600 rounded-md font-data-mono text-data-mono border border-slate-200"
+                      >AWS</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Experience Timeline -->
+            <div class="bg-white rounded-xl p-lg border border-slate-200 shadow-level-1">
+              <h3
+                class="font-headline-sm text-headline-sm text-on-surface mb-md pb-2 border-b border-slate-100 flex items-center justify-between"
+              >
+                Experience Timeline
+                <span class="material-symbols-outlined text-slate-400 text-[18px]">timeline</span>
+              </h3>
+              <div class="relative border-l-2 border-slate-100 ml-3 space-y-6 mt-4">
+                <!-- Job 1 -->
+                <div class="relative pl-6">
+                  <div
+                    class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-primary ring-4 ring-white"
+                  ></div>
+                  <div class="flex justify-between items-start mb-1">
+                    <h4 class="font-body-md font-semibold text-slate-900">
+                      Lead Frontend Engineer
+                    </h4>
+                    <span
+                      class="font-data-mono text-data-mono text-slate-500 bg-slate-50 px-2 py-0.5 rounded"
+                      >2021 - Present</span
+                    >
+                  </div>
+                  <p class="font-body-md text-slate-600 mb-2">Acme Corp • San Francisco, CA</p>
+                  <ul
+                    class="font-body-md text-slate-700 space-y-1 list-disc list-inside marker:text-slate-300"
+                  >
+                    <li>
+                      Architected and led the migration of a legacy SPA to Next.js, improving LCP by
+                      45%.
+                    </li>
+                    <li>
+                      Managed a team of 4 frontend developers, conducting code reviews and
+                      mentoring.
+                    </li>
+                    <li>Implemented a robust design system using Tailwind CSS and Storybook.</li>
+                  </ul>
+                </div>
+                <!-- Job 2 -->
+                <div class="relative pl-6">
+                  <div
+                    class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-slate-300 ring-4 ring-white"
+                  ></div>
+                  <div class="flex justify-between items-start mb-1">
+                    <h4 class="font-body-md font-semibold text-slate-900">Frontend Developer</h4>
+                    <span
+                      class="font-data-mono text-data-mono text-slate-500 bg-slate-50 px-2 py-0.5 rounded"
+                      >2018 - 2021</span
+                    >
+                  </div>
+                  <p class="font-body-md text-slate-600 mb-2">TechFlow Solutions • Austin, TX</p>
+                  <ul
+                    class="font-body-md text-slate-700 space-y-1 list-disc list-inside marker:text-slate-300"
+                  >
+                    <li>
+                      Developed responsive user interfaces for SaaS dashboards using React and
+                      Redux.
+                    </li>
+                    <li>
+                      Collaborated closely with UX designers to ensure pixel-perfect implementation.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Right Pane: PDF/Resume Viewer -->
+        <div class="w-full lg:w-[55%] xl:w-[60%] flex flex-col h-full bg-slate-800 relative z-0">
+          <!-- Viewer Toolbar -->
+          <div
+            class="h-14 bg-slate-900 border-b border-slate-700 flex justify-between items-center px-4 shrink-0"
+          >
+            <div class="flex items-center gap-3">
+              <span class="text-white font-body-md font-medium flex items-center gap-2">
+                <span class="material-symbols-outlined text-slate-400 text-[18px]"
+                  >picture_as_pdf</span
+                >
+                Sarah_Jenkins_Resume_2024.pdf
+              </span>
+            </div>
+            <div class="flex items-center gap-1">
+              <button
+                class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors"
+                title="Zoom Out"
+              >
+                <span class="material-symbols-outlined text-[20px]">remove</span>
+              </button>
+              <span class="text-slate-300 font-data-mono text-data-mono px-2">100%</span>
+              <button
+                class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors"
+                title="Zoom In"
+              >
+                <span class="material-symbols-outlined text-[20px]">add</span>
+              </button>
+              <div class="w-px h-4 bg-slate-700 mx-2"></div>
+              <button
+                class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors"
+                title="Download"
+              >
+                <span class="material-symbols-outlined text-[20px]">download</span>
+              </button>
+              <button
+                class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors"
+                title="Print"
+              >
+                <span class="material-symbols-outlined text-[20px]">print</span>
+              </button>
+            </div>
+          </div>
+          <!-- Document Canvas Container -->
+          <div
+            class="flex-1 overflow-auto p-lg flex justify-center custom-scrollbar bg-slate-800 relative"
+          >
+            <!-- The "PDF" Page -->
+            <div class="bg-white w-full max-w-[850px] min-h-[1100px] shadow-2xl relative">
+              <!-- AI Overlay Highlights (Absolute positioned over the document) -->
+              <div
+                class="absolute top-[280px] left-[40px] w-[770px] h-[120px] border-2 border-[#06B6D4] bg-[#06B6D4]/5 rounded pointer-events-none z-10 flex items-start"
+              >
+                <div
+                  class="absolute -right-3 -top-3 bg-white border border-[#06B6D4] rounded-full p-1 shadow-md pointer-events-auto cursor-help group"
+                >
+                  <span class="material-symbols-outlined text-[#06B6D4] text-[16px] block"
+                    >auto_awesome</span
+                  >
+                  <!-- Tooltip -->
+                  <div
+                    class="absolute right-full mr-2 top-1/2 -translate-y-1/2 w-64 bg-slate-900 text-white text-sm p-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl border border-slate-700 font-body-md z-50"
+                  >
+                    <strong class="block text-[#06B6D4] mb-1">High JD Match</strong>
+                    Experience leading Next.js migration directly aligns with our Q3 roadmap
+                    requirements.
+                  </div>
+                </div>
+              </div>
+              <!-- Mock Resume Content (To simulate the PDF) -->
+              <div class="p-12 font-body-md text-slate-800 space-y-8 select-text">
+                <!-- Header -->
+                <div class="text-center border-b-2 border-slate-200 pb-6">
+                  <h1 class="text-4xl font-headline-lg text-slate-900 mb-2">SARAH JENKINS</h1>
+                  <p class="text-slate-600 flex justify-center gap-4 text-sm">
+                    <span>sarah.j@example.com</span>
+                    <span>•</span>
+                    <span>(555) 123-4567</span>
+                    <span>•</span>
+                    <span>San Francisco, CA</span>
+                  </p>
+                </div>
+                <!-- Summary -->
+                <div>
+                  <h2
+                    class="text-lg font-bold text-slate-900 uppercase tracking-wider mb-3 border-b border-slate-200 pb-1"
+                  >
+                    Professional Summary
+                  </h2>
+                  <p class="text-sm leading-relaxed text-slate-700">
+                    Results-driven Senior Frontend Engineer with 6+ years of experience building
+                    scalable, high-performance web applications. Expert in React ecosystem and
+                    modern JavaScript architectures. Proven track record of leading technical
+                    initiatives, mentoring teams, and collaborating with cross-functional
+                    stakeholders to deliver exceptional user experiences.
+                  </p>
+                </div>
+                <!-- Experience -->
+                <div>
+                  <h2
+                    class="text-lg font-bold text-slate-900 uppercase tracking-wider mb-4 border-b border-slate-200 pb-1"
+                  >
+                    Experience
+                  </h2>
+                  <div class="mb-6">
+                    <div class="flex justify-between items-baseline mb-2">
+                      <h3 class="font-bold text-slate-900 text-base">Acme Corp</h3>
+                      <span class="text-sm font-semibold text-slate-600">Jan 2021 - Present</span>
+                    </div>
+                    <p class="text-sm italic text-slate-600 mb-2">
+                      Lead Frontend Engineer | San Francisco, CA
+                    </p>
+                    <ul
+                      class="list-disc list-outside ml-4 text-sm space-y-2 text-slate-700 leading-relaxed"
+                    >
+                      <li>
+                        Spearheaded the architectural design and execution of migrating a monolithic
+                        React SPA to Next.js, resulting in a 45% improvement in Largest Contentful
+                        Paint (LCP) and significant SEO gains.
+                      </li>
+                      <li>
+                        Manage and mentor a squad of 4 frontend engineers, establishing coding
+                        standards, conducting rigorous code reviews, and fostering a culture of
+                        technical excellence.
+                      </li>
+                      <li>
+                        Engineered a comprehensive, accessible component library using React,
+                        Tailwind CSS, and Storybook, adopted by 3 internal product teams to ensure
+                        UI consistency.
+                      </li>
+                      <li>
+                        Optimized complex data visualization dashboards utilizing WebGL and Canvas
+                        APIs to handle massive datasets with 60fps rendering performance.
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="mb-6">
+                    <div class="flex justify-between items-baseline mb-2">
+                      <h3 class="font-bold text-slate-900 text-base">TechFlow Solutions</h3>
+                      <span class="text-sm font-semibold text-slate-600">Jun 2018 - Dec 2020</span>
+                    </div>
+                    <p class="text-sm italic text-slate-600 mb-2">
+                      Frontend Developer | Austin, TX
+                    </p>
+                    <ul
+                      class="list-disc list-outside ml-4 text-sm space-y-2 text-slate-700 leading-relaxed"
+                    >
+                      <li>
+                        Developed and maintained core features for a B2B SaaS platform using React,
+                        Redux, and styled-components.
+                      </li>
+                      <li>
+                        Integrated RESTful APIs and WebSocket connections for real-time data updates
+                        across the application.
+                      </li>
+                      <li>
+                        Implemented comprehensive unit and integration testing strategies using Jest
+                        and React Testing Library, increasing test coverage from 40% to 85%.
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <!-- Education -->
+                <div>
+                  <h2
+                    class="text-lg font-bold text-slate-900 uppercase tracking-wider mb-3 border-b border-slate-200 pb-1"
+                  >
+                    Education
+                  </h2>
+                  <div class="flex justify-between items-baseline">
+                    <div>
+                      <h3 class="font-bold text-slate-900">University of Texas at Austin</h3>
+                      <p class="text-sm text-slate-700">Bachelor of Science in Computer Science</p>
+                    </div>
+                    <span class="text-sm text-slate-600 font-semibold">May 2018</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <style>
+      /* Custom scrollbar for inner containers */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 20px;
+        border: 2px solid transparent;
+        background-clip: content-box;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background-color: #94a3b8;
+      }
+
+      /* Darker scrollbar for the PDF viewer side */
+      .bg-slate-800.custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: #475569;
+      }
+      .bg-slate-800.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background-color: #64748b;
+      }
     </style>
-</body></html>
+  </body>
+</html>

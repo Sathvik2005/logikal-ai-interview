@@ -18,16 +18,39 @@ const NAV: NavItem[] = [
   { to: "/recruiter/analytics", icon: "monitoring", label: "Analytics" },
 ];
 
-export function Icon({ name, className = "", filled = false }: { name: string; className?: string; filled?: boolean }) {
+export function Icon({
+  name,
+  className = "",
+  filled = false,
+}: {
+  name: string;
+  className?: string;
+  filled?: boolean;
+}) {
   return (
-    <span className={`material-symbols-outlined ${filled ? "icon-fill" : ""} ${className}`} aria-hidden>
+    <span
+      className={`material-symbols-outlined ${filled ? "icon-fill" : ""} ${className}`}
+      aria-hidden
+    >
       {name}
     </span>
   );
 }
 
-export function CardShadow({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`bg-surface-container-lowest rounded-xl border border-outline-variant shadow-soft ${className}`}>{children}</div>;
+export function CardShadow({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`bg-surface-container-lowest rounded-xl border border-outline-variant shadow-soft ${className}`}
+    >
+      {children}
+    </div>
+  );
 }
 
 export function PageHeader({
@@ -49,10 +72,14 @@ export function PageHeader({
         <h2 className="text-headline-lg text-on-background truncate">{title}</h2>
         {subtitle ? <p className="text-body-lg text-on-surface-variant mt-1">{subtitle}</p> : null}
       </div>
-      {actions ? <div className="flex flex-wrap items-center gap-sm shrink-0">{actions}</div> : null}
+      {actions ? (
+        <div className="flex flex-wrap items-center gap-sm shrink-0">{actions}</div>
+      ) : null}
     </header>
   );
 }
+
+import { EmptyState as SharedEmptyState } from "@/components/shared/EmptyState";
 
 export function EmptyState({
   icon = "inbox",
@@ -68,14 +95,13 @@ export function EmptyState({
   className?: string;
 }) {
   return (
-    <div className={`flex flex-col items-center justify-center text-center px-lg py-xl gap-sm ${className}`}>
-      <div className="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
-        <Icon name={icon} />
-      </div>
-      <p className="text-headline-sm text-on-surface">{title}</p>
-      {hint ? <p className="text-body-md text-on-surface-variant max-w-sm">{hint}</p> : null}
-      {action ? <div className="mt-sm">{action}</div> : null}
-    </div>
+    <SharedEmptyState
+      icon={icon}
+      title={title}
+      description={hint}
+      action={action}
+      className={className}
+    />
   );
 }
 
@@ -104,7 +130,8 @@ export function RecruiterShell() {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  const isActive = (to: string) => (to === "/recruiter" ? pathname === "/recruiter" : pathname.startsWith(to));
+  const isActive = (to: string) =>
+    to === "/recruiter" ? pathname === "/recruiter" : pathname.startsWith(to);
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -115,7 +142,12 @@ export function RecruiterShell() {
     <div className="bg-background text-on-background min-h-screen flex">
       <aside className="hidden md:flex flex-col h-screen sticky left-0 top-0 w-64 bg-surface border-r border-outline-variant p-md">
         <div className="mb-lg">
-          <Link to="/recruiter" className="font-headline-md text-headline-md font-bold text-primary block">Logikality AI</Link>
+          <Link
+            to="/recruiter"
+            className="font-headline-md text-headline-md font-bold text-primary block"
+          >
+            Logikality AI
+          </Link>
           <p className="text-body-md text-on-surface-variant mt-1">Enterprise Plan</p>
         </div>
         <Link
@@ -155,12 +187,22 @@ export function RecruiterShell() {
       <div className="flex-1 flex flex-col min-w-0">
         <header className="flex justify-between items-center h-16 px-lg w-full sticky top-0 z-40 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
           <div className="flex items-center gap-2 md:hidden">
-            <MobileNav items={NAV} rootPath="/recruiter" brand="Logikality AI" subtitle="Enterprise Plan" />
-            <Link to="/recruiter" className="text-headline-sm font-black text-on-surface">Logikality AI</Link>
+            <MobileNav
+              items={NAV}
+              rootPath="/recruiter"
+              brand="Logikality AI"
+              subtitle="Enterprise Plan"
+            />
+            <Link to="/recruiter" className="text-headline-sm font-black text-on-surface">
+              Logikality AI
+            </Link>
           </div>
           <div className="flex-1 flex justify-start px-4 md:px-8">
             <div className="relative w-full max-w-md hidden md:block">
-              <Icon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-outline" />
+              <Icon
+                name="search"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-outline"
+              />
               <input
                 className="w-full pl-10 pr-4 py-2 bg-surface-container-lowest border border-outline-variant rounded-full focus:ring-2 focus:ring-primary-container outline-none text-body-md"
                 placeholder="Search candidates, reports..."
@@ -169,17 +211,27 @@ export function RecruiterShell() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Link to="/recruiter/reports" className="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low" aria-label="Reports">
+            <Link
+              to="/recruiter/reports"
+              className="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low"
+              aria-label="Reports"
+            >
               <Icon name="notifications" />
             </Link>
-            <Link to="/recruiter/analytics" className="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low" aria-label="History">
+            <Link
+              to="/recruiter/analytics"
+              className="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low"
+              aria-label="History"
+            >
               <Icon name="history" />
             </Link>
             <div className="ml-2 flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-low">
               <div className="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center text-label-caps font-semibold">
                 {(user?.email ?? "S").charAt(0).toUpperCase()}
               </div>
-              <span className="text-body-md text-on-surface hidden sm:block">{user?.email ?? "recruiter"}</span>
+              <span className="text-body-md text-on-surface hidden sm:block">
+                {user?.email ?? "recruiter"}
+              </span>
             </div>
           </div>
         </header>

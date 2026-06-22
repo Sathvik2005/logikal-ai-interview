@@ -7,7 +7,9 @@ import { EmptyState } from "@/components/shared/EmptyState";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   beforeLoad: async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw redirect({ to: "/auth" });
     const { data } = await supabase
       .from("user_roles")
@@ -18,7 +20,11 @@ export const Route = createFileRoute("/_authenticated/admin")({
     if (!data) throw redirect({ to: "/access-denied" });
   },
   component: AdminShell,
-  pendingComponent: () => <div className="p-lg"><LoadingState variant="detail" /></div>,
+  pendingComponent: () => (
+    <div className="p-lg">
+      <LoadingState variant="detail" />
+    </div>
+  ),
   errorComponent: ({ error, reset }) => <ErrorState error={error} reset={reset} />,
   notFoundComponent: () => (
     <div className="p-lg">
@@ -26,7 +32,11 @@ export const Route = createFileRoute("/_authenticated/admin")({
         icon="search_off"
         title="Page not found"
         description="That admin page doesn't exist."
-        action={<Link to="/admin" className="text-primary hover:underline">Back to Control Center</Link>}
+        action={
+          <Link to="/admin" className="text-primary hover:underline">
+            Back to Control Center
+          </Link>
+        }
       />
     </div>
   ),

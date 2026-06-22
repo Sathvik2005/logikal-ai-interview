@@ -28,27 +28,39 @@ export const bulkImportCandidates = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data: prof } = await supabaseAdmin
-      .from("profiles").select("org_id").eq("id", userId).maybeSingle();
+      .from("profiles")
+      .select("org_id")
+      .eq("id", userId)
+      .maybeSingle();
     let orgId = prof?.org_id as string | null;
     if (!orgId) {
       const { data: org, error: orgErr } = await supabaseAdmin
-        .from("organizations").insert({ name: "My Workspace", status: "active" }).select("id").single();
+        .from("organizations")
+        .insert({ name: "My Workspace", status: "active" })
+        .select("id")
+        .single();
       if (orgErr || !org) throw new Error(orgErr?.message ?? "Failed to create workspace");
       orgId = org.id as string;
       await supabaseAdmin.from("profiles").update({ org_id: orgId }).eq("id", userId);
-      await supabaseAdmin.from("user_roles").upsert(
-        { user_id: userId, role: "recruiter", org_id: orgId },
-        { onConflict: "user_id,org_id,role" },
-      );
+      await supabaseAdmin
+        .from("user_roles")
+        .upsert(
+          { user_id: userId, role: "recruiter", org_id: orgId },
+          { onConflict: "user_id,org_id,role" },
+        );
     }
     const orgIdSafe: string = orgId;
-
 
     // Dedupe by email within org
     const emails = data.rows.map((r) => r.email.toLowerCase());
     const { data: existing } = await supabaseAdmin
-      .from("candidates").select("email").in("email", emails).eq("org_id", orgId);
-    const existingSet = new Set((existing ?? []).map((r: { email: string }) => r.email.toLowerCase()));
+      .from("candidates")
+      .select("email")
+      .in("email", emails)
+      .eq("org_id", orgId);
+    const existingSet = new Set(
+      (existing ?? []).map((r: { email: string }) => r.email.toLowerCase()),
+    );
 
     const toInsert = data.rows
       .filter((r) => !existingSet.has(r.email.toLowerCase()))
@@ -66,11 +78,12 @@ export const bulkImportCandidates = createServerFn({ method: "POST" })
         resume_summary: r.resumeSummary ?? null,
       }));
 
-
     let inserted: Array<{ id: string; email: string }> = [];
     if (toInsert.length > 0) {
       const { data: rows, error } = await supabaseAdmin
-        .from("candidates").insert(toInsert).select("id, email");
+        .from("candidates")
+        .insert(toInsert)
+        .select("id, email");
       if (error) throw new Error(error.message);
       inserted = (rows ?? []) as typeof inserted;
     }
@@ -87,7 +100,6 @@ export const bulkImportCandidates = createServerFn({ method: "POST" })
       });
     }
 
-
     // If job provided, queue an ai_job per candidate for match scoring
     if (data.jobId && inserted.length > 0) {
       const jobs = inserted.map((c) => ({
@@ -100,7 +112,6 @@ export const bulkImportCandidates = createServerFn({ method: "POST" })
       }));
       await supabaseAdmin.from("ai_jobs").insert(jobs);
     }
-
 
     return {
       imported: inserted.length,
@@ -122,17 +133,24 @@ export const computeJdMatch = createServerFn({ method: "POST" })
     const { data: job } = await context.supabase
       .from("job_descriptions")
       .select("id, org_id, title, description, requirements, seniority")
-      .eq("id", data.jobId).maybeSingle();
+      .eq("id", data.jobId)
+      .maybeSingle();
     if (!job) throw new Error("Job not found");
 
     const { data: cand } = await context.supabase
       .from("candidates")
       .select("id, full_name, role_applied, skills, experience_years, resume_summary")
-      .eq("id", data.candidateId).maybeSingle();
+      .eq("id", data.candidateId)
+      .maybeSingle();
     if (!cand) throw new Error("Candidate not found");
 
     const apiKey = process.env.LOVABLE_API_KEY;
-    let match = { score: 50, missingSkills: [] as string[], strengths: [] as string[], focusAreas: [] as string[] };
+    let match = {
+      score: 50,
+      missingSkills: [] as string[],
+      strengths: [] as string[],
+      focusAreas: [] as string[],
+    };
 
     if (apiKey) {
       try {
@@ -169,7 +187,9 @@ Return ONLY JSON.`;
           const parsed = JSON.parse(txt);
           match = {
             score: Math.max(0, Math.min(100, Number(parsed.score) || 0)),
-            missingSkills: Array.isArray(parsed.missingSkills) ? parsed.missingSkills.slice(0, 20) : [],
+            missingSkills: Array.isArray(parsed.missingSkills)
+              ? parsed.missingSkills.slice(0, 20)
+              : [],
             strengths: Array.isArray(parsed.strengths) ? parsed.strengths.slice(0, 20) : [],
             focusAreas: Array.isArray(parsed.focusAreas) ? parsed.focusAreas.slice(0, 20) : [],
           };
@@ -182,16 +202,18 @@ Return ONLY JSON.`;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const orgId = job.org_id;
     if (!orgId) throw new Error("Job missing org");
-    await supabaseAdmin.from("jd_candidate_matches").upsert({
-      org_id: orgId as string,
-      job_id: data.jobId,
-      candidate_id: data.candidateId,
-      match_score: match.score,
-      missing_skills: match.missingSkills as never,
-      strengths: match.strengths as never,
-      focus_areas: match.focusAreas as never,
-    }, { onConflict: "job_id,candidate_id" });
-
+    await supabaseAdmin.from("jd_candidate_matches").upsert(
+      {
+        org_id: orgId as string,
+        job_id: data.jobId,
+        candidate_id: data.candidateId,
+        match_score: match.score,
+        missing_skills: match.missingSkills as never,
+        strengths: match.strengths as never,
+        focus_areas: match.focusAreas as never,
+      },
+      { onConflict: "job_id,candidate_id" },
+    );
 
     return match;
   });
@@ -202,14 +224,27 @@ export const listJdMatches = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: rows, error } = await context.supabase
       .from("jd_candidate_matches")
-      .select("id, candidate_id, match_score, missing_skills, strengths, focus_areas, shortlisted, candidates(full_name, email, role_applied, ai_score, status)")
+      .select(
+        "id, candidate_id, match_score, missing_skills, strengths, focus_areas, shortlisted, candidates(full_name, email, role_applied, ai_score, status)",
+      )
       .eq("job_id", data.jobId)
       .order("match_score", { ascending: false });
     if (error) throw new Error(error.message);
     type R = {
-      id: string; candidate_id: string; match_score: number | null;
-      missing_skills: string[]; strengths: string[]; focus_areas: string[]; shortlisted: boolean;
-      candidates: { full_name: string; email: string; role_applied: string | null; ai_score: number | null; status: string } | null;
+      id: string;
+      candidate_id: string;
+      match_score: number | null;
+      missing_skills: string[];
+      strengths: string[];
+      focus_areas: string[];
+      shortlisted: boolean;
+      candidates: {
+        full_name: string;
+        email: string;
+        role_applied: string | null;
+        ai_score: number | null;
+        status: string;
+      } | null;
     };
     return ((rows ?? []) as unknown as R[]).map((r) => ({
       id: r.id,
@@ -228,11 +263,13 @@ export const listJdMatches = createServerFn({ method: "POST" })
 export const shortlistCandidates = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    z.object({
-      jobId: z.string().uuid(),
-      candidateIds: z.array(z.string().uuid()).min(1).max(200),
-      shortlisted: z.boolean().default(true),
-    }).parse(d),
+    z
+      .object({
+        jobId: z.string().uuid(),
+        candidateIds: z.array(z.string().uuid()).min(1).max(200),
+        shortlisted: z.boolean().default(true),
+      })
+      .parse(d),
   )
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase

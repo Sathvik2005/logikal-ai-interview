@@ -1,7 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { IEventBus } from '../../application/common/event-bus/event-bus.interface';
-import { DomainEvent } from '../../domain/common/domain-event.base';
-import { Subject } from 'rxjs';
+import { Injectable, Logger } from "@nestjs/common";
+import { IEventBus } from "../../application/common/event-bus/event-bus.interface";
+import { DomainEvent } from "../../domain/common/domain-event.base";
+import { Subject } from "rxjs";
 
 @Injectable()
 export class EventEmitterBusService implements IEventBus {
@@ -9,7 +9,9 @@ export class EventEmitterBusService implements IEventBus {
   private readonly eventSubject = new Subject<DomainEvent>();
 
   publish(event: DomainEvent): void {
-    this.logger.log(`Publishing Domain Event: ${event.getEventName()} (Occurred: ${event.occurredAt.toISOString()})`);
+    this.logger.log(
+      `Publishing Domain Event: ${event.getEventName()} (Occurred: ${event.occurredAt.toISOString()})`,
+    );
     this.eventSubject.next(event);
   }
 

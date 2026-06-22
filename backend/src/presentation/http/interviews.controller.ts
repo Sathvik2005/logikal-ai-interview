@@ -1,12 +1,12 @@
-import { Controller, Get, Post, Param, Body, Req, UseGuards, Inject } from '@nestjs/common';
-import { SupabaseAuthGuard } from '../guards/supabase-auth.guard';
-import { Roles, RolesGuard } from '../guards/roles.guard';
-import { InterviewEngineService } from '../../application/interview/interview-engine.service';
-import { PrismaService } from '../../infrastructure/database/prisma.service';
-import { CandidateWorkflowService } from '../../application/candidate/candidate-workflow.service';
-import { IQueueService, IQueueServiceToken } from '../../application/common/queue/queue.service';
+import { Controller, Get, Post, Param, Body, Req, UseGuards, Inject } from "@nestjs/common";
+import { SupabaseAuthGuard } from "../guards/supabase-auth.guard";
+import { Roles, RolesGuard } from "../guards/roles.guard";
+import { InterviewEngineService } from "../../application/interview/interview-engine.service";
+import { PrismaService } from "../../infrastructure/database/prisma.service";
+import { CandidateWorkflowService } from "../../application/candidate/candidate-workflow.service";
+import { IQueueService, IQueueServiceToken } from "../../application/common/queue/queue.service";
 
-@Controller('interviews')
+@Controller("interviews")
 @UseGuards(SupabaseAuthGuard, RolesGuard)
 export class InterviewsController {
   constructor(
@@ -19,18 +19,18 @@ export class InterviewsController {
 
   @Get()
   async list(@Req() req: any) {
-    const orgId = req.user.orgId || '00000000-0000-0000-0000-000000000000';
+    const orgId = req.user.orgId || "00000000-0000-0000-0000-000000000000";
     return this.prisma.interview.findMany({
       where: { org_id: orgId, deleted_at: null },
       include: { candidate: true, job: true, template: true },
-      orderBy: { created_at: 'desc' },
+      orderBy: { created_at: "desc" },
     });
   }
 
   @Post()
-  @Roles('recruiter', 'admin')
+  @Roles("recruiter", "admin")
   async schedule(@Req() req: any, @Body() body: any) {
-    const orgId = req.user.orgId || '00000000-0000-0000-0000-000000000000';
+    const orgId = req.user.orgId || "00000000-0000-0000-0000-000000000000";
     const userId = req.user.userId;
 
     // 1. Create or Find Interview Template
@@ -45,8 +45,8 @@ export class InterviewsController {
           persona_id: body.personaId || null,
           question_bank_ids: body.questionIds || [],
           duration_minutes: body.durationMinutes || 45,
-          difficulty: body.difficulty || 'medium',
-          meeting_provider: body.meetingProvider || 'teams',
+          difficulty: body.difficulty || "medium",
+          meeting_provider: body.meetingProvider || "teams",
           proctoring_policy: body.proctoringPolicy || {},
           report_template: body.reportTemplate || {},
         },
@@ -65,23 +65,23 @@ export class InterviewsController {
         template_id: templateId,
         scheduled_at: body.scheduledAt ? new Date(body.scheduledAt) : null,
         duration_minutes: body.durationMinutes || 45,
-        status: 'scheduled',
+        status: "scheduled",
       },
     });
 
     // 3. Update candidate workflow timelines
     await this.workflow.transition(
       body.candidateId,
-      'interview_assigned',
-      'Assigned interview template to candidate. Link is ready.',
-      { interviewId: interview.id }
+      "interview_assigned",
+      "Assigned interview template to candidate. Link is ready.",
+      { interviewId: interview.id },
     );
 
     if (body.scheduledAt) {
       await this.workflow.transition(
         body.candidateId,
-        'interview_scheduled',
-        `Scheduled interview window starting at ${body.scheduledAt}.`
+        "interview_scheduled",
+        `Scheduled interview window starting at ${body.scheduledAt}.`,
       );
     }
 
@@ -89,17 +89,17 @@ export class InterviewsController {
     const candidate = await this.prisma.candidate.findUnique({
       where: { id: body.candidateId },
     });
-    
+
     if (candidate) {
       await this.workflow.transition(
         body.candidateId,
-        'invitation_sent',
-        'Dispatched interview invitation email with entry instructions.'
+        "invitation_sent",
+        "Dispatched interview invitation email with entry instructions.",
       );
-      
-      await this.queue.enqueue('send-notification', {
+
+      await this.queue.enqueue("send-notification", {
         orgId,
-        kind: 'interview_invitation',
+        kind: "interview_invitation",
         recipientEmail: candidate.email,
         payload: {
           candidateName: candidate.full_name,
@@ -112,56 +112,59 @@ export class InterviewsController {
     return interview;
   }
 
-  @Post('session/start')
+  @Post("session/start")
   async start(@Body() body: { interviewId: string; deviceInfo?: any }) {
     return this.engine.startSession(body.interviewId, body.deviceInfo);
   }
 
-  @Post('session/end')
+  @Post("session/end")
   async end(@Body() body: { sessionId: string }) {
     await this.engine.endSession(body.sessionId);
-    return { status: 'success' };
+    return { status: "success" };
   }
 
-  @Get('session/:sessionId/turns')
-  async getTurns(@Param('sessionId') sessionId: string) {
+  @Get("session/:sessionId/turns")
+  async getTurns(@Param("sessionId") sessionId: string) {
     return this.prisma.interviewTurn.findMany({
       where: { session_id: sessionId },
-      orderBy: { started_at: 'asc' },
+      orderBy: { started_at: "asc" },
     });
   }
 
-  @Post('session/:sessionId/turn')
+  @Post("session/:sessionId/turn")
   async appendTurn(
-    @Param('sessionId') sessionId: string,
-    @Body() body: { speaker: 'candidate' | 'persona' | 'system'; text: string; audioPath?: string },
+    @Param("sessionId") sessionId: string,
+    @Body() body: { speaker: "candidate" | "persona" | "system"; text: string; audioPath?: string },
   ) {
     return this.engine.appendTurn(sessionId, body.speaker, body.text, body.audioPath);
   }
 
-  @Post('session/:sessionId/next-question')
-  async getNextQuestion(@Param('sessionId') sessionId: string) {
+  @Post("session/:sessionId/next-question")
+  async getNextQuestion(@Param("sessionId") sessionId: string) {
     return this.engine.getNextQuestion(sessionId);
   }
 
-  @Post('session/:sessionId/event')
-  async logEvent(@Param('sessionId') sessionId: string, @Body() body: { type: string; payload?: any }) {
+  @Post("session/:sessionId/event")
+  async logEvent(
+    @Param("sessionId") sessionId: string,
+    @Body() body: { type: string; payload?: any },
+  ) {
     await this.engine.recordEvent(sessionId, body.type, body.payload);
-    return { status: 'success' };
+    return { status: "success" };
   }
 
-  @Post(':id/finalize-evaluation')
-  @Roles('recruiter', 'admin')
-  async finalizeEvaluation(@Param('id') id: string, @Body() body: { sessionId: string }) {
-    await this.queue.enqueue('finalize-evaluation', {
+  @Post(":id/finalize-evaluation")
+  @Roles("recruiter", "admin")
+  async finalizeEvaluation(@Param("id") id: string, @Body() body: { sessionId: string }) {
+    await this.queue.enqueue("finalize-evaluation", {
       interviewId: id,
       sessionId: body.sessionId,
     });
-    return { status: 'queued' };
+    return { status: "queued" };
   }
 
-  @Get(':id/evaluation')
-  async getEvaluation(@Param('id') id: string) {
+  @Get(":id/evaluation")
+  async getEvaluation(@Param("id") id: string) {
     return this.prisma.interview.findUnique({
       where: { id },
       select: {

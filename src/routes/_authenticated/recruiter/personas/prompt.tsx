@@ -15,9 +15,21 @@ export const Route = createFileRoute("/_authenticated/recruiter/personas/prompt"
 });
 
 const PRESETS = [
-  { id: "t1", label: "Technical Deep-Dive", text: "You are a Principal Engineer. Probe system design tradeoffs. Push back on hand-wavy answers. Ask 'why' three times." },
-  { id: "t2", label: "Behavioral STAR", text: "You are a hiring manager. Use the STAR framework. Probe for situation, task, action, result. Look for leadership signals." },
-  { id: "t3", label: "Product Sense", text: "You are a Product Director. Ask candidate to design a product for an underserved user. Evaluate clarity of thinking and prioritization." },
+  {
+    id: "t1",
+    label: "Technical Deep-Dive",
+    text: "You are a Principal Engineer. Probe system design tradeoffs. Push back on hand-wavy answers. Ask 'why' three times.",
+  },
+  {
+    id: "t2",
+    label: "Behavioral STAR",
+    text: "You are a hiring manager. Use the STAR framework. Probe for situation, task, action, result. Look for leadership signals.",
+  },
+  {
+    id: "t3",
+    label: "Product Sense",
+    text: "You are a Product Director. Ask candidate to design a product for an underserved user. Evaluate clarity of thinking and prioritization.",
+  },
 ];
 
 function PromptEditor() {
@@ -53,18 +65,27 @@ function PromptEditor() {
 
   return (
     <>
-      <Link to="/recruiter/personas" className="text-primary text-body-md hover:underline mb-md inline-flex items-center gap-1"><Icon name="arrow_back" />Back to personas</Link>
+      <Link
+        to="/recruiter/personas"
+        className="text-primary text-body-md hover:underline mb-md inline-flex items-center gap-1"
+      >
+        <Icon name="arrow_back" />
+        Back to personas
+      </Link>
       <div className="mb-lg">
         <h2 className="text-headline-lg">Persona Prompt Editor</h2>
         <p className="text-body-lg text-on-surface-variant">
-          Author the system prompt that drives the interviewer's behavior. Every save creates an immutable version snapshot used by future interviews.
+          Author the system prompt that drives the interviewer's behavior. Every save creates an
+          immutable version snapshot used by future interviews.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg">
         <CardShadow className="p-lg lg:col-span-2 space-y-md">
           <div>
-            <label className="text-label-caps uppercase text-on-surface-variant block mb-1">Persona name</label>
+            <label className="text-label-caps uppercase text-on-surface-variant block mb-1">
+              Persona name
+            </label>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -82,16 +103,24 @@ function PromptEditor() {
             />
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-label-caps uppercase text-on-surface-variant">{prompt.length} characters</span>
+            <span className="text-label-caps uppercase text-on-surface-variant">
+              {prompt.length} characters
+            </span>
             <div className="flex gap-sm">
-              <Link to="/recruiter/personas" className="px-4 py-2 border border-outline-variant rounded-lg hover:bg-surface-container-low">Cancel</Link>
+              <Link
+                to="/recruiter/personas"
+                className="px-4 py-2 border border-outline-variant rounded-lg hover:bg-surface-container-low"
+              >
+                Cancel
+              </Link>
               <button
                 type="button"
                 onClick={handleSave}
                 disabled={upsert.isPending}
                 className="px-4 py-2 bg-primary text-on-primary rounded-lg hover:brightness-110 disabled:opacity-50 inline-flex items-center gap-2"
               >
-                <Icon name="save" />{upsert.isPending ? "Saving…" : id ? "Save new version" : "Create persona"}
+                <Icon name="save" />
+                {upsert.isPending ? "Saving…" : id ? "Save new version" : "Create persona"}
               </button>
             </div>
           </div>
@@ -102,7 +131,11 @@ function PromptEditor() {
           <ul className="space-y-2">
             {PRESETS.map((p) => (
               <li key={p.id}>
-                <button type="button" onClick={() => setPrompt(p.text)} className="w-full text-left p-md rounded-lg border border-outline-variant hover:bg-surface-container-low transition">
+                <button
+                  type="button"
+                  onClick={() => setPrompt(p.text)}
+                  className="w-full text-left p-md rounded-lg border border-outline-variant hover:bg-surface-container-low transition"
+                >
                   <p className="font-semibold">{p.label}</p>
                   <p className="text-body-md text-on-surface-variant line-clamp-2">{p.text}</p>
                 </button>

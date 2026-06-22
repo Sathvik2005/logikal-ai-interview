@@ -11,7 +11,9 @@ export const jobsKeys = {
 export const jobsListOptions = () =>
   queryOptions({ queryKey: jobsKeys.all, queryFn: () => listJobs(), staleTime: 30_000 });
 
-export function useJobsQuery() { return useQuery(jobsListOptions()); }
+export function useJobsQuery() {
+  return useQuery(jobsListOptions());
+}
 export function useJobQuery(id: string) {
   const fn = useServerFn(getJob);
   return useQuery({ queryKey: jobsKeys.detail(id), queryFn: () => fn({ data: { id } }) });
@@ -20,7 +22,18 @@ export function useUpsertJob() {
   const qc = useQueryClient();
   const fn = useServerFn(upsertJob);
   return useMutation({
-    mutationFn: (input: { id?: string; title: string; department?: string | null; location?: string | null; employmentType?: string | null; seniority?: string | null; description?: string | null; requirements?: string | null; personaId?: string | null; status?: "draft" | "open" | "paused" | "closed" | "archived" }) => fn({ data: { status: "draft", ...input } }),
+    mutationFn: (input: {
+      id?: string;
+      title: string;
+      department?: string | null;
+      location?: string | null;
+      employmentType?: string | null;
+      seniority?: string | null;
+      description?: string | null;
+      requirements?: string | null;
+      personaId?: string | null;
+      status?: "draft" | "open" | "paused" | "closed" | "archived";
+    }) => fn({ data: { status: "draft", ...input } }),
     onSuccess: () => qc.invalidateQueries({ queryKey: jobsKeys.all }),
   });
 }

@@ -48,7 +48,10 @@ export function useProctor({ sessionId, webcamStream, screenStream, enabled }: P
     window.addEventListener("offline", onOff);
     window.addEventListener("online", onOn);
 
-    fire("session_start", { ua: navigator.userAgent, tz: Intl.DateTimeFormat().resolvedOptions().timeZone });
+    fire("session_start", {
+      ua: navigator.userAgent,
+      tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
 
     return () => {
       document.removeEventListener("visibilitychange", onVis);
@@ -67,7 +70,9 @@ export function useProctor({ sessionId, webcamStream, screenStream, enabled }: P
     const track = screenStream.getVideoTracks()[0];
     if (!track) return;
     const onEnd = () =>
-      recordEvent({ data: { sessionId, type: "screen_share_stopped" } as never }).catch(() => undefined);
+      recordEvent({ data: { sessionId, type: "screen_share_stopped" } as never }).catch(
+        () => undefined,
+      );
     track.addEventListener("ended", onEnd);
     return () => track.removeEventListener("ended", onEnd);
   }, [enabled, screenStream, sessionId, recordEvent]);

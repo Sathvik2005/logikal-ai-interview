@@ -3,12 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { MOCK_INTERVIEWS, type Interview } from "@/components/recruiter/mock-data";
 
-export type ActivityKind =
-  | "created"
-  | "rescheduled"
-  | "cancelled"
-  | "email"
-  | "joined";
+export type ActivityKind = "created" | "rescheduled" | "cancelled" | "email" | "joined";
 
 export type ActivityEntry = {
   id: string;
@@ -47,7 +42,11 @@ function pushActivity(entry: Omit<ActivityEntry, "id" | "at"> & { at?: string })
   state = {
     ...state,
     activity: [
-      { id: `a-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, at: entry.at ?? new Date().toISOString(), ...entry },
+      {
+        id: `a-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        at: entry.at ?? new Date().toISOString(),
+        ...entry,
+      },
       ...state.activity,
     ].slice(0, 30),
   };
@@ -60,7 +59,11 @@ export function useInterviewSchedule() {
     activity: snap.activity,
     addInterview: (i: Interview) => {
       state = { ...state, interviews: [...state.interviews, i] };
-      pushActivity({ kind: "created", interviewId: i.id, message: `Scheduled ${i.candidateName} — ${i.role}` });
+      pushActivity({
+        kind: "created",
+        interviewId: i.id,
+        message: `Scheduled ${i.candidateName} — ${i.role}`,
+      });
       emit();
     },
     rescheduleInterview: (id: string, newISO: string, newDuration?: number) => {
@@ -68,7 +71,9 @@ export function useInterviewSchedule() {
       state = {
         ...state,
         interviews: state.interviews.map((x) =>
-          x.id === id ? { ...x, scheduledAt: newISO, durationMin: newDuration ?? x.durationMin } : x,
+          x.id === id
+            ? { ...x, scheduledAt: newISO, durationMin: newDuration ?? x.durationMin }
+            : x,
         ),
       };
       if (before) {
@@ -86,7 +91,12 @@ export function useInterviewSchedule() {
         ...state,
         interviews: state.interviews.map((x) => (x.id === id ? { ...x, status: "cancelled" } : x)),
       };
-      if (before) pushActivity({ kind: "cancelled", interviewId: id, message: `Cancelled ${before.candidateName}` });
+      if (before)
+        pushActivity({
+          kind: "cancelled",
+          interviewId: id,
+          message: `Cancelled ${before.candidateName}`,
+        });
       emit();
     },
     logActivity: (kind: ActivityKind, message: string, interviewId?: string) => {

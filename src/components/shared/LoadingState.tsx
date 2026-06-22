@@ -7,8 +7,14 @@ export function LoadingState({
 }) {
   if (variant === "inline") {
     return (
-      <div className="flex items-center gap-2 text-on-surface-variant text-body-md py-md" role="status" aria-live="polite">
-        <span className="material-symbols-outlined animate-spin" aria-hidden>progress_activity</span>
+      <div
+        className="flex items-center gap-2 text-on-surface-variant text-body-md py-md"
+        role="status"
+        aria-live="polite"
+      >
+        <span className="material-symbols-outlined animate-spin" aria-hidden>
+          progress_activity
+        </span>
         <span>{label}</span>
       </div>
     );
@@ -28,7 +34,10 @@ export function LoadingState({
       {variant === "table" && (
         <div className="rounded-xl border border-outline-variant overflow-hidden">
           {Array.from({ length: rows }).map((_, i) => (
-            <div key={i} className="h-12 bg-surface-container animate-pulse border-b border-outline-variant last:border-b-0" />
+            <div
+              key={i}
+              className="h-12 bg-surface-container animate-pulse border-b border-outline-variant last:border-b-0"
+            />
           ))}
         </div>
       )}

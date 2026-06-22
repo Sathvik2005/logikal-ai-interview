@@ -1,465 +1,664 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html class="light" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Interview Assignment &amp; Assignment Hub</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Interview Assignment &amp; Assignment Hub</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
       tailwind.config = {
         darkMode: "class",
         theme: {
           extend: {
-            "colors": {
-                    "tertiary-container": "#a44100",
-                    "primary-fixed": "#e2dfff",
-                    "on-primary": "#ffffff",
-                    "primary-container": "#4f46e5",
-                    "surface-container-highest": "#d3e4fe",
-                    "on-tertiary-container": "#ffd2be",
-                    "secondary": "#00687a",
-                    "on-secondary-fixed": "#001f26",
-                    "on-primary-fixed-variant": "#3323cc",
-                    "surface-container-high": "#dce9ff",
-                    "on-secondary-container": "#006172",
-                    "surface": "#f8f9ff",
-                    "on-primary-fixed": "#0f0069",
-                    "outline-variant": "#c7c4d8",
-                    "on-secondary": "#ffffff",
-                    "inverse-surface": "#213145",
-                    "on-tertiary": "#ffffff",
-                    "on-surface": "#0b1c30",
-                    "on-tertiary-fixed": "#351000",
-                    "on-primary-container": "#dad7ff",
-                    "on-error": "#ffffff",
-                    "secondary-container": "#57dffe",
-                    "surface-variant": "#d3e4fe",
-                    "error": "#ba1a1a",
-                    "tertiary": "#7e3000",
-                    "primary-fixed-dim": "#c3c0ff",
-                    "surface-tint": "#4d44e3",
-                    "surface-container-low": "#eff4ff",
-                    "surface-container": "#e5eeff",
-                    "background": "#f8f9ff",
-                    "on-secondary-fixed-variant": "#004e5c",
-                    "on-error-container": "#93000a",
-                    "tertiary-fixed-dim": "#ffb695",
-                    "inverse-primary": "#c3c0ff",
-                    "on-surface-variant": "#464555",
-                    "primary": "#3525cd",
-                    "outline": "#777587",
-                    "on-background": "#0b1c30",
-                    "surface-container-lowest": "#ffffff",
-                    "secondary-fixed": "#acedff",
-                    "surface-bright": "#f8f9ff",
-                    "inverse-on-surface": "#eaf1ff",
-                    "error-container": "#ffdad6",
-                    "secondary-fixed-dim": "#4cd7f6",
-                    "tertiary-fixed": "#ffdbcc",
-                    "surface-dim": "#cbdbf5",
-                    "on-tertiary-fixed-variant": "#7b2f00"
+            colors: {
+              "tertiary-container": "#a44100",
+              "primary-fixed": "#e2dfff",
+              "on-primary": "#ffffff",
+              "primary-container": "#4f46e5",
+              "surface-container-highest": "#d3e4fe",
+              "on-tertiary-container": "#ffd2be",
+              secondary: "#00687a",
+              "on-secondary-fixed": "#001f26",
+              "on-primary-fixed-variant": "#3323cc",
+              "surface-container-high": "#dce9ff",
+              "on-secondary-container": "#006172",
+              surface: "#f8f9ff",
+              "on-primary-fixed": "#0f0069",
+              "outline-variant": "#c7c4d8",
+              "on-secondary": "#ffffff",
+              "inverse-surface": "#213145",
+              "on-tertiary": "#ffffff",
+              "on-surface": "#0b1c30",
+              "on-tertiary-fixed": "#351000",
+              "on-primary-container": "#dad7ff",
+              "on-error": "#ffffff",
+              "secondary-container": "#57dffe",
+              "surface-variant": "#d3e4fe",
+              error: "#ba1a1a",
+              tertiary: "#7e3000",
+              "primary-fixed-dim": "#c3c0ff",
+              "surface-tint": "#4d44e3",
+              "surface-container-low": "#eff4ff",
+              "surface-container": "#e5eeff",
+              background: "#f8f9ff",
+              "on-secondary-fixed-variant": "#004e5c",
+              "on-error-container": "#93000a",
+              "tertiary-fixed-dim": "#ffb695",
+              "inverse-primary": "#c3c0ff",
+              "on-surface-variant": "#464555",
+              primary: "#3525cd",
+              outline: "#777587",
+              "on-background": "#0b1c30",
+              "surface-container-lowest": "#ffffff",
+              "secondary-fixed": "#acedff",
+              "surface-bright": "#f8f9ff",
+              "inverse-on-surface": "#eaf1ff",
+              "error-container": "#ffdad6",
+              "secondary-fixed-dim": "#4cd7f6",
+              "tertiary-fixed": "#ffdbcc",
+              "surface-dim": "#cbdbf5",
+              "on-tertiary-fixed-variant": "#7b2f00",
             },
-            "borderRadius": {
-                    "DEFAULT": "0.25rem",
-                    "lg": "0.5rem",
-                    "xl": "0.75rem",
-                    "full": "9999px"
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
             },
-            "spacing": {
-                    "sm": "8px",
-                    "lg": "24px",
-                    "gutter": "24px",
-                    "container-max": "1440px",
-                    "md": "16px",
-                    "xl": "40px",
-                    "xs": "4px",
-                    "base": "4px"
+            spacing: {
+              sm: "8px",
+              lg: "24px",
+              gutter: "24px",
+              "container-max": "1440px",
+              md: "16px",
+              xl: "40px",
+              xs: "4px",
+              base: "4px",
             },
-            "fontFamily": {
-                    "headline-sm": [
-                            "Geist"
-                    ],
-                    "body-lg": [
-                            "Inter"
-                    ],
-                    "headline-lg-mobile": [
-                            "Geist"
-                    ],
-                    "headline-md": [
-                            "Geist"
-                    ],
-                    "data-mono": [
-                            "JetBrains Mono"
-                    ],
-                    "body-md": [
-                            "Inter"
-                    ],
-                    "label-caps": [
-                            "Inter"
-                    ],
-                    "headline-lg": [
-                            "Geist"
-                    ],
-                    "display-lg": [
-                            "Geist"
-                    ]
+            fontFamily: {
+              "headline-sm": ["Geist"],
+              "body-lg": ["Inter"],
+              "headline-lg-mobile": ["Geist"],
+              "headline-md": ["Geist"],
+              "data-mono": ["JetBrains Mono"],
+              "body-md": ["Inter"],
+              "label-caps": ["Inter"],
+              "headline-lg": ["Geist"],
+              "display-lg": ["Geist"],
             },
-            "fontSize": {
-                    "headline-sm": [
-                            "18px",
-                            {
-                                    "lineHeight": "1.4",
-                                    "fontWeight": "600"
-                            }
-                    ],
-                    "body-lg": [
-                            "16px",
-                            {
-                                    "lineHeight": "1.6",
-                                    "fontWeight": "400"
-                            }
-                    ],
-                    "headline-lg-mobile": [
-                            "24px",
-                            {
-                                    "lineHeight": "1.2",
-                                    "fontWeight": "600"
-                            }
-                    ],
-                    "headline-md": [
-                            "24px",
-                            {
-                                    "lineHeight": "1.3",
-                                    "fontWeight": "600"
-                            }
-                    ],
-                    "data-mono": [
-                            "13px",
-                            {
-                                    "lineHeight": "1.4",
-                                    "fontWeight": "450"
-                            }
-                    ],
-                    "body-md": [
-                            "14px",
-                            {
-                                    "lineHeight": "1.5",
-                                    "fontWeight": "400"
-                            }
-                    ],
-                    "label-caps": [
-                            "12px",
-                            {
-                                    "lineHeight": "1",
-                                    "letterSpacing": "0.05em",
-                                    "fontWeight": "600"
-                            }
-                    ],
-                    "headline-lg": [
-                            "32px",
-                            {
-                                    "lineHeight": "1.2",
-                                    "letterSpacing": "-0.02em",
-                                    "fontWeight": "600"
-                            }
-                    ],
-                    "display-lg": [
-                            "48px",
-                            {
-                                    "lineHeight": "1.1",
-                                    "letterSpacing": "-0.04em",
-                                    "fontWeight": "700"
-                            }
-                    ]
-            }
-    },
+            fontSize: {
+              "headline-sm": [
+                "18px",
+                {
+                  lineHeight: "1.4",
+                  fontWeight: "600",
+                },
+              ],
+              "body-lg": [
+                "16px",
+                {
+                  lineHeight: "1.6",
+                  fontWeight: "400",
+                },
+              ],
+              "headline-lg-mobile": [
+                "24px",
+                {
+                  lineHeight: "1.2",
+                  fontWeight: "600",
+                },
+              ],
+              "headline-md": [
+                "24px",
+                {
+                  lineHeight: "1.3",
+                  fontWeight: "600",
+                },
+              ],
+              "data-mono": [
+                "13px",
+                {
+                  lineHeight: "1.4",
+                  fontWeight: "450",
+                },
+              ],
+              "body-md": [
+                "14px",
+                {
+                  lineHeight: "1.5",
+                  fontWeight: "400",
+                },
+              ],
+              "label-caps": [
+                "12px",
+                {
+                  lineHeight: "1",
+                  letterSpacing: "0.05em",
+                  fontWeight: "600",
+                },
+              ],
+              "headline-lg": [
+                "32px",
+                {
+                  lineHeight: "1.2",
+                  letterSpacing: "-0.02em",
+                  fontWeight: "600",
+                },
+              ],
+              "display-lg": [
+                "48px",
+                {
+                  lineHeight: "1.1",
+                  letterSpacing: "-0.04em",
+                  fontWeight: "700",
+                },
+              ],
+            },
+          },
         },
+      };
+    </script>
+    <style>
+      body {
+        background-color: theme("colors.background");
+        color: theme("colors.on-background");
       }
-    </script>
-<style>
-        body {
-            background-color: theme('colors.background');
-            color: theme('colors.on-background');
-        }
-        .drag-over {
-            border: 2px dashed theme('colors.primary');
-            background-color: theme('colors.surface-container-low');
-        }
+      .drag-over {
+        border: 2px dashed theme("colors.primary");
+        background-color: theme("colors.surface-container-low");
+      }
     </style>
-</head>
-<body class="flex h-screen overflow-hidden">
-<!-- SideNavBar -->
-<nav class="bg-surface-container-lowest h-screen w-64 fixed left-0 top-0 border-r border-outline-variant shadow-sm flex flex-col py-lg px-md z-50">
-<div class="mb-xl">
-<h1 class="font-headline-md text-headline-md font-bold text-primary">Logikality AI</h1>
-<p class="font-label-caps text-label-caps text-on-surface-variant mt-xs">Executive Recruitment</p>
-</div>
-<div class="flex-1 overflow-y-auto">
-<ul class="space-y-sm">
-<li>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer active:scale-95" href="#">
-<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-<span class="font-body-md text-body-md">Dashboard</span>
-</a>
-</li>
-<li>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer active:scale-95" href="#">
-<span class="material-symbols-outlined" data-icon="group">group</span>
-<span class="font-body-md text-body-md">Candidates</span>
-</a>
-</li>
-<li>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer active:scale-95" href="#">
-<span class="material-symbols-outlined" data-icon="work">work</span>
-<span class="font-body-md text-body-md">Active Jobs</span>
-</a>
-</li>
-<li>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer active:scale-95" href="#">
-<span class="material-symbols-outlined" data-icon="database">database</span>
-<span class="font-body-md text-body-md">Talent Pools</span>
-</a>
-</li>
-<li>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer active:scale-95" href="#">
-<span class="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
-<span class="font-body-md text-body-md">Analytics</span>
-</a>
-</li>
-<li>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-primary font-bold border-r-2 border-primary bg-surface-container-low transition-colors duration-200 cursor-pointer active:scale-95" href="#">
-<span class="material-symbols-outlined" data-icon="event" data-weight="fill" style="font-variation-settings: 'FILL' 1;">event</span>
-<span class="font-body-md text-body-md">Interviews</span>
-</a>
-</li>
-<li>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer active:scale-95" href="#">
-<span class="material-symbols-outlined" data-icon="business_center">business_center</span>
-<span class="font-body-md text-body-md">Client Portal</span>
-</a>
-</li>
-<li>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer active:scale-95" href="#">
-<span class="material-symbols-outlined" data-icon="settings">settings</span>
-<span class="font-body-md text-body-md">Settings</span>
-</a>
-</li>
-</ul>
-</div>
-<div class="mt-auto pt-lg border-t border-outline-variant">
-<button class="w-full bg-primary text-on-primary font-body-md text-body-md py-sm rounded-lg hover:brightness-110 transition-all">Post New Job</button>
-<ul class="mt-md space-y-sm">
-<li>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer" href="#">
-<span class="material-symbols-outlined" data-icon="help">help</span>
-<span class="font-body-md text-body-md">Support</span>
-</a>
-</li>
-<li>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer" href="#">
-<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
-<span class="font-body-md text-body-md">Account</span>
-</a>
-</li>
-</ul>
-</div>
-</nav>
-<!-- Main Content Area -->
-<div class="flex-1 ml-64 flex flex-col h-screen">
-<!-- TopAppBar -->
-<header class="bg-surface docked full-width top-0 sticky z-40 border-b border-outline-variant flex justify-between items-center h-16 px-gutter">
-<div class="flex items-center gap-lg">
-<div class="relative">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
-<input class="pl-10 pr-4 py-2 rounded-lg bg-surface-container-lowest border border-outline-variant text-body-md focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20 transition-all w-64" placeholder="Search..." type="text"/>
-</div>
-</div>
-<nav class="hidden md:flex gap-lg">
-<a class="font-body-lg text-body-lg text-on-surface-variant hover:text-primary transition-colors" href="#">Reports</a>
-<a class="font-body-lg text-body-lg text-on-surface-variant hover:text-primary transition-colors" href="#">Automations</a>
-<a class="font-body-lg text-body-lg text-on-surface-variant hover:text-primary transition-colors" href="#">Team</a>
-</nav>
-<div class="flex items-center gap-md">
-<button class="font-body-md text-body-md text-primary hover:bg-surface-container-low px-4 py-2 rounded-lg transition-colors">Switch Org</button>
-<div class="flex gap-sm">
-<button class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container-low"><span class="material-symbols-outlined" data-icon="notifications">notifications</span></button>
-<button class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container-low"><span class="material-symbols-outlined" data-icon="apps">apps</span></button>
-</div>
-<img alt="User Profile" class="w-8 h-8 rounded-full border border-outline-variant" data-alt="A professional headshot of a person looking directly at the camera. The lighting is soft and flattering, highlighting their features. They are wearing a neutral-colored shirt. The background is a clean, modern office environment. The image is high resolution and suitable for a corporate profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-VD6z-eieBNxRX_6fggaoZ4V9jhc13WqRRw8PRWeLl7z3JI1SUoDS8oqEb7kTJSNST4tOWHo0cYXkorxP4RQN3fgSjt2vefqURUOT8qbNc4ZQOTeNjZrd9Vswpi-HVrgji3fi0l6R6IePndEpcWH9Vt2UVfhR5rCQskF3hzyPq7bfjlx8WW3aiWxzk__gyk156IPpVlu51-wqCK-_7fw07bpNFYARRuaapV0u0FdDa9_qw0vsVPlVGIbxfEOeElYGSt4Nu_FjgXPA"/>
-</div>
-</header>
-<!-- Main Workspace -->
-<main class="flex-1 overflow-hidden p-gutter flex gap-gutter bg-background">
-<!-- Left Pane: Unassigned Candidates -->
-<div class="w-1/3 flex flex-col bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0_1px_3px_0_rgba(0,0,0,0.02),0_1px_2px_-1px_rgba(0,0,0,0.03)] overflow-hidden">
-<div class="p-lg border-b border-outline-variant bg-surface flex justify-between items-center">
-<h2 class="font-headline-sm text-headline-sm text-on-surface">Unassigned Candidates</h2>
-<span class="bg-surface-container-high text-primary font-data-mono text-data-mono px-2 py-1 rounded-full">12</span>
-</div>
-<div class="p-md border-b border-outline-variant bg-surface-container-lowest">
-<div class="relative">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm" data-icon="filter_list">filter_list</span>
-<input class="w-full pl-9 pr-4 py-2 rounded-lg bg-surface border border-outline-variant text-body-md focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20 transition-all text-sm" placeholder="Filter candidates..." type="text"/>
-</div>
-</div>
-<div class="flex-1 overflow-y-auto p-md space-y-md" id="candidate-list">
-<!-- Candidate Card 1 -->
-<div class="bg-surface border border-outline-variant rounded-lg p-md cursor-grab hover:shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] transition-shadow active:cursor-grabbing group" draggable="true" id="cand-1" ondragstart="drag(event)">
-<div class="flex justify-between items-start mb-sm">
-<div>
-<h3 class="font-headline-sm text-headline-sm text-on-surface">Elena Rodriguez</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Senior Frontend Engineer</p>
-</div>
-<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors cursor-grab active:cursor-grabbing" data-icon="drag_indicator">drag_indicator</span>
-</div>
-<div class="flex gap-sm mt-sm">
-<span class="font-label-caps text-label-caps bg-surface-container-high text-on-surface-variant px-2 py-1 rounded">React</span>
-<span class="font-label-caps text-label-caps bg-surface-container-high text-on-surface-variant px-2 py-1 rounded">8 YOE</span>
-</div>
-<div class="mt-md pt-sm border-t border-outline-variant flex justify-between items-center">
-<span class="font-data-mono text-data-mono text-outline">ID: CND-492</span>
-<button class="font-label-caps text-label-caps text-primary hover:underline">View Profile</button>
-</div>
-</div>
-<!-- Candidate Card 2 -->
-<div class="bg-surface border border-outline-variant rounded-lg p-md cursor-grab hover:shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] transition-shadow active:cursor-grabbing group" draggable="true" id="cand-2" ondragstart="drag(event)">
-<div class="flex justify-between items-start mb-sm">
-<div>
-<h3 class="font-headline-sm text-headline-sm text-on-surface">Marcus Johnson</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Product Manager</p>
-</div>
-<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors cursor-grab active:cursor-grabbing" data-icon="drag_indicator">drag_indicator</span>
-</div>
-<div class="flex gap-sm mt-sm">
-<span class="font-label-caps text-label-caps bg-surface-container-high text-on-surface-variant px-2 py-1 rounded">B2B SaaS</span>
-<span class="font-label-caps text-label-caps bg-surface-container-high text-on-surface-variant px-2 py-1 rounded">Agile</span>
-</div>
-<div class="mt-md pt-sm border-t border-outline-variant flex justify-between items-center">
-<span class="font-data-mono text-data-mono text-outline">ID: CND-511</span>
-<button class="font-label-caps text-label-caps text-primary hover:underline">View Profile</button>
-</div>
-</div>
-</div>
-</div>
-<!-- Right Pane: Open Requisitions / Slots -->
-<div class="w-2/3 flex flex-col bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0_1px_3px_0_rgba(0,0,0,0.02),0_1px_2px_-1px_rgba(0,0,0,0.03)] overflow-hidden">
-<div class="p-lg border-b border-outline-variant bg-surface flex justify-between items-center">
-<div>
-<h2 class="font-headline-sm text-headline-sm text-on-surface">Assignment Hub</h2>
-<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Drag candidates to open slots to assign interviews.</p>
-</div>
-<div class="flex gap-sm border border-outline-variant rounded-lg bg-surface-container-lowest p-1">
-<button class="px-3 py-1 rounded bg-surface-container-high text-primary font-body-md text-body-md font-semibold">Roles</button>
-<button class="px-3 py-1 rounded text-on-surface-variant hover:bg-surface font-body-md text-body-md">Schedule View</button>
-</div>
-</div>
-<div class="flex-1 overflow-y-auto p-lg space-y-lg">
-<!-- Requisition Section 1 -->
-<div>
-<div class="flex justify-between items-center mb-md border-b border-outline-variant pb-sm">
-<h3 class="font-headline-sm text-headline-sm text-on-surface">Lead UI/UX Designer</h3>
-<span class="font-label-caps text-label-caps text-on-surface-variant">REQ-802</span>
-</div>
-<div class="grid grid-cols-2 gap-md">
-<!-- Slot 1 -->
-<div class="border border-outline-variant rounded-lg p-md bg-surface" id="slot-1" ondragover="allowDrop(event)" ondrop="drop(event)">
-<div class="flex justify-between items-center mb-md">
-<div class="flex items-center gap-sm">
-<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-bold">AS</div>
-<div>
-<p class="font-body-md text-body-md font-semibold text-on-surface">Technical Screen</p>
-<p class="font-label-caps text-label-caps text-on-surface-variant">Interviewer: Alex Smith</p>
-</div>
-</div>
-</div>
-<div class="min-h-[100px] border-2 border-dashed border-outline-variant rounded-lg flex items-center justify-center text-on-surface-variant bg-surface-container-lowest transition-colors drop-zone">
-<p class="font-body-md text-body-md">Drop candidate here</p>
-</div>
-</div>
-<!-- Slot 2 -->
-<div class="border border-outline-variant rounded-lg p-md bg-surface" id="slot-2" ondragover="allowDrop(event)" ondrop="drop(event)">
-<div class="flex justify-between items-center mb-md">
-<div class="flex items-center gap-sm">
-<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-bold">JD</div>
-<div>
-<p class="font-body-md text-body-md font-semibold text-on-surface">Culture Fit</p>
-<p class="font-label-caps text-label-caps text-on-surface-variant">Interviewer: Jane Doe</p>
-</div>
-</div>
-</div>
-<div class="min-h-[100px] border-2 border-dashed border-outline-variant rounded-lg flex items-center justify-center text-on-surface-variant bg-surface-container-lowest transition-colors drop-zone">
-<p class="font-body-md text-body-md">Drop candidate here</p>
-</div>
-</div>
-</div>
-</div>
-<!-- AI Insights -->
-<div class="bg-[#ECFEFF] border-l-2 border-[#06B6D4] rounded-r-xl p-md mt-lg flex items-start gap-md">
-<span class="material-symbols-outlined text-[#06B6D4]" data-icon="lightbulb">lightbulb</span>
-<div>
-<h4 class="font-headline-sm text-headline-sm text-on-surface mb-xs">Logikality AI Suggestion</h4>
-<p class="font-body-md text-body-md text-on-surface-variant">Elena Rodriguez is an 85% match for the Lead UI/UX Designer role based on her portfolio overlap with the JD. Consider assigning her to Alex Smith's Technical Screen.</p>
-</div>
-</div>
-</div>
-</div>
-</main>
-</div>
-<script>
-        function allowDrop(ev) {
-            ev.preventDefault();
-            if(ev.target.classList.contains('drop-zone') || ev.target.closest('.drop-zone')) {
-                const zone = ev.target.classList.contains('drop-zone') ? ev.target : ev.target.closest('.drop-zone');
-                zone.classList.add('drag-over');
-            }
+  </head>
+  <body class="flex h-screen overflow-hidden">
+    <!-- SideNavBar -->
+    <nav
+      class="bg-surface-container-lowest h-screen w-64 fixed left-0 top-0 border-r border-outline-variant shadow-sm flex flex-col py-lg px-md z-50"
+    >
+      <div class="mb-xl">
+        <h1 class="font-headline-md text-headline-md font-bold text-primary">Logikality AI</h1>
+        <p class="font-label-caps text-label-caps text-on-surface-variant mt-xs">
+          Executive Recruitment
+        </p>
+      </div>
+      <div class="flex-1 overflow-y-auto">
+        <ul class="space-y-sm">
+          <li>
+            <a
+              class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer active:scale-95"
+              href="#"
+            >
+              <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+              <span class="font-body-md text-body-md">Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a
+              class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer active:scale-95"
+              href="#"
+            >
+              <span class="material-symbols-outlined" data-icon="group">group</span>
+              <span class="font-body-md text-body-md">Candidates</span>
+            </a>
+          </li>
+          <li>
+            <a
+              class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer active:scale-95"
+              href="#"
+            >
+              <span class="material-symbols-outlined" data-icon="work">work</span>
+              <span class="font-body-md text-body-md">Active Jobs</span>
+            </a>
+          </li>
+          <li>
+            <a
+              class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer active:scale-95"
+              href="#"
+            >
+              <span class="material-symbols-outlined" data-icon="database">database</span>
+              <span class="font-body-md text-body-md">Talent Pools</span>
+            </a>
+          </li>
+          <li>
+            <a
+              class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer active:scale-95"
+              href="#"
+            >
+              <span class="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
+              <span class="font-body-md text-body-md">Analytics</span>
+            </a>
+          </li>
+          <li>
+            <a
+              class="flex items-center gap-md px-md py-sm rounded-lg text-primary font-bold border-r-2 border-primary bg-surface-container-low transition-colors duration-200 cursor-pointer active:scale-95"
+              href="#"
+            >
+              <span
+                class="material-symbols-outlined"
+                data-icon="event"
+                data-weight="fill"
+                style="font-variation-settings: &quot;FILL&quot; 1"
+                >event</span
+              >
+              <span class="font-body-md text-body-md">Interviews</span>
+            </a>
+          </li>
+          <li>
+            <a
+              class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer active:scale-95"
+              href="#"
+            >
+              <span class="material-symbols-outlined" data-icon="business_center"
+                >business_center</span
+              >
+              <span class="font-body-md text-body-md">Client Portal</span>
+            </a>
+          </li>
+          <li>
+            <a
+              class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer active:scale-95"
+              href="#"
+            >
+              <span class="material-symbols-outlined" data-icon="settings">settings</span>
+              <span class="font-body-md text-body-md">Settings</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="mt-auto pt-lg border-t border-outline-variant">
+        <button
+          class="w-full bg-primary text-on-primary font-body-md text-body-md py-sm rounded-lg hover:brightness-110 transition-all"
+        >
+          Post New Job
+        </button>
+        <ul class="mt-md space-y-sm">
+          <li>
+            <a
+              class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer"
+              href="#"
+            >
+              <span class="material-symbols-outlined" data-icon="help">help</span>
+              <span class="font-body-md text-body-md">Support</span>
+            </a>
+          </li>
+          <li>
+            <a
+              class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer"
+              href="#"
+            >
+              <span class="material-symbols-outlined" data-icon="account_circle"
+                >account_circle</span
+              >
+              <span class="font-body-md text-body-md">Account</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <!-- Main Content Area -->
+    <div class="flex-1 ml-64 flex flex-col h-screen">
+      <!-- TopAppBar -->
+      <header
+        class="bg-surface docked full-width top-0 sticky z-40 border-b border-outline-variant flex justify-between items-center h-16 px-gutter"
+      >
+        <div class="flex items-center gap-lg">
+          <div class="relative">
+            <span
+              class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline"
+              data-icon="search"
+              >search</span
+            >
+            <input
+              class="pl-10 pr-4 py-2 rounded-lg bg-surface-container-lowest border border-outline-variant text-body-md focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20 transition-all w-64"
+              placeholder="Search..."
+              type="text"
+            />
+          </div>
+        </div>
+        <nav class="hidden md:flex gap-lg">
+          <a
+            class="font-body-lg text-body-lg text-on-surface-variant hover:text-primary transition-colors"
+            href="#"
+            >Reports</a
+          >
+          <a
+            class="font-body-lg text-body-lg text-on-surface-variant hover:text-primary transition-colors"
+            href="#"
+            >Automations</a
+          >
+          <a
+            class="font-body-lg text-body-lg text-on-surface-variant hover:text-primary transition-colors"
+            href="#"
+            >Team</a
+          >
+        </nav>
+        <div class="flex items-center gap-md">
+          <button
+            class="font-body-md text-body-md text-primary hover:bg-surface-container-low px-4 py-2 rounded-lg transition-colors"
+          >
+            Switch Org
+          </button>
+          <div class="flex gap-sm">
+            <button
+              class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container-low"
+            >
+              <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+            </button>
+            <button
+              class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container-low"
+            >
+              <span class="material-symbols-outlined" data-icon="apps">apps</span>
+            </button>
+          </div>
+          <img
+            alt="User Profile"
+            class="w-8 h-8 rounded-full border border-outline-variant"
+            data-alt="A professional headshot of a person looking directly at the camera. The lighting is soft and flattering, highlighting their features. They are wearing a neutral-colored shirt. The background is a clean, modern office environment. The image is high resolution and suitable for a corporate profile."
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-VD6z-eieBNxRX_6fggaoZ4V9jhc13WqRRw8PRWeLl7z3JI1SUoDS8oqEb7kTJSNST4tOWHo0cYXkorxP4RQN3fgSjt2vefqURUOT8qbNc4ZQOTeNjZrd9Vswpi-HVrgji3fi0l6R6IePndEpcWH9Vt2UVfhR5rCQskF3hzyPq7bfjlx8WW3aiWxzk__gyk156IPpVlu51-wqCK-_7fw07bpNFYARRuaapV0u0FdDa9_qw0vsVPlVGIbxfEOeElYGSt4Nu_FjgXPA"
+          />
+        </div>
+      </header>
+      <!-- Main Workspace -->
+      <main class="flex-1 overflow-hidden p-gutter flex gap-gutter bg-background">
+        <!-- Left Pane: Unassigned Candidates -->
+        <div
+          class="w-1/3 flex flex-col bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0_1px_3px_0_rgba(0,0,0,0.02),0_1px_2px_-1px_rgba(0,0,0,0.03)] overflow-hidden"
+        >
+          <div
+            class="p-lg border-b border-outline-variant bg-surface flex justify-between items-center"
+          >
+            <h2 class="font-headline-sm text-headline-sm text-on-surface">Unassigned Candidates</h2>
+            <span
+              class="bg-surface-container-high text-primary font-data-mono text-data-mono px-2 py-1 rounded-full"
+              >12</span
+            >
+          </div>
+          <div class="p-md border-b border-outline-variant bg-surface-container-lowest">
+            <div class="relative">
+              <span
+                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm"
+                data-icon="filter_list"
+                >filter_list</span
+              >
+              <input
+                class="w-full pl-9 pr-4 py-2 rounded-lg bg-surface border border-outline-variant text-body-md focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-20 transition-all text-sm"
+                placeholder="Filter candidates..."
+                type="text"
+              />
+            </div>
+          </div>
+          <div class="flex-1 overflow-y-auto p-md space-y-md" id="candidate-list">
+            <!-- Candidate Card 1 -->
+            <div
+              class="bg-surface border border-outline-variant rounded-lg p-md cursor-grab hover:shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] transition-shadow active:cursor-grabbing group"
+              draggable="true"
+              id="cand-1"
+              ondragstart="drag(event)"
+            >
+              <div class="flex justify-between items-start mb-sm">
+                <div>
+                  <h3 class="font-headline-sm text-headline-sm text-on-surface">Elena Rodriguez</h3>
+                  <p class="font-body-md text-body-md text-on-surface-variant">
+                    Senior Frontend Engineer
+                  </p>
+                </div>
+                <span
+                  class="material-symbols-outlined text-outline group-hover:text-primary transition-colors cursor-grab active:cursor-grabbing"
+                  data-icon="drag_indicator"
+                  >drag_indicator</span
+                >
+              </div>
+              <div class="flex gap-sm mt-sm">
+                <span
+                  class="font-label-caps text-label-caps bg-surface-container-high text-on-surface-variant px-2 py-1 rounded"
+                  >React</span
+                >
+                <span
+                  class="font-label-caps text-label-caps bg-surface-container-high text-on-surface-variant px-2 py-1 rounded"
+                  >8 YOE</span
+                >
+              </div>
+              <div
+                class="mt-md pt-sm border-t border-outline-variant flex justify-between items-center"
+              >
+                <span class="font-data-mono text-data-mono text-outline">ID: CND-492</span>
+                <button class="font-label-caps text-label-caps text-primary hover:underline">
+                  View Profile
+                </button>
+              </div>
+            </div>
+            <!-- Candidate Card 2 -->
+            <div
+              class="bg-surface border border-outline-variant rounded-lg p-md cursor-grab hover:shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] transition-shadow active:cursor-grabbing group"
+              draggable="true"
+              id="cand-2"
+              ondragstart="drag(event)"
+            >
+              <div class="flex justify-between items-start mb-sm">
+                <div>
+                  <h3 class="font-headline-sm text-headline-sm text-on-surface">Marcus Johnson</h3>
+                  <p class="font-body-md text-body-md text-on-surface-variant">Product Manager</p>
+                </div>
+                <span
+                  class="material-symbols-outlined text-outline group-hover:text-primary transition-colors cursor-grab active:cursor-grabbing"
+                  data-icon="drag_indicator"
+                  >drag_indicator</span
+                >
+              </div>
+              <div class="flex gap-sm mt-sm">
+                <span
+                  class="font-label-caps text-label-caps bg-surface-container-high text-on-surface-variant px-2 py-1 rounded"
+                  >B2B SaaS</span
+                >
+                <span
+                  class="font-label-caps text-label-caps bg-surface-container-high text-on-surface-variant px-2 py-1 rounded"
+                  >Agile</span
+                >
+              </div>
+              <div
+                class="mt-md pt-sm border-t border-outline-variant flex justify-between items-center"
+              >
+                <span class="font-data-mono text-data-mono text-outline">ID: CND-511</span>
+                <button class="font-label-caps text-label-caps text-primary hover:underline">
+                  View Profile
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Right Pane: Open Requisitions / Slots -->
+        <div
+          class="w-2/3 flex flex-col bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0_1px_3px_0_rgba(0,0,0,0.02),0_1px_2px_-1px_rgba(0,0,0,0.03)] overflow-hidden"
+        >
+          <div
+            class="p-lg border-b border-outline-variant bg-surface flex justify-between items-center"
+          >
+            <div>
+              <h2 class="font-headline-sm text-headline-sm text-on-surface">Assignment Hub</h2>
+              <p class="font-body-md text-body-md text-on-surface-variant mt-xs">
+                Drag candidates to open slots to assign interviews.
+              </p>
+            </div>
+            <div
+              class="flex gap-sm border border-outline-variant rounded-lg bg-surface-container-lowest p-1"
+            >
+              <button
+                class="px-3 py-1 rounded bg-surface-container-high text-primary font-body-md text-body-md font-semibold"
+              >
+                Roles
+              </button>
+              <button
+                class="px-3 py-1 rounded text-on-surface-variant hover:bg-surface font-body-md text-body-md"
+              >
+                Schedule View
+              </button>
+            </div>
+          </div>
+          <div class="flex-1 overflow-y-auto p-lg space-y-lg">
+            <!-- Requisition Section 1 -->
+            <div>
+              <div
+                class="flex justify-between items-center mb-md border-b border-outline-variant pb-sm"
+              >
+                <h3 class="font-headline-sm text-headline-sm text-on-surface">
+                  Lead UI/UX Designer
+                </h3>
+                <span class="font-label-caps text-label-caps text-on-surface-variant">REQ-802</span>
+              </div>
+              <div class="grid grid-cols-2 gap-md">
+                <!-- Slot 1 -->
+                <div
+                  class="border border-outline-variant rounded-lg p-md bg-surface"
+                  id="slot-1"
+                  ondragover="allowDrop(event)"
+                  ondrop="drop(event)"
+                >
+                  <div class="flex justify-between items-center mb-md">
+                    <div class="flex items-center gap-sm">
+                      <div
+                        class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-bold"
+                      >
+                        AS
+                      </div>
+                      <div>
+                        <p class="font-body-md text-body-md font-semibold text-on-surface">
+                          Technical Screen
+                        </p>
+                        <p class="font-label-caps text-label-caps text-on-surface-variant">
+                          Interviewer: Alex Smith
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="min-h-[100px] border-2 border-dashed border-outline-variant rounded-lg flex items-center justify-center text-on-surface-variant bg-surface-container-lowest transition-colors drop-zone"
+                  >
+                    <p class="font-body-md text-body-md">Drop candidate here</p>
+                  </div>
+                </div>
+                <!-- Slot 2 -->
+                <div
+                  class="border border-outline-variant rounded-lg p-md bg-surface"
+                  id="slot-2"
+                  ondragover="allowDrop(event)"
+                  ondrop="drop(event)"
+                >
+                  <div class="flex justify-between items-center mb-md">
+                    <div class="flex items-center gap-sm">
+                      <div
+                        class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-bold"
+                      >
+                        JD
+                      </div>
+                      <div>
+                        <p class="font-body-md text-body-md font-semibold text-on-surface">
+                          Culture Fit
+                        </p>
+                        <p class="font-label-caps text-label-caps text-on-surface-variant">
+                          Interviewer: Jane Doe
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="min-h-[100px] border-2 border-dashed border-outline-variant rounded-lg flex items-center justify-center text-on-surface-variant bg-surface-container-lowest transition-colors drop-zone"
+                  >
+                    <p class="font-body-md text-body-md">Drop candidate here</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- AI Insights -->
+            <div
+              class="bg-[#ECFEFF] border-l-2 border-[#06B6D4] rounded-r-xl p-md mt-lg flex items-start gap-md"
+            >
+              <span class="material-symbols-outlined text-[#06B6D4]" data-icon="lightbulb"
+                >lightbulb</span
+              >
+              <div>
+                <h4 class="font-headline-sm text-headline-sm text-on-surface mb-xs">
+                  Logikality AI Suggestion
+                </h4>
+                <p class="font-body-md text-body-md text-on-surface-variant">
+                  Elena Rodriguez is an 85% match for the Lead UI/UX Designer role based on her
+                  portfolio overlap with the JD. Consider assigning her to Alex Smith's Technical
+                  Screen.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script>
+      function allowDrop(ev) {
+        ev.preventDefault();
+        if (ev.target.classList.contains("drop-zone") || ev.target.closest(".drop-zone")) {
+          const zone = ev.target.classList.contains("drop-zone")
+            ? ev.target
+            : ev.target.closest(".drop-zone");
+          zone.classList.add("drag-over");
+        }
+      }
+
+      function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.id);
+      }
+
+      function drop(ev) {
+        ev.preventDefault();
+        const data = ev.dataTransfer.getData("text");
+        const draggedElement = document.getElementById(data);
+
+        let dropZone = ev.target;
+        if (!dropZone.classList.contains("drop-zone")) {
+          dropZone = dropZone.closest(".drop-zone");
         }
 
-        function drag(ev) {
-            ev.dataTransfer.setData("text", ev.target.id);
+        if (dropZone && draggedElement) {
+          dropZone.classList.remove("drag-over");
+          dropZone.innerHTML = ""; // Clear 'Drop here' text
+
+          // Clone the dragged element to keep the original in the list, or move it.
+          // For this UI, moving it makes sense for assignment.
+          const newElement = draggedElement.cloneNode(true);
+          newElement.classList.remove("cursor-grab", "active:cursor-grabbing");
+          newElement.removeAttribute("draggable");
+
+          // Add status indicator
+          const statusDiv = document.createElement("div");
+          statusDiv.className =
+            "mt-sm inline-flex items-center gap-xs px-2 py-1 rounded bg-surface-container-high text-primary font-label-caps text-label-caps";
+          statusDiv.innerHTML =
+            '<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span> Pending Confirmation';
+          newElement.appendChild(statusDiv);
+
+          dropZone.appendChild(newElement);
+          dropZone.classList.remove("border-dashed", "items-center", "justify-center");
+
+          // Optionally remove from original list if it's a strict assignment
+          // draggedElement.remove();
         }
+      }
 
-        function drop(ev) {
-            ev.preventDefault();
-            const data = ev.dataTransfer.getData("text");
-            const draggedElement = document.getElementById(data);
-            
-            let dropZone = ev.target;
-            if(!dropZone.classList.contains('drop-zone')) {
-                dropZone = dropZone.closest('.drop-zone');
-            }
-
-            if (dropZone && draggedElement) {
-                dropZone.classList.remove('drag-over');
-                dropZone.innerHTML = ''; // Clear 'Drop here' text
-                
-                // Clone the dragged element to keep the original in the list, or move it. 
-                // For this UI, moving it makes sense for assignment.
-                const newElement = draggedElement.cloneNode(true);
-                newElement.classList.remove('cursor-grab', 'active:cursor-grabbing');
-                newElement.removeAttribute('draggable');
-                
-                // Add status indicator
-                const statusDiv = document.createElement('div');
-                statusDiv.className = 'mt-sm inline-flex items-center gap-xs px-2 py-1 rounded bg-surface-container-high text-primary font-label-caps text-label-caps';
-                statusDiv.innerHTML = '<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span> Pending Confirmation';
-                newElement.appendChild(statusDiv);
-
-                dropZone.appendChild(newElement);
-                dropZone.classList.remove('border-dashed', 'items-center', 'justify-center');
-                
-                // Optionally remove from original list if it's a strict assignment
-                // draggedElement.remove();
-            }
-        }
-
-        // Add event listeners to remove drag-over class when leaving
-        document.querySelectorAll('.drop-zone').forEach(zone => {
-            zone.addEventListener('dragleave', (e) => {
-                zone.classList.remove('drag-over');
-            });
+      // Add event listeners to remove drag-over class when leaving
+      document.querySelectorAll(".drop-zone").forEach((zone) => {
+        zone.addEventListener("dragleave", (e) => {
+          zone.classList.remove("drag-over");
         });
+      });
     </script>
-</body></html>
+  </body>
+</html>

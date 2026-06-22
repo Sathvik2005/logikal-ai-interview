@@ -31,7 +31,11 @@ function addDays(d: Date, n: number): Date {
 }
 
 function sameDay(a: Date, b: Date): boolean {
-  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
 }
 
 function fmtTime(d: Date): string {
@@ -62,7 +66,10 @@ export function WeekCalendar({
     return () => document.removeEventListener("mousedown", close);
   }, [popoverId]);
 
-  const days = useMemo(() => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)), [weekStart]);
+  const days = useMemo(
+    () => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)),
+    [weekStart],
+  );
   const slots = useMemo(() => {
     const out: { h: number; m: number }[] = [];
     for (let h = HOUR_START; h < HOUR_END; h++) {
@@ -145,16 +152,24 @@ export function WeekCalendar({
       </div>
 
       {/* Header row */}
-      <div className="grid border-b border-outline-variant" style={{ gridTemplateColumns: "60px repeat(7, 1fr)" }}>
+      <div
+        className="grid border-b border-outline-variant"
+        style={{ gridTemplateColumns: "60px repeat(7, 1fr)" }}
+      >
         <div />
         {days.map((d, i) => {
           const isToday = sameDay(d, now);
           return (
-            <div key={i} className={`px-2 py-2 text-center border-l border-outline-variant ${isToday ? "bg-primary-fixed/60" : ""}`}>
+            <div
+              key={i}
+              className={`px-2 py-2 text-center border-l border-outline-variant ${isToday ? "bg-primary-fixed/60" : ""}`}
+            >
               <div className="text-[11px] uppercase tracking-wide text-on-surface-variant">
                 {d.toLocaleDateString(undefined, { weekday: "short" })}
               </div>
-              <div className={`text-lg font-semibold ${isToday ? "text-primary" : "text-on-surface"}`}>
+              <div
+                className={`text-lg font-semibold ${isToday ? "text-primary" : "text-on-surface"}`}
+              >
                 {d.getDate()}
               </div>
             </div>
@@ -185,7 +200,10 @@ export function WeekCalendar({
             const isToday = sameDay(day, now);
             const events = eventsByDay.get(day.toDateString()) ?? [];
             return (
-              <div key={di} className={`relative border-l border-outline-variant ${isToday ? "bg-primary-fixed/30" : ""}`}>
+              <div
+                key={di}
+                className={`relative border-l border-outline-variant ${isToday ? "bg-primary-fixed/30" : ""}`}
+              >
                 {slots.map((s, si) => {
                   const cellKey = `${di}-${si}`;
                   return (
@@ -205,7 +223,9 @@ export function WeekCalendar({
                         onCreateAt(date, time);
                       }}
                       className={`${s.m === 0 ? "border-t border-outline-variant" : "border-t border-dashed border-outline-variant"} cursor-pointer transition ${
-                        dragOver === cellKey ? "bg-primary-fixed/70" : "hover:bg-surface-container-low"
+                        dragOver === cellKey
+                          ? "bg-primary-fixed/70"
+                          : "hover:bg-surface-container-low"
                       }`}
                       style={{ height: SLOT_PX }}
                     />
@@ -216,7 +236,11 @@ export function WeekCalendar({
                 {isToday && now.getHours() >= HOUR_START && now.getHours() < HOUR_END && (
                   <div
                     className="absolute left-0 right-0 pointer-events-none z-10"
-                    style={{ top: (((now.getHours() - HOUR_START) * 60 + now.getMinutes()) / SLOT_MIN) * SLOT_PX }}
+                    style={{
+                      top:
+                        (((now.getHours() - HOUR_START) * 60 + now.getMinutes()) / SLOT_MIN) *
+                        SLOT_PX,
+                    }}
                   >
                     <div className="h-px bg-error" />
                     <div className="absolute -left-1 -top-1 w-2 h-2 rounded-full bg-error" />
@@ -241,7 +265,9 @@ export function WeekCalendar({
                       style={{ top: eventTop(i), height: eventHeight(i) }}
                       title={`${i.candidateName} — ${fmtTime(start)} → ${fmtTime(end)}`}
                     >
-                      <div className="font-semibold truncate">{fmtTime(start)} {i.candidateName.split(" ")[0]}</div>
+                      <div className="font-semibold truncate">
+                        {fmtTime(start)} {i.candidateName.split(" ")[0]}
+                      </div>
                       <div className="truncate opacity-80">{i.persona}</div>
                     </div>
                   );
@@ -254,7 +280,10 @@ export function WeekCalendar({
 
       {/* Popover */}
       {popoverInterview && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20" onClick={() => setPopoverId(null)}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/20"
+          onClick={() => setPopoverId(null)}
+        >
           <div
             ref={popoverRef}
             className="bg-white border border-outline-variant rounded-xl shadow-xl p-4 w-[340px]"
@@ -265,14 +294,28 @@ export function WeekCalendar({
                 <p className="font-semibold text-on-surface">{popoverInterview.candidateName}</p>
                 <p className="text-xs text-on-surface-variant">{popoverInterview.role}</p>
               </div>
-              <span className={`text-[10px] uppercase px-2 py-0.5 rounded ${STATUS_STYLES[popoverInterview.status]}`}>
+              <span
+                className={`text-[10px] uppercase px-2 py-0.5 rounded ${STATUS_STYLES[popoverInterview.status]}`}
+              >
                 {popoverInterview.status}
               </span>
             </div>
             <div className="text-sm text-on-surface space-y-1 mb-3">
-              <p className="flex items-center gap-2"><Icon name="schedule" className="text-base text-outline" /> {new Date(popoverInterview.scheduledAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</p>
-              <p className="flex items-center gap-2"><Icon name="smart_toy" className="text-base text-outline" /> {popoverInterview.persona}</p>
-              <p className="flex items-center gap-2"><Icon name="timer" className="text-base text-outline" /> {popoverInterview.durationMin} min</p>
+              <p className="flex items-center gap-2">
+                <Icon name="schedule" className="text-base text-outline" />{" "}
+                {new Date(popoverInterview.scheduledAt).toLocaleString(undefined, {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })}
+              </p>
+              <p className="flex items-center gap-2">
+                <Icon name="smart_toy" className="text-base text-outline" />{" "}
+                {popoverInterview.persona}
+              </p>
+              <p className="flex items-center gap-2">
+                <Icon name="timer" className="text-base text-outline" />{" "}
+                {popoverInterview.durationMin} min
+              </p>
             </div>
             <div className="flex flex-wrap gap-2">
               {popoverInterview.status === "scheduled" || popoverInterview.status === "live" ? (
@@ -286,14 +329,20 @@ export function WeekCalendar({
                   </Link>
                   <button
                     type="button"
-                    onClick={() => { toast("Drag the event on the calendar to reschedule."); setPopoverId(null); }}
+                    onClick={() => {
+                      toast("Drag the event on the calendar to reschedule.");
+                      setPopoverId(null);
+                    }}
                     className="flex-1 px-3 py-1.5 border border-outline-variant text-sm rounded-md hover:bg-surface-container-low"
                   >
                     Reschedule
                   </button>
                   <button
                     type="button"
-                    onClick={() => { onAction("cancel", popoverInterview); setPopoverId(null); }}
+                    onClick={() => {
+                      onAction("cancel", popoverInterview);
+                      setPopoverId(null);
+                    }}
                     className="px-3 py-1.5 border border-error text-on-error-container text-sm rounded-md hover:bg-error-container"
                   >
                     Cancel

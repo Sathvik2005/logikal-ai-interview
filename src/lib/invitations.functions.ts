@@ -19,7 +19,11 @@ export type InvitationLookup = {
   email: string;
 };
 
-function computeWindow(scheduledAt: string | null, durationMinutes: number, status: string): WindowState {
+function computeWindow(
+  scheduledAt: string | null,
+  durationMinutes: number,
+  status: string,
+): WindowState {
   if (status === "cancelled") return "cancelled";
   if (!scheduledAt) return "open"; // ad-hoc interviews can join any time
   const start = new Date(scheduledAt).getTime();
@@ -116,7 +120,9 @@ async function createOrRefreshInvitation(interviewId: string, userId: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: iv, error } = await supabaseAdmin
     .from("interviews")
-    .select("id, org_id, candidate_id, scheduled_at, duration_minutes, candidates(email, full_name)")
+    .select(
+      "id, org_id, candidate_id, scheduled_at, duration_minutes, candidates(email, full_name)",
+    )
     .eq("id", interviewId)
     .maybeSingle();
   if (error) throw error;
@@ -168,7 +174,6 @@ async function createOrRefreshInvitation(interviewId: string, userId: string) {
       } as never,
     });
 
-
     return { token: existing.token as string, email: interview.candidates.email as string };
   }
 
@@ -202,10 +207,8 @@ async function createOrRefreshInvitation(interviewId: string, userId: string) {
     } as never,
   });
 
-
   return { token: inserted.token as string, email: interview.candidates.email as string };
 }
-
 
 export const createInterviewInvitation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

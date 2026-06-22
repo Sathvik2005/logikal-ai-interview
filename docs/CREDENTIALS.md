@@ -1,8 +1,10 @@
 # Lokality AI Interview
+
 ## Default Application Credentials
 
 ### Overview
-This document serves as the single source of truth for all default application credentials used during development, testing, demos, and local deployment for the **Lokality AI Interview** platform. 
+
+This document serves as the single source of truth for all default application credentials used during development, testing, demos, and local deployment for the **Lokality AI Interview** platform.
 
 > [!WARNING]
 > These credentials are strictly for development, QA testing, and demonstration environments. **Never use or expose these credentials in production environments.** All production deployments must use unique, strong passwords, secret keys stored in environment variables, and secure identity provider configurations.
@@ -10,6 +12,7 @@ This document serves as the single source of truth for all default application c
 ---
 
 ## Super Admin
+
 Super Admin accounts have global access across the entire platform, including system settings, system-wide metrics, tenant/organization onboarding, global user management, and security audit logs.
 
 - **Email**: `superadmin@lokality.ai`
@@ -22,6 +25,7 @@ Super Admin accounts have global access across the entire platform, including sy
 ---
 
 ## Organization Admin
+
 Organization Admins have administrative permissions scoped to their specific tenant organization. They manage recruiters, hiring managers, company settings, and custom branding.
 
 - **Email**: `orgadmin@acme.com`
@@ -34,10 +38,13 @@ Organization Admins have administrative permissions scoped to their specific ten
 ---
 
 ## Recruiter Accounts
+
 Recruiter accounts manage the day-to-day candidate screening process, build interview stages, assign AI personas, and review AI-generated reports.
 
 ### 1. Satya Recruiter (Primary Database Seeded Account)
-*This account is pre-configured and updated automatically via the database migration schema.*
+
+_This account is pre-configured and updated automatically via the database migration schema._
+
 - **Name**: Satya Recruiter
 - **Email**: `recruitersatya@logikality.demo`
 - **Password**: `Recruiter@2026`
@@ -47,6 +54,7 @@ Recruiter accounts manage the day-to-day candidate screening process, build inte
 - **Permissions**: Schedule candidate interviews, assign job descriptions (JDs), customize AI interviewer profiles, view comprehensive candidate analytics.
 
 ### 2. Sarah Recruiter (Tenant Recruiter)
+
 - **Name**: Sarah Recruiter
 - **Email**: `recruiter.sarah@acme.com`
 - **Password**: `Recruiter@2026`
@@ -58,6 +66,7 @@ Recruiter accounts manage the day-to-day candidate screening process, build inte
 ---
 
 ## Hiring Manager Accounts
+
 Hiring Managers review final candidate transcripts and AI evaluation reports, leaving notes/reviews for final hiring alignment.
 
 - **Name**: Michael Manager
@@ -70,9 +79,11 @@ Hiring Managers review final candidate transcripts and AI evaluation reports, le
 ---
 
 ## Candidate Test Accounts
+
 These accounts represent demo candidates with varying application statuses, roles, and evaluations.
 
 ### 1. Sarah Jenkins
+
 - **Name**: Sarah Jenkins
 - **Email**: `sarah.j@example.com`
 - **Applied Role**: Senior Software Engineer
@@ -83,6 +94,7 @@ These accounts represent demo candidates with varying application statuses, role
 - **Assigned Interview**: Completed (Score: 92)
 
 ### 2. Marcus Chen
+
 - **Name**: Marcus Chen
 - **Email**: `m.chen@example.com`
 - **Applied Role**: Product Manager
@@ -93,6 +105,7 @@ These accounts represent demo candidates with varying application statuses, role
 - **Assigned Interview**: Scheduled
 
 ### 3. Priya Patel
+
 - **Name**: Priya Patel
 - **Email**: `priya.p@example.com`
 - **Applied Role**: Data Scientist
@@ -103,6 +116,7 @@ These accounts represent demo candidates with varying application statuses, role
 - **Assigned Interview**: Scheduled
 
 ### 4. James O'Brien
+
 - **Name**: James O'Brien
 - **Email**: `j.obrien@example.com`
 - **Applied Role**: DevOps Engineer
@@ -115,39 +129,48 @@ These accounts represent demo candidates with varying application statuses, role
 ---
 
 ## Demo Interview Accounts
+
 Use these dedicated profiles to demonstrate different phases and outcomes of the AI evaluation lifecycle.
 
 ### 1. Scheduled Interview Demo
+
 - **Candidate**: Marcus Chen (`m.chen@example.com`)
 - **Key Showcase**: How recruiters configure interview links, candidate system checks, and preparation cards.
 
 ### 2. In Progress / Live Interview Demo
+
 - **Candidate**: Sarah Jenkins (`sarah.j@example.com` - active session mockup)
 - **Key Showcase**: Real-time AI interviewer transcript playback, candidate speech-to-text, and browser focus logs.
 
 ### 3. Completed Interview Demo
+
 - **Candidate**: Aisha Khan (`aisha.k@example.com`)
 - **Key Showcase**: Audio playback of the interview room session, detailed timeline, and metrics breakdown.
 
 ### 4. Strong Hire Report Demo (Score: 95)
+
 - **Candidate**: Aisha Khan (`aisha.k@example.com`)
 - **Key Showcase**: Deep technical responses, consistent architectural insights, 100% video/audio verification.
 
 ### 5. Hire Report Demo (Score: 84)
+
 - **Candidate**: Marcus Chen (`m.chen@example.com`)
 - **Key Showcase**: Solid domain knowledge, balanced communication skills, minor gaps in system scaling depth.
 
 ### 6. Maybe Report Demo (Score: 78)
+
 - **Candidate**: Priya Patel (`priya.p@example.com`)
 - **Key Showcase**: Strong python scripting but struggled with theoretical statistics; border-line suitability.
 
 ### 7. Reject Report Demo (Score: 62)
+
 - **Candidate**: Diego Ramirez (`d.ramirez@example.com`)
 - **Key Showcase**: Insufficient project experience, skipped design queries, proctoring warnings (lost window focus).
 
 ---
 
 ## API Test Accounts
+
 Service accounts utilized for automation testing, external integrations (ATS syncing), and CI/CD pipelines.
 
 - **Account Name**: `automated-ats-sync`
@@ -159,6 +182,7 @@ Service accounts utilized for automation testing, external integrations (ATS syn
 ---
 
 ## Local Development Credentials
+
 To quickly login locally and inspect specific dashboards, use:
 
 - **Local Admin Login**: `superadmin@lokality.ai` / `SuperAdmin@2026`
@@ -168,8 +192,9 @@ To quickly login locally and inspect specific dashboards, use:
 ---
 
 ## Environment Notes
+
 - **Local Sandbox**: All accounts except `recruitersatya@logikality.demo` can be self-signed up dynamically on a local instance using the `/auth` page.
-- **Production Safety**: Never commit `.env` or `.env.local` files containing real production database keys or JWT secrets. 
+- **Production Safety**: Never commit `.env` or `.env.local` files containing real production database keys or JWT secrets.
 - **Environment Variables**: Configure your variables in `.env` based on the `.env.example` file.
 - **Password Enforcement**: All real-world staging/production credentials must be provisioned through standard Auth flow and enforce a minimum of 8 characters with complex character requirements.
 
@@ -187,23 +212,26 @@ To quickly login locally and inspect specific dashboards, use:
 
 ## Quick Demo Accounts
 
-| Role | Email | Password | Purpose |
-|------|-------|----------|---------|
-| Super Admin | `superadmin@lokality.ai` | `SuperAdmin@2026` | Global control panel, audit logs, system-wide admin dashboards |
-| Org Admin | `orgadmin@acme.com` | `OrgAdmin@2026` | Organization/tenant customization, recruiter provisioning |
-| Recruiter (Seeded) | `recruitersatya@logikality.demo` | `Recruiter@2026` | Managing candidate lists, editing JDs, reviewing AI reports |
-| Candidate (Strong Hire) | `aisha.k@example.com` | `Candidate@2026` | Demonstrating score reports, audio transcribing, strong evaluations |
-| Candidate (Scheduled) | `m.chen@example.com` | `Candidate@2026` | Testing scheduled candidates, system checkups, pre-interview layouts |
+| Role                    | Email                            | Password          | Purpose                                                              |
+| ----------------------- | -------------------------------- | ----------------- | -------------------------------------------------------------------- |
+| Super Admin             | `superadmin@lokality.ai`         | `SuperAdmin@2026` | Global control panel, audit logs, system-wide admin dashboards       |
+| Org Admin               | `orgadmin@acme.com`              | `OrgAdmin@2026`   | Organization/tenant customization, recruiter provisioning            |
+| Recruiter (Seeded)      | `recruitersatya@logikality.demo` | `Recruiter@2026`  | Managing candidate lists, editing JDs, reviewing AI reports          |
+| Candidate (Strong Hire) | `aisha.k@example.com`            | `Candidate@2026`  | Demonstrating score reports, audio transcribing, strong evaluations  |
+| Candidate (Scheduled)   | `m.chen@example.com`             | `Candidate@2026`  | Testing scheduled candidates, system checkups, pre-interview layouts |
 
 ---
 
 ## Database Seeding & Regeneration
 
 ### Pre-existing User Migrations
+
 The database user `recruitersatya@logikality.demo` is configured and attached to the `Logikality Demo Org` during migrations via:
+
 - [20260606034600_6f4f18bc-c35b-4128-a2ef-36389906449a.sql](file:///e:/logikaiinterview/supabase/migrations/20260606034600_6f4f18bc-c35b-4128-a2ef-36389906449a.sql)
 
 ### How to Regenerate or Add New Seed Accounts
+
 1. If running a local Supabase stack, you can create a `supabase/seed.sql` file to seed database entities.
 2. Inside `seed.sql`, use Supabase-specific helper functions or SQL inserts to create auth accounts:
    ```sql

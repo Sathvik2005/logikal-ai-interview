@@ -1,5 +1,5 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { IQueueService } from '../../application/common/queue/queue.service';
+import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { IQueueService } from "../../application/common/queue/queue.service";
 
 @Injectable()
 export class InMemoryQueueService implements IQueueService, OnModuleInit {
@@ -7,7 +7,7 @@ export class InMemoryQueueService implements IQueueService, OnModuleInit {
   private readonly handlers = new Map<string, (payload: any) => Promise<void>>();
 
   onModuleInit() {
-    this.logger.log('In-Memory Queue Service initialized.');
+    this.logger.log("In-Memory Queue Service initialized.");
   }
 
   registerProcessor(taskName: string, processor: (payload: any) => Promise<void>) {
@@ -17,7 +17,7 @@ export class InMemoryQueueService implements IQueueService, OnModuleInit {
 
   async enqueue(taskName: string, payload: any, delayMs?: number): Promise<void> {
     this.logger.log(`Enqueued task [${taskName}] (Delay: ${delayMs ?? 0}ms)`);
-    
+
     const taskExecution = async () => {
       const handler = this.handlers.get(taskName);
       if (!handler) {
@@ -31,7 +31,7 @@ export class InMemoryQueueService implements IQueueService, OnModuleInit {
       } catch (err) {
         this.logger.error(
           `Task [${taskName}] failed: ${err instanceof Error ? err.message : String(err)}`,
-          err instanceof Error ? err.stack : undefined
+          err instanceof Error ? err.stack : undefined,
         );
       }
     };

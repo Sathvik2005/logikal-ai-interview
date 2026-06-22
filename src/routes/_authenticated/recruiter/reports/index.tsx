@@ -3,11 +3,17 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { toast } from "sonner";
-import { Icon, SkeletonCard } from "@/components/recruiter/RecruiterShell";
+import { Icon, EmptyState, SkeletonCard } from "@/components/recruiter/RecruiterShell";
 import { StatCard } from "@/components/shared/StatCard";
 import { scoreColor, fmtDate } from "@/components/recruiter/mock-data";
 import { listReports, type ReportListItem } from "@/lib/reports-list.functions";
-import { listLiveInterviews, getMonitorSession, type LiveInterviewDTO, type MonitorTurn, type MonitorEvent } from "@/lib/monitor.functions";
+import {
+  listLiveInterviews,
+  getMonitorSession,
+  type LiveInterviewDTO,
+  type MonitorTurn,
+  type MonitorEvent,
+} from "@/lib/monitor.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/recruiter/reports/")({
@@ -33,7 +39,9 @@ function recommendationBadge(rec: string | null) {
     no_hire: "Reject",
   };
   return (
-    <span className={`px-2.5 py-1 rounded-full text-label-caps font-semibold ${map[rec] ?? "bg-surface-container text-on-surface"}`}>
+    <span
+      className={`px-2.5 py-1 rounded-full text-label-caps font-semibold ${map[rec] ?? "bg-surface-container text-on-surface"}`}
+    >
       {label[rec] ?? rec.replace(/_/g, " ")}
     </span>
   );
@@ -47,7 +55,9 @@ function statusBadge(status: string) {
     evaluation_pending: "bg-[#fef9c3] text-[#854d0e] border border-[#fef08a]",
   };
   return (
-    <span className={`px-2.5 py-1 rounded-full text-label-caps font-medium ${map[status] ?? "bg-surface-container text-on-surface"}`}>
+    <span
+      className={`px-2.5 py-1 rounded-full text-label-caps font-medium ${map[status] ?? "bg-surface-container text-on-surface"}`}
+    >
       {status.replace(/_/g, " ")}
     </span>
   );
@@ -68,19 +78,33 @@ function parseIntegritySummary(timeline: any[] | null) {
   timeline.forEach((e) => {
     const t = (e.type ?? "").toLowerCase();
     if (t.includes("tab_switch") || t.includes("blur")) summary.tabSwitches++;
-    else if (t.includes("fullscreen_exit") || t.includes("fullscreen_change")) summary.fullscreenExits++;
+    else if (t.includes("fullscreen_exit") || t.includes("fullscreen_change"))
+      summary.fullscreenExits++;
     else if (t.includes("face_missing") || t.includes("no_face")) summary.faceMissing++;
-    else if (t.includes("multiple_faces") || t.includes("more_than_one_face")) summary.multipleFaces = true;
-    else if (t.includes("voice") || t.includes("audio") || t.includes("background_voice")) summary.backgroundVoice++;
+    else if (t.includes("multiple_faces") || t.includes("more_than_one_face"))
+      summary.multipleFaces = true;
+    else if (t.includes("voice") || t.includes("audio") || t.includes("background_voice"))
+      summary.backgroundVoice++;
     else if (t.includes("copy") || t.includes("paste")) summary.copyPaste++;
     else if (t.includes("devtools") || t.includes("developer_tools")) summary.devtools++;
-    else if (t.includes("screen_share") || t.includes("screen_stop")) summary.screenShareViolations++;
+    else if (t.includes("screen_share") || t.includes("screen_stop"))
+      summary.screenShareViolations++;
   });
   return summary;
 }
 
 function exportReportsCSV(reports: ReportListItem[]) {
-  const headers = ["Candidate", "Role", "Persona", "Recruiter", "Date", "Overall Score", "Integrity Score", "Recommendation", "Status"];
+  const headers = [
+    "Candidate",
+    "Role",
+    "Persona",
+    "Recruiter",
+    "Date",
+    "Overall Score",
+    "Integrity Score",
+    "Recommendation",
+    "Status",
+  ];
   const rows = reports.map((r) => [
     r.candidateName,
     r.role ?? "",
@@ -92,7 +116,9 @@ function exportReportsCSV(reports: ReportListItem[]) {
     r.recommendation ?? "",
     r.status ?? "",
   ]);
-  const csv = [headers, ...rows].map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+  const csv = [headers, ...rows]
+    .map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(","))
+    .join("\n");
   const blob = new Blob([csv], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -104,7 +130,8 @@ function exportReportsCSV(reports: ReportListItem[]) {
 }
 
 function exportReportsJSON(reports: ReportListItem[]) {
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(reports, null, 2));
+  const dataStr =
+    "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(reports, null, 2));
   const a = document.createElement("a");
   a.setAttribute("href", dataStr);
   a.setAttribute("download", `recruiter-reports-${new Date().toISOString().slice(0, 10)}.json`);
@@ -120,7 +147,12 @@ function ReportsCenter() {
   const reportsFn = useServerFn(listReports);
   const liveFn = useServerFn(listLiveInterviews);
 
-  const { data: reportsData, isLoading: reportsLoading, error: reportsErr, refetch: refetchReports } = useQuery({
+  const {
+    data: reportsData,
+    isLoading: reportsLoading,
+    error: reportsErr,
+    refetch: refetchReports,
+  } = useQuery({
     queryKey: ["reports", "list"],
     queryFn: () => reportsFn({}),
     refetchInterval: 30_000,
@@ -157,9 +189,18 @@ function ReportsCenter() {
   const [hoveredReportId, setHoveredReportId] = useState<string | null>(null);
 
   // Dynamic filter values from dataset
-  const rolesList = useMemo(() => Array.from(new Set(reports.map((r) => r.role).filter(Boolean))), [reports]);
-  const recruitersList = useMemo(() => Array.from(new Set(reports.map((r) => r.recruiterName).filter(Boolean))), [reports]);
-  const personasList = useMemo(() => Array.from(new Set(reports.map((r) => r.personaName).filter(Boolean))), [reports]);
+  const rolesList = useMemo(
+    () => Array.from(new Set(reports.map((r) => r.role).filter(Boolean))),
+    [reports],
+  );
+  const recruitersList = useMemo(
+    () => Array.from(new Set(reports.map((r) => r.recruiterName).filter(Boolean))),
+    [reports],
+  );
+  const personasList = useMemo(
+    () => Array.from(new Set(reports.map((r) => r.personaName).filter(Boolean))),
+    [reports],
+  );
 
   // Overall statistics
   const stats = useMemo(() => {
@@ -167,10 +208,16 @@ function ReportsCenter() {
     const inProgress = reports.filter((r) => r.status === "in_progress");
     const scored = completed.filter((r) => r.score != null);
     const integrityScored = completed.filter((r) => r.integrityScore != null);
-    
-    const avgScore = scored.length ? Math.round(scored.reduce((a, r) => a + r.score!, 0) / scored.length) : null;
-    const avgInteg = integrityScored.length ? Math.round(integrityScored.reduce((a, r) => a + r.integrityScore!, 0) / integrityScored.length) : null;
-    
+
+    const avgScore = scored.length
+      ? Math.round(scored.reduce((a, r) => a + r.score!, 0) / scored.length)
+      : null;
+    const avgInteg = integrityScored.length
+      ? Math.round(
+          integrityScored.reduce((a, r) => a + r.integrityScore!, 0) / integrityScored.length,
+        )
+      : null;
+
     return {
       total: reports.length,
       completed: completed.length,
@@ -178,7 +225,9 @@ function ReportsCenter() {
       strongHire: completed.filter((r) => r.recommendation === "strong_hire").length,
       hire: completed.filter((r) => r.recommendation === "hire").length,
       maybe: completed.filter((r) => r.recommendation === "maybe").length,
-      reject: completed.filter((r) => r.recommendation === "reject" || r.recommendation === "no_hire").length,
+      reject: completed.filter(
+        (r) => r.recommendation === "reject" || r.recommendation === "no_hire",
+      ).length,
       avgScore,
       avgInteg,
     };
@@ -195,7 +244,7 @@ function ReportsCenter() {
         (r) =>
           r.candidateName.toLowerCase().includes(q) ||
           r.role.toLowerCase().includes(q) ||
-          r.personaName.toLowerCase().includes(q)
+          r.personaName.toLowerCase().includes(q),
       );
     }
 
@@ -231,10 +280,10 @@ function ReportsCenter() {
     list.sort((a, b) => {
       let av = a[sortKey];
       let bv = b[sortKey];
-      
+
       if (av === null || av === undefined) av = "";
       if (bv === null || bv === undefined) bv = "";
-      
+
       if (typeof av === "number" && typeof bv === "number") {
         return sortDir === "asc" ? av - bv : bv - av;
       }
@@ -244,7 +293,19 @@ function ReportsCenter() {
     });
 
     return list;
-  }, [reports, search, roleFilter, recruiterFilter, personaFilter, recFilter, statusFilter, riskFilter, dateRange, sortKey, sortDir]);
+  }, [
+    reports,
+    search,
+    roleFilter,
+    recruiterFilter,
+    personaFilter,
+    recFilter,
+    statusFilter,
+    riskFilter,
+    dateRange,
+    sortKey,
+    sortDir,
+  ]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -260,9 +321,7 @@ function ReportsCenter() {
   };
 
   const toggleSelect = (id: string) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
 
   const handleSelectAll = (checked: boolean) => {
@@ -294,9 +353,12 @@ function ReportsCenter() {
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-md border-b border-outline-variant/60 pb-md">
         <div>
-          <h2 className="text-display-lg text-on-background font-bold tracking-tight">Recruiter Intelligence Center</h2>
+          <h2 className="text-display-lg text-on-background font-bold tracking-tight">
+            Recruiter Intelligence Center
+          </h2>
           <p className="text-body-lg text-on-surface-variant mt-1">
-            Real-time proctoring telemetry, multi-candidate comparisons, and explainable AI interview evaluations.
+            Real-time proctoring telemetry, multi-candidate comparisons, and explainable AI
+            interview evaluations.
           </p>
         </div>
         <div className="flex items-center gap-sm">
@@ -336,15 +398,40 @@ function ReportsCenter() {
       {/* Summary Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9 gap-md mb-lg">
         {[
-          { label: "Total Reviews", value: stats.total, icon: "description", tone: "default" as const },
-          { label: "Completed", value: stats.completed, icon: "check_circle", tone: "success" as const },
-          { label: "In Progress", value: stats.inProgress, icon: "pending", tone: "primary" as const },
+          {
+            label: "Total Reviews",
+            value: stats.total,
+            icon: "description",
+            tone: "default" as const,
+          },
+          {
+            label: "Completed",
+            value: stats.completed,
+            icon: "check_circle",
+            tone: "success" as const,
+          },
+          {
+            label: "In Progress",
+            value: stats.inProgress,
+            icon: "pending",
+            tone: "primary" as const,
+          },
           { label: "Strong Hire", value: stats.strongHire, icon: "star", tone: "success" as const },
           { label: "Hire", value: stats.hire, icon: "thumb_up", tone: "primary" as const },
           { label: "Maybe", value: stats.maybe, icon: "help", tone: "warning" as const },
           { label: "Reject", value: stats.reject, icon: "cancel", tone: "error" as const },
-          { label: "Avg Score", value: stats.avgScore != null ? stats.avgScore : "—", icon: "analytics", tone: "default" as const },
-          { label: "Avg Integrity", value: stats.avgInteg != null ? `${stats.avgInteg}%` : "—", icon: "shield", tone: "default" as const },
+          {
+            label: "Avg Score",
+            value: stats.avgScore != null ? stats.avgScore : "—",
+            icon: "analytics",
+            tone: "default" as const,
+          },
+          {
+            label: "Avg Integrity",
+            value: stats.avgInteg != null ? `${stats.avgInteg}%` : "—",
+            icon: "shield",
+            tone: "default" as const,
+          },
         ].map((s) => (
           <StatCard key={s.label} label={s.label} value={s.value} icon={s.icon} tone={s.tone} />
         ))}
@@ -364,11 +451,12 @@ function ReportsCenter() {
         </div>
 
         {liveInterviews.length === 0 ? (
-          <div className="py-8 text-center text-white/60">
-            <Icon name="visibility" className="text-3xl opacity-50 mb-2" />
-            <p className="text-body-md">No candidate interviews are live at the moment.</p>
-            <p className="text-xs mt-1">Observer console will populate automatically when a scheduled session begins.</p>
-          </div>
+          <EmptyState
+            icon="visibility"
+            title="No candidate interviews are live at the moment"
+            hint="Observer console will populate automatically when a scheduled session begins."
+            className="py-12 text-white/60 [&_span]:text-white/60 [&_h3]:text-white [&_p]:text-white/60"
+          />
         ) : (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-lg">
             {liveInterviews.map((live) => (
@@ -386,18 +474,22 @@ function ReportsCenter() {
               <Icon name="smart_display" className="text-primary" />
               Interview Recording Library
             </h3>
-            <p className="text-body-sm text-on-surface-variant">Replay completed candidate videos and check proctor logs.</p>
+            <p className="text-body-sm text-on-surface-variant">
+              Replay completed candidate videos and check proctor logs.
+            </p>
           </div>
           <span className="text-label-caps uppercase text-on-surface-variant font-semibold">
-            {reports.filter(r => r.status === "completed").length} recordings
+            {reports.filter((r) => r.status === "completed").length} recordings
           </span>
         </div>
 
-        {reports.filter(r => r.status === "completed").length === 0 ? (
-          <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-soft py-12 flex flex-col items-center text-center">
-            <Icon name="video_library" className="text-4xl text-outline mb-2" />
-            <p className="text-body-md text-on-surface-variant">No recording files found.</p>
-          </div>
+        {reports.filter((r) => r.status === "completed").length === 0 ? (
+          <EmptyState
+            icon="video_library"
+            title="No recording files found"
+            hint="Recording files will appear here once candidate sessions are completed."
+            className="py-12"
+          />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-lg">
             {reports
@@ -418,7 +510,9 @@ function ReportsCenter() {
       {/* COMPREHENSIVE REPORTS TABLE WITH FILTERBAR */}
       <section className="space-y-md">
         <div className="flex items-center justify-between flex-wrap gap-md">
-          <h3 className="text-headline-md font-bold text-on-background">Comprehensive Evaluation Matrix</h3>
+          <h3 className="text-headline-md font-bold text-on-background">
+            Comprehensive Evaluation Matrix
+          </h3>
           {selectedIds.length >= 2 && (
             <button
               type="button"
@@ -434,10 +528,16 @@ function ReportsCenter() {
         {/* Dynamic Filters Bar */}
         <div className="filter-bar">
           <div className="relative flex-1 min-w-[200px]">
-            <Icon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]" />
+            <Icon
+              name="search"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]"
+            />
             <input
               value={search}
-              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
               placeholder="Search candidate, role, persona…"
               className="w-full pl-9 pr-3 py-2 bg-surface border border-outline-variant rounded-lg text-body-md outline-none focus:ring-2 focus:ring-primary-container transition"
             />
@@ -445,34 +545,58 @@ function ReportsCenter() {
 
           <select
             value={roleFilter}
-            onChange={(e) => { setRoleFilter(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setRoleFilter(e.target.value);
+              setPage(1);
+            }}
             className="px-3 py-2 bg-surface border border-outline-variant rounded-lg text-body-md"
           >
             <option value="all">All Roles</option>
-            {rolesList.map((r) => <option key={r} value={r}>{r}</option>)}
+            {rolesList.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
           </select>
 
           <select
             value={recruiterFilter}
-            onChange={(e) => { setRecruiterFilter(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setRecruiterFilter(e.target.value);
+              setPage(1);
+            }}
             className="px-3 py-2 bg-surface border border-outline-variant rounded-lg text-body-md"
           >
             <option value="all">All Recruiters</option>
-            {recruitersList.map((rec) => <option key={rec} value={rec}>{rec}</option>)}
+            {recruitersList.map((rec) => (
+              <option key={rec} value={rec}>
+                {rec}
+              </option>
+            ))}
           </select>
 
           <select
             value={personaFilter}
-            onChange={(e) => { setPersonaFilter(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setPersonaFilter(e.target.value);
+              setPage(1);
+            }}
             className="px-3 py-2 bg-surface border border-outline-variant rounded-lg text-body-md"
           >
             <option value="all">All Personas</option>
-            {personasList.map((p) => <option key={p} value={p}>{p}</option>)}
+            {personasList.map((p) => (
+              <option key={p} value={p}>
+                {p}
+              </option>
+            ))}
           </select>
 
           <select
             value={recFilter || "all"}
-            onChange={(e) => { setRecFilter(e.target.value as Recommendation | "all"); setPage(1); }}
+            onChange={(e) => {
+              setRecFilter(e.target.value as Recommendation | "all");
+              setPage(1);
+            }}
             className="px-3 py-2 bg-surface border border-outline-variant rounded-lg text-body-md"
           >
             <option value="all">Recommendation</option>
@@ -484,7 +608,10 @@ function ReportsCenter() {
 
           <select
             value={riskFilter}
-            onChange={(e) => { setRiskFilter(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setRiskFilter(e.target.value);
+              setPage(1);
+            }}
             className="px-3 py-2 bg-surface border border-outline-variant rounded-lg text-body-md"
           >
             <option value="all">Integrity Risk</option>
@@ -499,19 +626,33 @@ function ReportsCenter() {
             <input
               type="date"
               value={dateRange.start}
-              onChange={(e) => { setDateRange(prev => ({ ...prev, start: e.target.value })); setPage(1); }}
+              onChange={(e) => {
+                setDateRange((prev) => ({ ...prev, start: e.target.value }));
+                setPage(1);
+              }}
               className="bg-transparent text-body-sm outline-none"
             />
             <span className="text-[11px] text-on-surface-variant font-semibold">To:</span>
             <input
               type="date"
               value={dateRange.end}
-              onChange={(e) => { setDateRange(prev => ({ ...prev, end: e.target.value })); setPage(1); }}
+              onChange={(e) => {
+                setDateRange((prev) => ({ ...prev, end: e.target.value }));
+                setPage(1);
+              }}
               className="bg-transparent text-body-sm outline-none"
             />
           </div>
 
-          {(search || roleFilter !== "all" || recruiterFilter !== "all" || personaFilter !== "all" || recFilter !== "all" || statusFilter !== "all" || riskFilter !== "all" || dateRange.start || dateRange.end) && (
+          {(search ||
+            roleFilter !== "all" ||
+            recruiterFilter !== "all" ||
+            personaFilter !== "all" ||
+            recFilter !== "all" ||
+            statusFilter !== "all" ||
+            riskFilter !== "all" ||
+            dateRange.start ||
+            dateRange.end) && (
             <button
               type="button"
               onClick={handleClearFilters}
@@ -542,29 +683,37 @@ function ReportsCenter() {
                       aria-label="Select all candidates on this page"
                     />
                   </th>
-                  {([
-                    { label: "Candidate", key: "candidateName" },
-                    { label: "Applied Role", key: "role" },
-                    { label: "AI Persona", key: "personaName" },
-                    { label: "Recruiter", key: "recruiterName" },
-                    { label: "Interview Date", key: "scheduledAt" },
-                    { label: "Overall Score", key: "score" },
-                    { label: "Integrity", key: "integrityScore" },
-                    { label: "Recommendation", key: "recommendation" },
-                    { label: "Duration", key: "durationMinutes" },
-                    { label: "Status", key: "status" },
-                    { label: "Actions", key: null },
-                  ] as { label: string; key: keyof ReportListItem | null }[]).map((col) => (
+                  {(
+                    [
+                      { label: "Candidate", key: "candidateName" },
+                      { label: "Applied Role", key: "role" },
+                      { label: "AI Persona", key: "personaName" },
+                      { label: "Recruiter", key: "recruiterName" },
+                      { label: "Interview Date", key: "scheduledAt" },
+                      { label: "Overall Score", key: "score" },
+                      { label: "Integrity", key: "integrityScore" },
+                      { label: "Recommendation", key: "recommendation" },
+                      { label: "Duration", key: "durationMinutes" },
+                      { label: "Status", key: "status" },
+                      { label: "Actions", key: null },
+                    ] as { label: string; key: keyof ReportListItem | null }[]
+                  ).map((col) => (
                     <th
                       key={col.label}
                       className={`p-4 font-semibold tracking-wide text-left border-b border-outline-variant ${col.key ? "cursor-pointer hover:bg-surface-container transition" : ""}`}
-                      onClick={col.key ? () => handleSort(col.key as keyof ReportListItem) : undefined}
+                      onClick={
+                        col.key ? () => handleSort(col.key as keyof ReportListItem) : undefined
+                      }
                     >
                       <span className="inline-flex items-center gap-1">
                         {col.label}
                         {col.key && (
                           <span className="material-symbols-outlined text-[13px] opacity-60">
-                            {sortKey === col.key ? (sortDir === "asc" ? "arrow_upward" : "arrow_downward") : "unfold_more"}
+                            {sortKey === col.key
+                              ? sortDir === "asc"
+                                ? "arrow_upward"
+                                : "arrow_downward"
+                              : "unfold_more"}
                           </span>
                         )}
                       </span>
@@ -575,21 +724,39 @@ function ReportsCenter() {
               <tbody className="divide-y divide-outline-variant/60">
                 {reportsLoading ? (
                   <tr>
-                    <td colSpan={11} className="p-0"><SkeletonCard rows={6} /></td>
+                    <td colSpan={11} className="p-0">
+                      <SkeletonCard rows={6} />
+                    </td>
                   </tr>
                 ) : paged.length === 0 ? (
                   <tr>
-                    <td colSpan={11} className="py-16 text-center">
-                      <Icon name="search_off" className="text-3xl text-outline mb-2" />
-                      <p className="text-headline-sm text-on-surface mb-1">No candidate reports fit the current filters</p>
-                      <p className="text-body-md text-on-surface-variant">Try resetting filters to show database records.</p>
+                    <td colSpan={11} className="p-0">
+                      <EmptyState
+                        icon="search_off"
+                        title="No candidate reports fit the current filters"
+                        hint="Try resetting filters to show database records."
+                        action={
+                          <button
+                            type="button"
+                            onClick={handleClearFilters}
+                            className="px-4 py-2 border border-outline-variant rounded-lg inline-flex items-center gap-2 hover:bg-surface-container-low text-body-md transition text-on-surface"
+                          >
+                            <Icon name="close" />
+                            Clear Filters
+                          </button>
+                        }
+                        className="py-12"
+                      />
                     </td>
                   </tr>
                 ) : (
                   paged.map((r) => {
                     const isChecked = selectedIds.includes(r.id);
                     return (
-                      <tr key={r.id} className={`hover:bg-surface-container-low/50 transition ${isChecked ? "bg-primary-container/5" : ""}`}>
+                      <tr
+                        key={r.id}
+                        className={`hover:bg-surface-container-low/50 transition ${isChecked ? "bg-primary-container/5" : ""}`}
+                      >
                         <td className="p-4 text-center">
                           <input
                             type="checkbox"
@@ -602,9 +769,18 @@ function ReportsCenter() {
                         <td className="p-4 font-semibold text-on-surface">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-xs shrink-0">
-                              {r.candidateName.split(" ").map(n => n[0]).slice(0,2).join("").toUpperCase()}
+                              {r.candidateName
+                                .split(" ")
+                                .map((n) => n[0])
+                                .slice(0, 2)
+                                .join("")
+                                .toUpperCase()}
                             </div>
-                            <Link to="/recruiter/reports/$interviewId" params={{ interviewId: r.id }} className="hover:text-primary hover:underline">
+                            <Link
+                              to="/recruiter/reports/$interviewId"
+                              params={{ interviewId: r.id }}
+                              className="hover:text-primary hover:underline"
+                            >
                               {r.candidateName}
                             </Link>
                           </div>
@@ -615,10 +791,14 @@ function ReportsCenter() {
                         <td className="p-4 text-on-surface-variant whitespace-nowrap text-xs">
                           {r.scheduledAt ? fmtDate(r.scheduledAt) : "—"}
                         </td>
-                        <td className={`p-4 font-bold text-data-mono ${r.score != null ? scoreColor(r.score) : "text-on-surface-variant"}`}>
+                        <td
+                          className={`p-4 font-bold text-data-mono ${r.score != null ? scoreColor(r.score) : "text-on-surface-variant"}`}
+                        >
                           {r.score != null ? Math.round(r.score) : "—"}
                         </td>
-                        <td className={`p-4 font-bold text-data-mono ${r.integrityScore != null ? scoreColor(r.integrityScore) : "text-on-surface-variant"}`}>
+                        <td
+                          className={`p-4 font-bold text-data-mono ${r.integrityScore != null ? scoreColor(r.integrityScore) : "text-on-surface-variant"}`}
+                        >
                           {r.integrityScore != null ? `${Math.round(r.integrityScore)}%` : "—"}
                         </td>
                         <td className="p-4">{recommendationBadge(r.recommendation)}</td>
@@ -659,9 +839,21 @@ function ReportsCenter() {
               <div className="flex items-center gap-1">
                 {[
                   { icon: "first_page", action: () => setPage(1), disabled: page === 1 },
-                  { icon: "chevron_left", action: () => setPage((p) => Math.max(1, p - 1)), disabled: page === 1 },
-                  { icon: "chevron_right", action: () => setPage((p) => Math.min(totalPages, p + 1)), disabled: page === totalPages },
-                  { icon: "last_page", action: () => setPage(totalPages), disabled: page === totalPages },
+                  {
+                    icon: "chevron_left",
+                    action: () => setPage((p) => Math.max(1, p - 1)),
+                    disabled: page === 1,
+                  },
+                  {
+                    icon: "chevron_right",
+                    action: () => setPage((p) => Math.min(totalPages, p + 1)),
+                    disabled: page === totalPages,
+                  },
+                  {
+                    icon: "last_page",
+                    action: () => setPage(totalPages),
+                    disabled: page === totalPages,
+                  },
                 ].map((btn, idx) => (
                   <button
                     key={idx}
@@ -711,7 +903,7 @@ function LiveObserverCard({ live }: { live: LiveInterviewDTO }) {
     if (data) {
       setTurns((data as any).turns ?? []);
       setEvents((data as any).events ?? []);
-      
+
       // Calculate elapsed time from session start
       const startedAt = (data as any).session?.startedAt;
       if (startedAt) {
@@ -729,8 +921,15 @@ function LiveObserverCard({ live }: { live: LiveInterviewDTO }) {
       .channel(`realtime-turns-${sessionId}`)
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "interview_turns", filter: `session_id=eq.${sessionId}` },
-        () => { refetch(); }
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "interview_turns",
+          filter: `session_id=eq.${sessionId}`,
+        },
+        () => {
+          refetch();
+        },
       )
       .subscribe();
 
@@ -738,8 +937,15 @@ function LiveObserverCard({ live }: { live: LiveInterviewDTO }) {
       .channel(`realtime-events-${sessionId}`)
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "interview_events", filter: `session_id=eq.${sessionId}` },
-        () => { refetch(); }
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "interview_events",
+          filter: `session_id=eq.${sessionId}`,
+        },
+        () => {
+          refetch();
+        },
       )
       .subscribe();
 
@@ -771,10 +977,14 @@ function LiveObserverCard({ live }: { live: LiveInterviewDTO }) {
         <div className="flex items-center justify-between border-b border-white/5 pb-sm mb-md">
           <div>
             <h4 className="font-semibold text-white text-[15px]">{live.candidateName}</h4>
-            <p className="text-xs text-white/60">{live.role} • {live.personaName}</p>
+            <p className="text-xs text-white/60">
+              {live.role} • {live.personaName}
+            </p>
           </div>
           <div className="text-right">
-            <span className="text-[13px] font-mono text-[#57dffe] font-semibold">{formatSecs(elapsed)}</span>
+            <span className="text-[13px] font-mono text-[#57dffe] font-semibold">
+              {formatSecs(elapsed)}
+            </span>
             <p className="text-[9px] uppercase tracking-wider text-white/40">Elapsed Time</p>
           </div>
         </div>
@@ -783,9 +993,11 @@ function LiveObserverCard({ live }: { live: LiveInterviewDTO }) {
         <div className="h-16 bg-black/40 rounded-lg flex items-center justify-center gap-1.5 px-md mb-md border border-white/5 relative">
           <div className="absolute top-2 left-2 flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-success animate-ping" />
-            <span className="text-[9px] uppercase tracking-wider text-white/50">Telemetric Stream</span>
+            <span className="text-[9px] uppercase tracking-wider text-white/50">
+              Telemetric Stream
+            </span>
           </div>
-          
+
           {/* Animated voice bars */}
           {Array.from({ length: 15 }).map((_, i) => {
             const delay = (i * 0.1).toFixed(1);
@@ -796,7 +1008,7 @@ function LiveObserverCard({ live }: { live: LiveInterviewDTO }) {
                 style={{
                   height: `${Math.floor(Math.random() * 40) + 12}px`,
                   animationDuration: `${Math.random() * 0.8 + 0.5}s`,
-                  animationDelay: `${delay}s`
+                  animationDelay: `${delay}s`,
                 }}
               />
             );
@@ -821,15 +1033,22 @@ function LiveObserverCard({ live }: { live: LiveInterviewDTO }) {
       <div>
         {/* Live Proctor Alerts */}
         <div className="space-y-1.5 mb-md">
-          <p className="text-[10px] uppercase text-white/40 tracking-wider font-semibold">Proctor Logs</p>
+          <p className="text-[10px] uppercase text-white/40 tracking-wider font-semibold">
+            Proctor Logs
+          </p>
           {recentAlerts.length === 0 ? (
             <p className="text-xs text-white/30 italic">No proctoring violations detected.</p>
           ) : (
             recentAlerts.map((e) => (
-              <div key={e.id} className="text-xs bg-error-container/10 border border-error/20 text-[#ffb4ab] px-2.5 py-1.5 rounded flex items-center gap-2">
+              <div
+                key={e.id}
+                className="text-xs bg-error-container/10 border border-error/20 text-[#ffb4ab] px-2.5 py-1.5 rounded flex items-center gap-2"
+              >
                 <Icon name="warning" className="text-sm shrink-0" />
                 <span className="truncate">{e.type.replace(/_/g, " ").toUpperCase()}</span>
-                <span className="ml-auto text-[9px] opacity-65">{new Date(e.at).toLocaleTimeString()}</span>
+                <span className="ml-auto text-[9px] opacity-65">
+                  {new Date(e.at).toLocaleTimeString()}
+                </span>
               </div>
             ))
           )}
@@ -868,11 +1087,24 @@ function RecordingCard({
   setHoveredId: (id: string | null) => void;
 }) {
   const isHovered = hoveredId === report.id;
-  const initials = report.candidateName.split(" ").map(n => n[0]).slice(0,2).join("").toUpperCase();
+  const initials = report.candidateName
+    .split(" ")
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   // Proctor counts
-  const proctor = useMemo(() => parseIntegritySummary(report.integrityTimeline), [report.integrityTimeline]);
-  const riskColor = (report.integrityScore ?? 100) >= 80 ? "text-[#166534] bg-[#dcfce7]" : (report.integrityScore ?? 100) >= 60 ? "text-[#854d0e] bg-[#fef9c3]" : "text-error bg-error-container";
+  const proctor = useMemo(
+    () => parseIntegritySummary(report.integrityTimeline),
+    [report.integrityTimeline],
+  );
+  const riskColor =
+    (report.integrityScore ?? 100) >= 80
+      ? "text-[#166534] bg-[#dcfce7]"
+      : (report.integrityScore ?? 100) >= 60
+        ? "text-[#854d0e] bg-[#fef9c3]"
+        : "text-error bg-error-container";
 
   return (
     <div
@@ -906,8 +1138,12 @@ function RecordingCard({
 
         {/* Card info */}
         <div className="p-md">
-          <p className="font-semibold text-on-surface text-body-md truncate">{report.candidateName}</p>
-          <p className="text-xs text-on-surface-variant truncate">{report.role} • {report.personaName}</p>
+          <p className="font-semibold text-on-surface text-body-md truncate">
+            {report.candidateName}
+          </p>
+          <p className="text-xs text-on-surface-variant truncate">
+            {report.role} • {report.personaName}
+          </p>
           <div className="flex items-center justify-between mt-3 pt-2 border-t border-outline-variant/40">
             <span className="text-[10px] text-on-surface-variant uppercase tracking-wider">
               {report.scheduledAt ? fmtDate(report.scheduledAt) : "—"}
@@ -946,7 +1182,9 @@ function RecordingCard({
 
           {/* Detailed Proctoring Summary logs */}
           <div className="space-y-1.5 text-[11px]">
-            <p className="font-semibold text-white/50 text-[10px] uppercase tracking-wider">Proctoring Telemetry</p>
+            <p className="font-semibold text-white/50 text-[10px] uppercase tracking-wider">
+              Proctoring Telemetry
+            </p>
             <div className="divide-y divide-white/5">
               <div className="flex justify-between py-1">
                 <span className="text-white/60">Tab Switches</span>
@@ -983,8 +1221,15 @@ function RecordingCard({
             </div>
           </div>
 
-          <div className={`text-center py-1 rounded text-[10px] font-bold uppercase tracking-wider ${riskColor}`}>
-            Risk Level: {(report.integrityScore ?? 100) >= 80 ? "Low Risk" : (report.integrityScore ?? 100) >= 60 ? "Medium Risk" : "High Risk"}
+          <div
+            className={`text-center py-1 rounded text-[10px] font-bold uppercase tracking-wider ${riskColor}`}
+          >
+            Risk Level:{" "}
+            {(report.integrityScore ?? 100) >= 80
+              ? "Low Risk"
+              : (report.integrityScore ?? 100) >= 60
+                ? "Medium Risk"
+                : "High Risk"}
           </div>
         </div>
       )}
@@ -1020,14 +1265,25 @@ function ComparisonMatrixModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 print:p-0 print:static print:bg-white" role="dialog" aria-modal="true" onClick={onClose}>
-      <div className="bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-2xl w-full max-w-5xl h-[88vh] flex flex-col overflow-hidden print:h-auto print:border-none print:shadow-none" onClick={(e) => e.stopPropagation()}>
-        
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 print:p-0 print:static print:bg-white"
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+    >
+      <div
+        className="bg-surface-container-lowest rounded-2xl border border-outline-variant shadow-2xl w-full max-w-5xl h-[88vh] flex flex-col overflow-hidden print:h-auto print:border-none print:shadow-none"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Modal Header */}
         <div className="p-lg border-b border-outline-variant flex items-center justify-between bg-surface-container-low print:hidden">
           <div>
-            <h3 className="text-headline-md font-bold text-on-surface">Candidate Evaluation Comparison Matrix</h3>
-            <p className="text-body-sm text-on-surface-variant">Side-by-side radar overlay and competency criteria alignment.</p>
+            <h3 className="text-headline-md font-bold text-on-surface">
+              Candidate Evaluation Comparison Matrix
+            </h3>
+            <p className="text-body-sm text-on-surface-variant">
+              Side-by-side radar overlay and competency criteria alignment.
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -1051,20 +1307,24 @@ function ComparisonMatrixModal({
 
         {/* Modal Content */}
         <div className="flex-1 overflow-y-auto p-lg space-y-xl print:overflow-visible print:p-0">
-          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-lg items-center">
             {/* SVG Radar Chart Overlay Column */}
             <div className="md:col-span-1 border border-outline-variant/60 rounded-xl p-md bg-surface-container-low/40 flex flex-col items-center">
-              <h4 className="text-label-caps uppercase font-bold text-on-surface-variant mb-4">Competency Overlay</h4>
+              <h4 className="text-label-caps uppercase font-bold text-on-surface-variant mb-4">
+                Competency Overlay
+              </h4>
               <RadarChart candidates={radarData} />
-              
+
               <div className="flex flex-col gap-2 mt-4 w-full">
                 {candidates.map((c, idx) => {
-                  const colorClass = idx === 0 ? "bg-primary" : idx === 1 ? "bg-secondary" : "bg-tertiary";
+                  const colorClass =
+                    idx === 0 ? "bg-primary" : idx === 1 ? "bg-secondary" : "bg-tertiary";
                   return (
                     <div key={c.id} className="flex items-center gap-2 text-xs">
                       <span className={`w-3 h-3 rounded-full ${colorClass}`} />
-                      <span className="font-semibold text-on-surface truncate">{c.candidateName}</span>
+                      <span className="font-semibold text-on-surface truncate">
+                        {c.candidateName}
+                      </span>
                     </div>
                   );
                 })}
@@ -1073,24 +1333,40 @@ function ComparisonMatrixModal({
 
             {/* Comparison Overview Details */}
             <div className="md:col-span-2 space-y-md">
-              <h4 className="text-label-caps uppercase font-bold text-on-surface-variant">Evaluation Summary</h4>
+              <h4 className="text-label-caps uppercase font-bold text-on-surface-variant">
+                Evaluation Summary
+              </h4>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-md">
                 {candidates.slice(0, 3).map((c, idx) => {
-                  const borderCol = idx === 0 ? "border-t-primary" : idx === 1 ? "border-t-secondary" : "border-t-tertiary";
+                  const borderCol =
+                    idx === 0
+                      ? "border-t-primary"
+                      : idx === 1
+                        ? "border-t-secondary"
+                        : "border-t-tertiary";
                   return (
-                    <div key={c.id} className={`bg-surface border border-outline-variant rounded-xl p-4 border-t-4 ${borderCol} flex flex-col justify-between`}>
+                    <div
+                      key={c.id}
+                      className={`bg-surface border border-outline-variant rounded-xl p-4 border-t-4 ${borderCol} flex flex-col justify-between`}
+                    >
                       <div>
-                        <p className="font-bold text-on-surface leading-tight text-body-md truncate">{c.candidateName}</p>
+                        <p className="font-bold text-on-surface leading-tight text-body-md truncate">
+                          {c.candidateName}
+                        </p>
                         <p className="text-[11px] text-on-surface-variant mt-0.5">{c.role}</p>
                       </div>
                       <div className="mt-4 space-y-2">
                         <div className="flex justify-between text-xs">
                           <span className="text-on-surface-variant">Overall score:</span>
-                          <span className="font-bold">{c.score != null ? `${Math.round(c.score)}%` : "—"}</span>
+                          <span className="font-bold">
+                            {c.score != null ? `${Math.round(c.score)}%` : "—"}
+                          </span>
                         </div>
                         <div className="flex justify-between text-xs">
                           <span className="text-on-surface-variant">Integrity status:</span>
-                          <span className="font-bold">{c.integrityScore != null ? `${Math.round(c.integrityScore)}%` : "—"}</span>
+                          <span className="font-bold">
+                            {c.integrityScore != null ? `${Math.round(c.integrityScore)}%` : "—"}
+                          </span>
                         </div>
                         <div className="pt-2 border-t border-outline-variant/40 flex justify-center">
                           {recommendationBadge(c.recommendation)}
@@ -1105,14 +1381,21 @@ function ComparisonMatrixModal({
 
           {/* Grid details alignment table */}
           <div className="space-y-md">
-            <h4 className="text-label-caps uppercase font-bold text-on-surface-variant">Competency Dimension Scores</h4>
+            <h4 className="text-label-caps uppercase font-bold text-on-surface-variant">
+              Competency Dimension Scores
+            </h4>
             <div className="border border-outline-variant rounded-xl overflow-hidden bg-surface">
               <table className="w-full text-body-md text-left">
                 <thead className="bg-surface-container-low text-label-caps uppercase text-on-surface-variant">
                   <tr>
                     <th className="p-3">Evaluation Criteria</th>
                     {candidates.map((c) => (
-                      <th key={c.id} className="p-3 font-semibold text-center border-l border-outline-variant">{c.candidateName}</th>
+                      <th
+                        key={c.id}
+                        className="p-3 font-semibold text-center border-l border-outline-variant"
+                      >
+                        {c.candidateName}
+                      </th>
                     ))}
                   </tr>
                 </thead>
@@ -1130,14 +1413,19 @@ function ComparisonMatrixModal({
                       <td className="p-3 font-semibold">{dim.label}</td>
                       {candidates.map((c) => {
                         let score = "—";
-                        if (dim.key === "overall" && c.score != null) score = `${Math.round(c.score)}%`;
-                        else if (dim.key === "integrity" && c.integrityScore != null) score = `${Math.round(c.integrityScore)}%`;
+                        if (dim.key === "overall" && c.score != null)
+                          score = `${Math.round(c.score)}%`;
+                        else if (dim.key === "integrity" && c.integrityScore != null)
+                          score = `${Math.round(c.integrityScore)}%`;
                         else {
                           const v = (c.scores as any)?.[dim.key];
                           if (v != null) score = `${Math.round(Number(v))}%`;
                         }
                         return (
-                          <td key={c.id} className="p-3 text-center border-l border-outline-variant font-data-mono font-bold text-on-surface">
+                          <td
+                            key={c.id}
+                            className="p-3 text-center border-l border-outline-variant font-data-mono font-bold text-on-surface"
+                          >
                             {score}
                           </td>
                         );
@@ -1197,7 +1485,7 @@ function RadarChart({
   const axisLabels = ["Technical", "Behavioral", "Communication", "Confidence", "Knowledge"];
 
   const getPoint = (index: number, value: number) => {
-    const angle = (Math.PI * 2 / axes.length) * index - Math.PI / 2;
+    const angle = ((Math.PI * 2) / axes.length) * index - Math.PI / 2;
     const r = (value / 100) * radius;
     return {
       x: center + r * Math.cos(angle),
@@ -1211,10 +1499,12 @@ function RadarChart({
     <svg width="100%" height="100%" viewBox={`0 0 ${size} ${size}`} className="max-w-[280px]">
       {/* Background circles grids */}
       {grids.map((g) => {
-        const points = axes.map((_, idx) => {
-          const pt = getPoint(idx, g);
-          return `${pt.x},${pt.y}`;
-        }).join(" ");
+        const points = axes
+          .map((_, idx) => {
+            const pt = getPoint(idx, g);
+            return `${pt.x},${pt.y}`;
+          })
+          .join(" ");
         return (
           <polygon
             key={g}
@@ -1262,23 +1552,25 @@ function RadarChart({
 
       {/* Candidates Data overlays */}
       {candidates.map((c, cIdx) => {
-        const points = axes.map((a, idx) => {
-          const score = (c.scores as any)[a] ?? 50;
-          const pt = getPoint(idx, score);
-          return `${pt.x},${pt.y}`;
-        }).join(" ");
+        const points = axes
+          .map((a, idx) => {
+            const score = (c.scores as any)[a] ?? 50;
+            const pt = getPoint(idx, score);
+            return `${pt.x},${pt.y}`;
+          })
+          .join(" ");
 
         const strokeColor = cIdx === 0 ? "#3525cd" : cIdx === 1 ? "#00687a" : "#7e3000";
-        const fillColor = cIdx === 0 ? "rgba(53, 37, 205, 0.15)" : cIdx === 1 ? "rgba(0, 104, 122, 0.15)" : "rgba(126, 48, 0, 0.15)";
+        const fillColor =
+          cIdx === 0
+            ? "rgba(53, 37, 205, 0.15)"
+            : cIdx === 1
+              ? "rgba(0, 104, 122, 0.15)"
+              : "rgba(126, 48, 0, 0.15)";
 
         return (
           <g key={c.name}>
-            <polygon
-              points={points}
-              stroke={strokeColor}
-              strokeWidth="2.5"
-              fill={fillColor}
-            />
+            <polygon points={points} stroke={strokeColor} strokeWidth="2.5" fill={fillColor} />
             {axes.map((a, idx) => {
               const score = (c.scores as any)[a] ?? 50;
               const pt = getPoint(idx, score);
