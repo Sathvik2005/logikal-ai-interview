@@ -78,4 +78,100 @@ export class AnalyticsController {
       ];
     }
   }
+
+  @Get("recruiter-dashboard")
+  async recruiterDashboard(@Req() req: any) {
+    const orgId = req.user.orgId || "00000000-0000-0000-0000-000000000000";
+
+    const weekFrom = new Date();
+    weekFrom.setHours(0, 0, 0, 0);
+    weekFrom.setDate(weekFrom.getDate() - weekFrom.getDay());
+    const weekTo = new Date(weekFrom);
+    weekTo.setDate(weekTo.getDate() + 7);
+
+    const [cands, ivs, tops] = await Promise.all([
+      this.prisma.candidate.findMany({
+        where: { org_id: orgId, deleted_at: null },
+        select: { id: true, status: true },
+      }),
+      this.prisma.interview.findMany({
+        where: {
+          org_id: orgId,
+          deleted_at: null,
+          scheduled_at: {
+            gte: weekFrom,
+            lt: weekTo,
+          },
+        },
+        include: {
+          candidate: {
+            select: {
+              full_name: true,
+              role_applied: true,
+            },
+          },
+        },
+        orderBy: { scheduled_at: "asc" },
+      }),
+      this.prisma.candidate.findMany({
+        where: { org_id: orgId, deleted_at: null },
+        select: {
+          id: true,
+          full_name: true,
+          role_applied: true,
+          ai_score: true,
+          status: true,
+        },
+        orderBy: { ai_score: "desc" },
+        take: 5,
+      }),
+    ]);
+
+    const pipelineCount = cands.length;
+    const evaluatedCount = cands.filter(
+      (c) => c.status === "evaluated" || c.status === "offer" || c.status === "hired"
+    ).length;
+    const interviewsThisWeek = ivs.length;
+    const liveOrScheduledCount = ivs.filter(
+      (i) => i.status === "scheduled" || i.status === "in_progress"
+    ).length;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const todaysInterviews = ivs
+      .filter(
+        (i) =>
+          i.scheduled_at &&
+          i.scheduled_at >= today &&
+          i.scheduled_at < tomorrow
+      )
+      .map((i) => ({
+        id: i.id,
+        candidateName: i.candidate?.full_name ?? "Candidate",
+        role: i.candidate?.role_applied ?? "—",
+        scheduledAt: i.scheduled_at ? i.scheduled_at.toISOString() : null,
+        status: i.status,
+      }));
+
+    const topCandidates = tops.map((c) => ({
+      id: c.id,
+      name: c.full_name,
+      role: c.role_applied ?? "—",
+      score: c.ai_score === null ? 0 : Number(c.ai_score),
+      status: c.status,
+      avatar: c.full_name.trim().split(/\s+/).slice(0, 2).map((p) => p[0]?.toUpperCase() ?? "").join("") || "?",
+    }));
+
+    return {
+      pipelineCount,
+      interviewsThisWeek,
+      evaluatedCount,
+      liveOrScheduledCount,
+      todaysInterviews,
+      topCandidates,
+    };
+  }
 }

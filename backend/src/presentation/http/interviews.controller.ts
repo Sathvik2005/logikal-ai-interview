@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Body, Req, UseGuards, Inject } from "@nestjs/common";
+import { Controller, Get, Post, Patch, Param, Body, Query, Req, UseGuards, Inject } from "@nestjs/common";
 import { SupabaseAuthGuard } from "../guards/supabase-auth.guard";
 import { Roles, RolesGuard } from "../guards/roles.guard";
 import { InterviewEngineService } from "../../application/interview/interview-engine.service";
@@ -18,12 +18,29 @@ export class InterviewsController {
   ) {}
 
   @Get()
-  async list(@Req() req: any) {
+  async list(
+    @Req() req: any,
+    @Query('status') status?: string,
+    @Query('from') from?: string,
+    @Query('to') to?: string,
+    @Query('limit') limit?: string,
+  ) {
     const orgId = req.user.orgId || "00000000-0000-0000-0000-000000000000";
+    const where: any = { org_id: orgId, deleted_at: null };
+    if (status) {
+      where.status = status;
+    }
+    if (from || to) {
+      where.scheduled_at = {};
+      if (from) where.scheduled_at.gte = new Date(from);
+      if (to) where.scheduled_at.lte = new Date(to);
+    }
+    const lim = limit ? parseInt(limit, 10) : 100;
     return this.prisma.interview.findMany({
-      where: { org_id: orgId, deleted_at: null },
+      where,
       include: { candidate: true, job: true, template: true },
-      orderBy: { created_at: "desc" },
+      orderBy: { scheduled_at: "asc" },
+      take: Math.min(lim, 200),
     });
   }
 
@@ -177,5 +194,331 @@ export class InterviewsController {
         status: true,
       },
     });
+  }
+
+  @Get(":id")
+  async getOne(@Param("id") id: string) {
+    return this.prisma.interview.findUnique({
+      where: { id },
+      include: { candidate: true, job: true, template: true, persona: true },
+    });
+  }
+
+  @Patch(":id/reschedule")
+  @Roles("recruiter", "admin")
+  async reschedule(
+    @Param("id") id: string,
+    @Body() body: { scheduledAt: string; durationMinutes?: number; reason?: string },
+    @Req() req: any,
+  ) {
+    const userId = req.user.userId;
+    const existing = await this.prisma.interview.findUnique({
+      where: { id },
+    });
+    if (!existing) throw new Error("Interview not found");
+    if (existing.status === "completed" || existing.status === "evaluation_pending") {
+      throw new Error(`Cannot reschedule a completed or pending evaluation interview`);
+    }
+
+    const duration = body.durationMinutes ?? existing.duration_minutes ?? 45;
+
+    await this.prisma.interview.update({
+      where: { id },
+      data: {
+        scheduled_at: new Date(body.scheduledAt),
+        duration_minutes: duration,
+        status: "scheduled",
+      },
+    });
+
+    await this.prisma.interviewReschedule.create({
+      data: {
+        interview_id: id,
+        from_at: existing.scheduled_at,
+        to_at: new Date(body.scheduledAt),
+        reason: body.reason ?? null,
+        actor_id: userId,
+      },
+    });
+
+    const candidate = await this.prisma.candidate.findUnique({
+      where: { id: existing.candidate_id },
+    });
+
+    if (candidate) {
+      await this.workflow.transition(
+        existing.candidate_id,
+        "interview_scheduled",
+        `Rescheduled interview window starting at ${body.scheduledAt}.`,
+      );
+
+      await this.queue.enqueue("send-notification", {
+        orgId: existing.org_id,
+        kind: "reschedule",
+        recipientEmail: candidate.email,
+        payload: {
+          interviewId: id,
+          candidateName: candidate.full_name,
+          from: existing.scheduled_at ? existing.scheduled_at.toISOString() : null,
+          to: body.scheduledAt,
+          reason: body.reason ?? null,
+        },
+      });
+    }
+
+    return { ok: true };
+  }
+
+  @Patch(":id/cancel")
+  @Roles("recruiter", "admin")
+  async cancel(
+    @Param("id") id: string,
+    @Body() body: { reason?: string },
+    @Req() req: any,
+  ) {
+    const userId = req.user.userId;
+    const existing = await this.prisma.interview.findUnique({
+      where: { id },
+    });
+    if (!existing) throw new Error("Interview not found");
+    if (existing.status === "completed" || existing.status === "evaluation_pending") {
+      throw new Error(`Cannot cancel a completed or pending evaluation interview`);
+    }
+
+    await this.prisma.interview.update({
+      where: { id },
+      data: { status: "cancelled" },
+    });
+
+    const candidate = await this.prisma.candidate.findUnique({
+      where: { id: existing.candidate_id },
+    });
+
+    if (candidate) {
+      await this.workflow.transition(
+        existing.candidate_id,
+        "archived",
+        `Cancelled interview. Reason: ${body.reason ?? "None provided"}`,
+      );
+
+      await this.queue.enqueue("send-notification", {
+        orgId: existing.org_id,
+        kind: "cancel",
+        recipientEmail: candidate.email,
+        payload: {
+          interviewId: id,
+          candidateName: candidate.full_name,
+          scheduledAt: existing.scheduled_at ? existing.scheduled_at.toISOString() : null,
+          reason: body.reason ?? null,
+        },
+      });
+    }
+
+    return { ok: true };
+  }
+
+  @Get("live")
+  async listLive(@Req() req: any) {
+    const orgId = req.user.orgId || "00000000-0000-0000-0000-000000000000";
+    const now = new Date();
+    const horizon = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
+    const interviews = await this.prisma.interview.findMany({
+      where: {
+        org_id: orgId,
+        deleted_at: null,
+        status: { in: ["scheduled", "in_progress"] },
+        scheduled_at: { lte: horizon },
+      },
+      include: {
+        candidate: {
+          select: {
+            full_name: true,
+            email: true,
+            role_applied: true,
+          },
+        },
+        persona: {
+          select: {
+            name: true,
+          },
+        },
+        sessions: {
+          select: {
+            id: true,
+          },
+          orderBy: { started_at: "desc" },
+          take: 1,
+        },
+      },
+      orderBy: { scheduled_at: "asc" },
+    });
+
+    return interviews.map((iv) => ({
+      id: iv.id,
+      candidateName: iv.candidate?.full_name ?? "Candidate",
+      candidateEmail: iv.candidate?.email ?? "",
+      role: iv.candidate?.role_applied ?? "Interview",
+      personaName: iv.persona?.name ?? "AI Interviewer",
+      scheduledAt: iv.scheduled_at ? iv.scheduled_at.toISOString() : null,
+      durationMinutes: iv.duration_minutes ?? 45,
+      status: iv.status,
+      sessionId: iv.sessions[0]?.id ?? null,
+    }));
+  }
+
+  @Get("recorded")
+  async listRecorded(@Req() req: any) {
+    const orgId = req.user.orgId || "00000000-0000-0000-0000-000000000000";
+
+    const interviews = await this.prisma.interview.findMany({
+      where: {
+        org_id: orgId,
+        deleted_at: null,
+        status: { in: ["completed", "evaluation_pending"] },
+      },
+      include: {
+        candidate: {
+          select: {
+            full_name: true,
+            email: true,
+            role_applied: true,
+          },
+        },
+        persona: {
+          select: {
+            name: true,
+          },
+        },
+        sessions: {
+          select: {
+            id: true,
+            started_at: true,
+            ended_at: true,
+          },
+          orderBy: { started_at: "desc" },
+          take: 1,
+        },
+      },
+      orderBy: { scheduled_at: "desc" },
+      take: 60,
+    });
+
+    return interviews.map((iv) => {
+      const s = iv.sessions[0];
+      const start = s?.started_at ? s.started_at.getTime() : 0;
+      const end = s?.ended_at ? s.ended_at.getTime() : 0;
+      const durationSec = end > start ? Math.round((end - start) / 1000) : (iv.duration_minutes ?? 45) * 60;
+
+      return {
+        id: s?.id ?? iv.id,
+        interviewId: iv.id,
+        candidateName: iv.candidate?.full_name ?? "Candidate",
+        role: iv.candidate?.role_applied ?? "Interview",
+        personaName: iv.persona?.name ?? "AI Interviewer",
+        durationSec,
+        scheduledAt: iv.scheduled_at ? iv.scheduled_at.toISOString() : null,
+        score: iv.overall_score ? Number(iv.overall_score) : null,
+      };
+    });
+  }
+
+  @Get("monitor/:interviewId")
+  async getMonitorSession(@Param("interviewId") interviewId: string) {
+    const iv = await this.prisma.interview.findUnique({
+      where: { id: interviewId },
+      include: {
+        candidate: {
+          select: {
+            full_name: true,
+            email: true,
+            role_applied: true,
+          },
+        },
+        persona: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+    if (!iv) throw new Error("Interview not found");
+
+    const sess = await this.prisma.interviewSession.findFirst({
+      where: { interview_id: interviewId },
+      orderBy: { started_at: "desc" },
+    });
+
+    const sessionId = sess?.id ?? null;
+    const interview = {
+      id: iv.id,
+      candidateName: iv.candidate?.full_name ?? "Candidate",
+      candidateEmail: iv.candidate?.email ?? "",
+      role: iv.candidate?.role_applied ?? "Interview",
+      personaName: iv.persona?.name ?? "AI Interviewer",
+      scheduledAt: iv.scheduled_at ? iv.scheduled_at.toISOString() : null,
+      durationMinutes: iv.duration_minutes ?? 45,
+      status: iv.status,
+      sessionId,
+    };
+
+    let turns: any[] = [];
+    let events: any[] = [];
+    if (sessionId) {
+      const [tRows, eRows] = await Promise.all([
+        this.prisma.interviewTurn.findMany({
+          where: { session_id: sessionId },
+          orderBy: { created_at: "asc" },
+        }),
+        this.prisma.interviewEvent.findMany({
+          where: { session_id: sessionId },
+          orderBy: { at: "asc" },
+        }),
+      ]);
+
+      turns = tRows.map((t) => ({
+        id: t.id,
+        who: t.speaker === "candidate" ? "Candidate" : "AI",
+        text: t.text ?? "",
+        at: t.started_at ? t.started_at.toISOString() : t.created_at.toISOString(),
+      }));
+
+      events = eRows.map((e) => ({
+        id: e.id,
+        type: e.type,
+        payload: e.payload == null ? null : JSON.stringify(e.payload),
+        at: e.at.toISOString(),
+      }));
+    }
+
+    return {
+      interview,
+      session: sess
+        ? {
+            id: sess.id,
+            startedAt: sess.started_at ? sess.started_at.toISOString() : null,
+            endedAt: sess.ended_at ? sess.ended_at.toISOString() : null,
+          }
+        : null,
+      turns,
+      events,
+    };
+  }
+
+  @Post("session/:sessionId/flag")
+  async flagSessionEvent(
+    @Param("sessionId") sessionId: string,
+    @Body() body: { note: string },
+    @Req() req: any,
+  ) {
+    const userId = req.user.userId;
+    await this.prisma.interviewEvent.create({
+      data: {
+        session_id: sessionId,
+        type: "manual_flag",
+        payload: { note: body.note, flagged_by: userId },
+      },
+    });
+    return { ok: true };
   }
 }

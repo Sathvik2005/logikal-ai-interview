@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { getRequest } from "@tanstack/react-start/server";
 
 export type QuestionDTO = {
   id: string;
@@ -41,33 +42,52 @@ function mapRow(r: Row): QuestionDTO {
   };
 }
 
+function getBackendUrl(): string {
+  return process.env.BACKEND_URL || "http://localhost:3000";
+}
+
+function getAuthHeader(): Record<string, string> {
+  const request = getRequest();
+  const auth = request?.headers?.get("authorization");
+  return auth ? { Authorization: auth } : {};
+}
+
 export const listQuestions = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
     z.object({ competency: z.string().optional() }).parse(input ?? {}),
   )
-  .handler(async ({ data, context }) => {
-    let q = context.supabase
-      .from("questions")
-      .select("id, competency, difficulty, type, prompt, expected_signals, created_at")
-      .is("deleted_at", null)
-      .order("created_at", { ascending: false });
-    if (data.competency) q = q.eq("competency", data.competency);
-    const { data: rows, error } = await q;
-    if (error) throw new Error(error.message);
-    return ((rows ?? []) as Row[]).map(mapRow);
+  .handler(async ({ data }) => {
+    let url = `${getBackendUrl()}/api/questions`;
+    if (data.competency) {
+      url += `?competency=${encodeURIComponent(data.competency)}`;
+    }
+    const res = await fetch(url, {
+      headers: {
+        ...getAuthHeader(),
+      },
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to list questions: ${res.statusText}`);
+    }
+    const rows = (await res.json()) as Row[];
+    return rows.map(mapRow);
   });
 
 export const listQuestionBanks = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { data: rows, error } = await context.supabase
-      .from("questions")
-      .select("competency, difficulty")
-      .is("deleted_at", null);
-    if (error) throw new Error(error.message);
+  .handler(async () => {
+    const res = await fetch(`${getBackendUrl()}/api/questions`, {
+      headers: {
+        ...getAuthHeader(),
+      },
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to fetch questions for bank: ${res.statusText}`);
+    }
+    const rows = (await res.json()) as Row[];
     const map = new Map<string, { count: number; difficulties: Set<string> }>();
-    (rows ?? []).forEach((r: { competency: string | null; difficulty: string | null }) => {
+    rows.forEach((r) => {
       const key = r.competency ?? "General";
       const entry = map.get(key) ?? { count: 0, difficulties: new Set<string>() };
       entry.count += 1;
@@ -94,89 +114,34 @@ const UpsertInput = z.object({
 export const upsertQuestion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => UpsertInput.parse(input))
-  .handler(async ({ data, context }) => {
-    const { data: prof } = await context.supabase
-      .from("profiles")
-      .select("org_id")
-      .eq("id", context.userId)
-      .maybeSingle();
-    const orgId = prof?.org_id;
-    if (!orgId) throw new Error("Missing organization");
-    const payload: Record<string, unknown> = {
-      competency: data.competency,
-      difficulty: data.difficulty,
-      type: data.type,
-      prompt: data.prompt,
-      expected_signals: data.expectedSignals,
-    };
-
-    let row: Row | null = null;
-    const auditAction = data.id ? "update" : "create";
-
-    if (data.id) {
-      const { data: updated, error } = await context.supabase
-        .from("questions")
-        .update(payload as never)
-        .eq("id", data.id)
-        .select("id, competency, difficulty, type, prompt, expected_signals, created_at")
-        .maybeSingle();
-      if (error) throw new Error(error.message);
-      row = updated as Row;
-    } else {
-      const insertPayload = { ...payload, org_id: orgId, created_by: context.userId };
-      const { data: inserted, error } = await context.supabase
-        .from("questions")
-        .insert(insertPayload as never)
-        .select("id, competency, difficulty, type, prompt, expected_signals, created_at")
-        .maybeSingle();
-      if (error) throw new Error(error.message);
-      row = inserted as Row;
-    }
-
-    if (!row) throw new Error("Question upsert failed");
-
-    // Write audit log
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await supabaseAdmin.from("audit_events").insert({
-      org_id: orgId,
-      actor_id: context.userId,
-      entity_type: "question",
-      entity_id: row.id,
-      action: auditAction,
-      diff: payload as never,
+  .handler(async ({ data }) => {
+    const res = await fetch(`${getBackendUrl()}/api/questions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
+      body: JSON.stringify(data),
     });
-
-    return mapRow(row as Row);
+    if (!res.ok) {
+      throw new Error(`Failed to upsert question: ${res.statusText}`);
+    }
+    const row = (await res.json()) as Row;
+    return mapRow(row);
   });
 
 export const deleteQuestion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
-  .handler(async ({ data, context }) => {
-    const { data: prof } = await context.supabase
-      .from("profiles")
-      .select("org_id")
-      .eq("id", context.userId)
-      .maybeSingle();
-    const orgId = prof?.org_id;
-    if (!orgId) throw new Error("Missing organization");
-
-    const { error } = await context.supabase
-      .from("questions")
-      .update({ deleted_at: new Date().toISOString() })
-      .eq("id", data.id);
-    if (error) throw new Error(error.message);
-
-    // Write audit log
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await supabaseAdmin.from("audit_events").insert({
-      org_id: orgId,
-      actor_id: context.userId,
-      entity_type: "question",
-      entity_id: data.id,
-      action: "delete",
-      diff: { deleted_at: new Date().toISOString() } as never,
+  .handler(async ({ data }) => {
+    const res = await fetch(`${getBackendUrl()}/api/questions/${data.id}`, {
+      method: "DELETE",
+      headers: {
+        ...getAuthHeader(),
+      },
     });
-
+    if (!res.ok) {
+      throw new Error(`Failed to delete question: ${res.statusText}`);
+    }
     return { ok: true };
   });

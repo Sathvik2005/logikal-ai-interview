@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { getRequest } from "@tanstack/react-start/server";
 
 const QuestionItem = z.object({
   prompt: z.string().trim().min(4).max(4000),
@@ -17,47 +18,43 @@ const BulkUpsert = z.object({
   questions: z.array(QuestionItem).min(1).max(200),
 });
 
+function getBackendUrl(): string {
+  return process.env.BACKEND_URL || "http://localhost:3000";
+}
+
+function getAuthHeader(): Record<string, string> {
+  const request = getRequest();
+  const auth = request?.headers?.get("authorization");
+  return auth ? { Authorization: auth } : {};
+}
+
 export const bulkUpsertQuestions = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => BulkUpsert.parse(d))
-  .handler(async ({ data, context }) => {
-    const { data: prof } = await context.supabase
-      .from("profiles")
-      .select("org_id")
-      .eq("id", context.userId)
-      .maybeSingle();
-    const orgId = prof?.org_id;
-    if (!orgId) throw new Error("Missing organization");
-
-    const rows = data.questions.map((q, i) => ({
-      org_id: orgId,
-      created_by: context.userId,
-      bank_name: data.bankName,
+  .handler(async ({ data }) => {
+    // Map questions to match NestJS expectations
+    const mappedQuestions = data.questions.map((q) => ({
       competency: data.competency,
-      category: q.category,
       difficulty: q.difficulty,
       type: "open",
       prompt: q.prompt,
-      expected_signals: q.hints,
-      hints: q.hints,
-      mandatory: q.mandatory,
-      sort_order: i,
+      expectedSignals: q.hints,
     }));
-    const { error } = await context.supabase.from("questions").insert(rows as never);
-    if (error) throw new Error(error.message);
 
-    // Write audit log
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await supabaseAdmin.from("audit_events").insert({
-      org_id: orgId,
-      actor_id: context.userId,
-      entity_type: "question_bank",
-      entity_id: orgId, // scoped to organization
-      action: "bulk_upsert",
-      diff: { bank_name: data.bankName, competency: data.competency, count: rows.length } as never,
+    const res = await fetch(`${getBackendUrl()}/api/questions/bulk`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
+      body: JSON.stringify({ questions: mappedQuestions }),
     });
 
-    return { ok: true, count: rows.length };
+    if (!res.ok) {
+      throw new Error(`Failed to bulk import questions: ${res.statusText}`);
+    }
+
+    return await res.json();
   });
 
 const ParsePdf = z.object({
@@ -84,7 +81,7 @@ export const parseQuestionsFromPdf = createServerFn({ method: "POST" })
           {
             role: "system",
             content:
-              'You extract interview questions from documents and return STRICT JSON. Output schema: {"questions":[{"prompt":string,"category":"Technical"|"Behavioral"|"Compliance"|"Situational"|"Coding","difficulty":"easy"|"medium"|"hard","mandatory":boolean,"hints":string[]}]}. Return ONLY JSON, no prose.',
+              "You extract interview questions from documents and return STRICT JSON. Output schema: {\"questions\":[{\"prompt\":string,\"category\":\"Technical\"|\"Behavioral\"|\"Compliance\"|\"Situational\"|\"Coding\",\"difficulty\":\"easy\"|\"medium\"|\"hard\",\"mandatory\":boolean,\"hints\":string[]}]}. Return ONLY JSON, no prose.",
           },
           {
             role: "user",
@@ -101,46 +98,30 @@ export const parseQuestionsFromPdf = createServerFn({ method: "POST" })
     if (!res.ok) {
       const txt = await res.text();
       if (res.status === 429) throw new Error("AI rate limit reached. Try again shortly.");
-      if (res.status === 402)
-        throw new Error("AI credits exhausted. Add credits in workspace settings.");
+      if (res.status === 402) throw new Error("AI credits exhausted. Add credits in workspace settings.");
       throw new Error(`PDF parse failed: ${res.status} ${txt.slice(0, 200)}`);
     }
     const j = await res.json();
     const txt = j.choices?.[0]?.message?.content ?? "{}";
     let parsed: unknown;
-    try {
-      parsed = JSON.parse(txt);
-    } catch {
-      parsed = {};
-    }
+    try { parsed = JSON.parse(txt); } catch { parsed = {}; }
     const list = (parsed as { questions?: unknown }).questions;
     if (!Array.isArray(list)) return { questions: [] as QuestionItemDTO[] };
 
-    type ParsedQ = {
-      prompt: string;
-      category: string;
-      difficulty: "easy" | "medium" | "hard";
-      mandatory: boolean;
-      hints: string[];
-    };
+    type ParsedQ = { prompt: string; category: string; difficulty: "easy" | "medium" | "hard"; mandatory: boolean; hints: string[] };
     const out: ParsedQ[] = list
       .map((q: unknown): ParsedQ | null => {
         const o = q as Record<string, unknown>;
         const promptStr = typeof o.prompt === "string" ? o.prompt.trim() : "";
         if (!promptStr) return null;
         const cat = typeof o.category === "string" ? o.category : "Technical";
-        const diff = typeof o.difficulty === "string" ? o.difficulty.toLowerCase() : "medium";
+        const diff = (typeof o.difficulty === "string" ? o.difficulty.toLowerCase() : "medium");
         return {
           prompt: promptStr.slice(0, 4000),
           category: cat.slice(0, 60),
-          difficulty: (["easy", "medium", "hard"].includes(diff) ? diff : "medium") as
-            | "easy"
-            | "medium"
-            | "hard",
+          difficulty: (["easy", "medium", "hard"].includes(diff) ? diff : "medium") as "easy" | "medium" | "hard",
           mandatory: Boolean(o.mandatory),
-          hints: Array.isArray(o.hints)
-            ? ((o.hints as unknown[]).filter((h) => typeof h === "string").slice(0, 10) as string[])
-            : [],
+          hints: Array.isArray(o.hints) ? (o.hints as unknown[]).filter((h) => typeof h === "string").slice(0, 10) as string[] : [],
         };
       })
       .filter((q): q is ParsedQ => q !== null)
