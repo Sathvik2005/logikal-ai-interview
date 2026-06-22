@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Live Interview Monitor - Logikality AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700;900&amp;family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@450&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary-container": "#a44100",
+                        "primary-fixed": "#e2dfff",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#4f46e5",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-tertiary-container": "#ffd2be",
+                        "secondary": "#00687a",
+                        "on-secondary-fixed": "#001f26",
+                        "on-primary-fixed-variant": "#3323cc",
+                        "surface-container-high": "#dce9ff",
+                        "on-secondary-container": "#006172",
+                        "surface": "#f8f9ff",
+                        "on-primary-fixed": "#0f0069",
+                        "outline-variant": "#c7c4d8",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#213145",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#0b1c30",
+                        "on-tertiary-fixed": "#351000",
+                        "on-primary-container": "#dad7ff",
+                        "on-error": "#ffffff",
+                        "secondary-container": "#57dffe",
+                        "surface-variant": "#d3e4fe",
+                        "error": "#ba1a1a",
+                        "tertiary": "#7e3000",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "surface-tint": "#4d44e3",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container": "#e5eeff",
+                        "background": "#f8f9ff",
+                        "on-secondary-fixed-variant": "#004e5c",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "inverse-primary": "#c3c0ff",
+                        "on-surface-variant": "#464555",
+                        "primary": "#3525cd",
+                        "outline": "#777587",
+                        "on-background": "#0b1c30",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#acedff",
+                        "surface-bright": "#f8f9ff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#4cd7f6",
+                        "tertiary-fixed": "#ffdbcc",
+                        "surface-dim": "#cbdbf5",
+                        "on-tertiary-fixed-variant": "#7b2f00"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "sm": "8px",
+                        "lg": "24px",
+                        "gutter": "24px",
+                        "container-max": "1440px",
+                        "md": "16px",
+                        "xl": "40px",
+                        "xs": "4px",
+                        "base": "4px"
+                    },
+                    fontFamily: {
+                        "headline-sm": ["Geist"],
+                        "body-lg": ["Inter"],
+                        "headline-lg-mobile": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "data-mono": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-lg": ["Geist"],
+                        "display-lg": ["Geist"]
+                    },
+                    fontSize: {
+                        "headline-sm": ["18px", { lineHeight: "1.4", fontWeight: "600" }],
+                        "body-lg": ["16px", { lineHeight: "1.6", fontWeight: "400" }],
+                        "headline-lg-mobile": ["24px", { lineHeight: "1.2", fontWeight: "600" }],
+                        "headline-md": ["24px", { lineHeight: "1.3", fontWeight: "600" }],
+                        "data-mono": ["13px", { lineHeight: "1.4", fontWeight: "450" }],
+                        "body-md": ["14px", { lineHeight: "1.5", fontWeight: "400" }],
+                        "label-caps": ["12px", { lineHeight: "1", letterSpacing: "0.05em", fontWeight: "600" }],
+                        "headline-lg": ["32px", { lineHeight: "1.2", letterSpacing: "-0.02em", fontWeight: "600" }],
+                        "display-lg": ["48px", { lineHeight: "1.1", letterSpacing: "-0.04em", fontWeight: "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .ai-insight-card {
+            background-color: #ECFEFF;
+            border-left: 2px solid #06B6D4;
+        }
+        
+        @keyframes pulse-wave {
+            0%, 100% { transform: scaleY(0.3); opacity: 0.5; }
+            50% { transform: scaleY(1); opacity: 1; }
+        }
+        .wave-bar {
+            animation: pulse-wave 1.2s ease-in-out infinite;
+            transform-origin: bottom;
+        }
+        .wave-bar:nth-child(1) { animation-delay: 0.0s; }
+        .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(4) { animation-delay: 0.3s; }
+        .wave-bar:nth-child(5) { animation-delay: 0.4s; }
+        .wave-bar:nth-child(6) { animation-delay: 0.5s; }
+        .wave-bar:nth-child(7) { animation-delay: 0.4s; }
+        .wave-bar:nth-child(8) { animation-delay: 0.3s; }
+        .wave-bar:nth-child(9) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(10) { animation-delay: 0.1s; }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .typing-cursor::after {
+            content: '|';
+            animation: blink 1s step-end infinite;
+            color: #3525cd; /* primary */
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md antialiased overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-background docked full-width top-0 sticky z-40 border-b border-outline-variant dark:border-outline flat no shadows flex justify-between items-center h-16 px-gutter hidden md:flex ml-64">
+<div class="flex items-center gap-lg">
+<span class="font-headline-sm text-headline-sm font-black text-on-surface dark:text-on-background">Logikality AI</span>
+<nav class="flex gap-md">
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors text-body-md font-body-md scale-100 active:scale-98 transition-transform" href="#">Reports</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors text-body-md font-body-md scale-100 active:scale-98 transition-transform" href="#">Automations</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors text-body-md font-body-md scale-100 active:scale-98 transition-transform" href="#">Team</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="text-primary dark:text-primary-fixed font-label-caps text-label-caps bg-surface-container-highest px-md py-sm rounded-full hover:bg-surface-tint hover:text-on-primary transition-colors">Switch Org</button>
+<div class="flex gap-sm">
+<button class="p-sm text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined">notifications</span></button>
+<button class="p-sm text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined">apps</span></button>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="A professional headshot of an executive in a modern corporate setting, light mode aesthetic, clean and crisp photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqPwzukB3nlZXVOXrKHXHVDwe5tLdPdRuL20DhN2rLx3LY9fpDkmGN0KKmo3wf1GsS_5zwe9nTaEBnt-xu9rPqZp9Y053nY4OR5zm47D2iAf--tVgTLFjiaGd8WMsYOsc4kcQu84CO-QTkdgjM0qEYHOA2iGU3Biq4moMiq5li-354ZS_je7Uj4Pp70dZVokdC0_j2mDVi-ry6gwvMN16jhxooIw4p02QdZAOOdONnwmSdkU4B3GurJIGGRyoSIWZqOZVo45A0pb7A"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar (Desktop Only) -->
+<nav class="bg-surface-container-lowest dark:bg-inverse-surface h-screen w-64 fixed left-0 top-0 border-r border-outline-variant dark:border-outline shadow-sm flex flex-col py-lg px-md z-50 hidden md:flex">
+<div class="mb-xl px-sm">
+<div class="flex items-center gap-sm mb-xs">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-on-primary font-bold">L</div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed truncate">Logikality AI</h1>
+</div>
+<p class="font-label-caps text-label-caps text-on-surface-variant ml-10">Executive Recruitment</p>
+</div>
+<button class="w-full mb-lg bg-primary text-on-primary font-label-caps text-label-caps py-sm px-md rounded-lg shadow-sm hover:brightness-110 transition-all active:scale-95 flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined" style="font-size: 16px;">add</span> Post New Job
+        </button>
+<div class="flex-1 flex flex-col gap-xs overflow-y-auto">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 cursor-pointer transition-all active:scale-95 group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 cursor-pointer transition-all active:scale-95 group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">group</span>
+<span class="font-label-caps text-label-caps">Candidates</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 cursor-pointer transition-all active:scale-95 group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">work</span>
+<span class="font-label-caps text-label-caps">Active Jobs</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 cursor-pointer transition-all active:scale-95 group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">database</span>
+<span class="font-label-caps text-label-caps">Talent Pools</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 cursor-pointer transition-all active:scale-95 group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">bar_chart</span>
+<span class="font-label-caps text-label-caps">Analytics</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-primary dark:text-primary-fixed font-bold border-r-2 border-primary dark:border-primary-fixed bg-surface-container-low dark:bg-surface-container-highest cursor-pointer transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">event</span>
+<span class="font-label-caps text-label-caps">Interviews</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 cursor-pointer transition-all active:scale-95 group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">business_center</span>
+<span class="font-label-caps text-label-caps">Client Portal</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 cursor-pointer transition-all active:scale-95 group mt-auto" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+</div>
+<div class="mt-lg border-t border-outline-variant pt-md flex flex-col gap-xs">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary transition-colors text-label-caps font-label-caps" href="#">
+<span class="material-symbols-outlined">help</span> Support
+            </a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary transition-colors text-label-caps font-label-caps" href="#">
+<span class="material-symbols-outlined">account_circle</span> Account
+            </a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 p-lg min-h-screen pt-4">
+<div class="max-w-container-max mx-auto space-y-lg">
+<!-- Dashboard Header / Context Bar -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-md">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full overflow-hidden border-2 border-surface-container-high">
+<img alt="Candidate" class="w-full h-full object-cover" data-alt="A professional headshot of a female software engineering candidate, looking focused, bright lighting, modern corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzWe59sft3g2FjowqU_8h7NaFhrKCVnht3kYpOPh3HoLPi-uxRh84jURkBxeAl2173WCd5q80HWIUqLuW2BWEawQJzRof6DOLUXEq-kqrm4qWJx2ypgg4jccTFvL7zM8H9QWuYtwbbDpGa9OnmpmLJpUtE5AlpldLGv6QTFpDgFDPZTFmAiCoafYuyFyWyE01lCHR0WSLq-FCu-0kWGne-E2Xyw0AZ5kFwwDYizrKrDS3-RsVxSChTs6pQ8uNngDl7ic5QV6FtaqTk"/>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+                            Sarah Jenkins
+                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-caps text-[10px]">
+<span class="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></span> LIVE
+                            </span>
+</h2>
+<p class="font-label-caps text-label-caps text-on-surface-variant mt-1">Sr. Staff Engineer Candidate • Requisition #REQ-0942</p>
+</div>
+</div>
+<div class="flex items-center gap-xl bg-surface-container-low px-lg py-md rounded-lg border border-outline-variant/50">
+<div class="flex flex-col items-center">
+<span class="font-label-caps text-label-caps text-on-surface-variant mb-1">Current Focus</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">System Architecture</span>
+</div>
+<div class="w-px h-8 bg-outline-variant"></div>
+<div class="flex flex-col items-center">
+<span class="font-label-caps text-label-caps text-on-surface-variant mb-1">Elapsed Time</span>
+<span class="font-data-mono text-data-mono text-error font-semibold flex items-center gap-2">
+                            00:24:18
+                        </span>
+</div>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg items-start">
+<!-- Left/Center Column: Stream & Transcript (Col 8) -->
+<div class="lg:col-span-8 flex flex-col gap-lg">
+<!-- Media Stream Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden relative">
+<!-- Stream Placeholder -->
+<div class="aspect-video bg-inverse-surface relative overflow-hidden group">
+<img alt="Candidate Feed" class="w-full h-full object-cover opacity-60" data-alt="A wide shot of a female candidate looking into a webcam during a video interview, slightly blurred to represent a live feed, high-tech overlay aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQab9-RtFj9gZjZrZcH-b61-ZyeUufLDJ7lQ83k_mvm4MKEH3QZdUosVXlzHZQ8ehAzJUQniIwKnbXct4GlkpchirVyaatuAALo6GCs1t3rIPw6zujIzZ8YvNsF68urEfEq5Lq787Ji0cUReJr66WD_i4Hw_nrTDqkDfquJ1PJtNrRdqreVLAklzbz7WZtNRQzUOAwO3BrDr1ep21cKn6sj6wxiC37-Ug6WL-kKJaMiyuOvdzvHl4UVZl6BUG8TCFHGoaEP4LWvvsv"/>
+<!-- High-tech overlays -->
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="px-2 py-1 bg-background/80 backdrop-blur text-on-surface font-data-mono text-[10px] rounded border border-outline-variant/30 flex items-center gap-1">
+<span class="material-symbols-outlined" style="font-size: 14px;">videocam</span> 1080p
+                                </span>
+<span class="px-2 py-1 bg-background/80 backdrop-blur text-on-surface font-data-mono text-[10px] rounded border border-outline-variant/30 flex items-center gap-1">
+<span class="material-symbols-outlined" style="font-size: 14px;">mic</span> 48kHz
+                                </span>
+</div>
+<!-- Audio Visualizer Overlay (Bottom) -->
+<div class="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-inverse-surface to-transparent flex items-end justify-center pb-4 gap-1 opacity-80">
+<div class="w-1.5 h-4 bg-secondary-container rounded-t wave-bar"></div>
+<div class="w-1.5 h-8 bg-secondary-container rounded-t wave-bar"></div>
+<div class="w-1.5 h-12 bg-secondary-container rounded-t wave-bar"></div>
+<div class="w-1.5 h-6 bg-secondary-container rounded-t wave-bar"></div>
+<div class="w-1.5 h-10 bg-secondary-container rounded-t wave-bar"></div>
+<div class="w-1.5 h-14 bg-secondary-container rounded-t wave-bar"></div>
+<div class="w-1.5 h-8 bg-secondary-container rounded-t wave-bar"></div>
+<div class="w-1.5 h-5 bg-secondary-container rounded-t wave-bar"></div>
+<div class="w-1.5 h-10 bg-secondary-container rounded-t wave-bar"></div>
+<div class="w-1.5 h-6 bg-secondary-container rounded-t wave-bar"></div>
+</div>
+</div>
+</div>
+<!-- Live Transcript Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm flex flex-col h-[400px]">
+<div class="p-md border-b border-outline-variant flex justify-between items-center bg-surface-container-low/50 rounded-t-xl">
+<h3 class="font-label-caps text-label-caps text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-size: 16px;">subtitles</span> Live Transcript Feed
+                            </h3>
+<span class="px-2 py-1 bg-surface-container-high text-primary font-label-caps text-[10px] rounded-full flex items-center gap-1 shadow-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span> Auto-scroll Active
+                            </span>
+</div>
+<div class="flex-1 p-lg overflow-y-auto space-y-md font-body-lg text-body-lg">
+<!-- AI Speaker -->
+<div class="flex gap-md max-w-[85%]">
+<div class="w-8 h-8 rounded bg-primary-fixed flex-shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-fixed" style="font-size: 18px;">robot_2</span>
+</div>
+<div class="bg-surface-container-low p-md rounded-lg rounded-tl-none border border-outline-variant/50">
+<p class="text-on-surface text-body-md font-body-md">Can you walk me through a specific instance where you had to refactor a legacy microservice architecture to improve latency? What were the key trade-offs you considered?</p>
+</div>
+</div>
+<!-- Candidate Speaker (Older text) -->
+<div class="flex gap-md max-w-[90%] ml-auto flex-row-reverse">
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant flex-shrink-0 overflow-hidden">
+<img alt="Candidate small" class="w-full h-full object-cover" data-alt="Small avatar of the candidate." src="https://lh3.googleusercontent.com/aida-public/AB6AXuACUSBumvfww_cOkvyX5r6U2tC_5B9AiaAol70iN3PLGhPdxrHH74_xG44kRYyEEoI4phSNkShxBtYFji1QxguoDOYydBACOncI2ohM_ny5YwLPm-iHEP1CE9-3XbRIbZcbZrQpxQhMxcD-_wbm4z7Eq27lKvIDWYdZ_9bPL2hsjLn_mAfRZWd6ezT3tAhncR02dGkv2z4-y0jIWzpTPef1vAC3ER6GKw3deTNU1uoNUGEZOVtJnC_NKJNla-1WnWVcFFvKEyUW1lxn"/>
+</div>
+<div class="p-md text-right">
+<p class="text-on-surface-variant text-body-md font-body-md">Yes, absolutely. In my previous role at FinTech Corp, we had an order processing service built on a monolithic Node.js backend that was hitting scaling limits during peak trading hours.</p>
+</div>
+</div>
+<!-- Candidate Speaker (Live typing text) -->
+<div class="flex gap-md max-w-[90%] ml-auto flex-row-reverse">
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant flex-shrink-0 overflow-hidden opacity-0">
+<!-- Spacer for alignment -->
+</div>
+<div class="p-md pt-0 text-right">
+<p class="text-on-surface text-body-md font-body-md">
+                                        The primary bottleneck was the database connection pool exhaustion. So, I proposed decoupling the ingestion layer using <span class="bg-secondary-container/30 text-on-secondary-container px-1 rounded font-data-mono text-data-mono">Apache Kafka</span> to buffer the incoming requests. The trade-off was introducing eventual consistency into a previously synchronous flow, which meant we had to overhaul the client-side polling logic to handle <span class="typing-cursor">asynchronous states</span>
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Analytics & Intervention (Col 4) -->
+<div class="lg:col-span-4 flex flex-col gap-lg">
+<!-- AI Intervention Card (Custom Component per Style Guide) -->
+<div class="ai-insight-card rounded-xl p-lg shadow-sm">
+<div class="flex items-start gap-md mb-md">
+<span class="material-symbols-outlined text-[#06B6D4]" style="font-variation-settings: 'FILL' 1;">electric_bolt</span>
+<div>
+<h3 class="font-label-caps text-label-caps text-on-surface font-bold uppercase tracking-wider mb-1">AI Intervention Suggested</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Candidate is heavily relying on high-level architectural concepts without providing concrete implementation metrics.</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest/80 rounded p-sm border border-[#06B6D4]/30 mb-md">
+<p class="font-data-mono text-data-mono text-on-surface">"Could you specify the exact latency reduction achieved post-migration, and how you monitored Kafka consumer lag?"</p>
+</div>
+<div class="flex gap-sm">
+<button class="flex-1 bg-primary text-on-primary font-label-caps text-label-caps py-2 rounded shadow-sm hover:brightness-110 transition-colors">Inject Prompt</button>
+<button class="px-sm border border-outline-variant rounded bg-surface-container-lowest text-on-surface hover:bg-surface-container-low transition-colors"><span class="material-symbols-outlined" style="font-size: 20px;">close</span></button>
+</div>
+</div>
+<!-- Sentiment & Telemetry Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-lg">
+<h3 class="font-label-caps text-label-caps text-on-surface mb-lg pb-sm border-b border-outline-variant flex justify-between items-center">
+                            Real-time Telemetry
+                            <span class="material-symbols-outlined text-on-surface-variant" style="font-size: 16px;">monitoring</span>
+</h3>
+<div class="space-y-lg">
+<!-- Sentiment Meter -->
+<div>
+<div class="flex justify-between items-end mb-sm">
+<span class="font-body-md text-body-md text-on-surface-variant">Cognitive Sentiment</span>
+<span class="font-data-mono text-data-mono text-secondary-container font-bold">Positive (0.78)</span>
+</div>
+<div class="h-2 w-full bg-surface-container-high rounded-full overflow-hidden flex">
+<div class="h-full bg-error/40 w-1/4"></div>
+<div class="h-full bg-outline-variant/40 w-1/4"></div>
+<div class="h-full bg-secondary-container w-1/2 relative">
+<!-- Animated indicator -->
+<div class="absolute right-0 top-0 h-full w-1 bg-surface-container-lowest animate-pulse"></div>
+</div>
+</div>
+<div class="flex justify-between mt-1 px-1">
+<span class="font-label-caps text-[10px] text-on-surface-variant">Stress</span>
+<span class="font-label-caps text-[10px] text-on-surface-variant">Neutral</span>
+<span class="font-label-caps text-[10px] text-on-surface-variant">Confident</span>
+</div>
+</div>
+<!-- Speaking Pace -->
+<div>
+<div class="flex justify-between items-end mb-sm">
+<span class="font-body-md text-body-md text-on-surface-variant">Speaking Pace</span>
+<span class="font-data-mono text-data-mono text-on-surface">142 WPM</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary/70 w-[60%] rounded-full"></div>
+</div>
+</div>
+<!-- Clarity Score -->
+<div>
+<div class="flex justify-between items-end mb-sm">
+<span class="font-body-md text-body-md text-on-surface-variant">Technical Clarity</span>
+<span class="font-data-mono text-data-mono text-on-surface">High</span>
+</div>
+<div class="flex gap-1 h-2">
+<div class="flex-1 bg-primary rounded-sm"></div>
+<div class="flex-1 bg-primary rounded-sm"></div>
+<div class="flex-1 bg-primary rounded-sm"></div>
+<div class="flex-1 bg-primary/30 rounded-sm"></div>
+<div class="flex-1 bg-surface-container-high rounded-sm"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Interview Structure Map -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-lg">
+<h3 class="font-label-caps text-label-caps text-on-surface mb-md">Evaluation Rubric Map</h3>
+<div class="space-y-sm relative before:absolute before:inset-0 before:ml-2.5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-outline-variant">
+<!-- Completed Step -->
+<div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+<div class="flex items-center justify-center w-6 h-6 rounded-full border-2 border-primary bg-primary text-on-primary shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+<span class="material-symbols-outlined" style="font-size: 12px; font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div class="w-[calc(100%-2.5rem)] md:w-[calc(50%-1.5rem)] p-sm rounded bg-surface-container-lowest border border-outline-variant">
+<p class="font-label-caps text-[10px] text-on-surface-variant">Completed</p>
+<p class="font-body-md text-body-md text-on-surface">Intro &amp; Background</p>
+</div>
+</div>
+<!-- Current Step -->
+<div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+<div class="flex items-center justify-center w-6 h-6 rounded-full border-2 border-primary bg-surface-container-lowest text-primary shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 relative">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+</div>
+<div class="w-[calc(100%-2.5rem)] md:w-[calc(50%-1.5rem)] p-sm rounded bg-surface-container-low border border-primary/50 shadow-sm">
+<p class="font-label-caps text-[10px] text-primary">In Progress</p>
+<p class="font-body-md text-body-md text-on-surface font-semibold">System Design</p>
+</div>
+</div>
+<!-- Future Step -->
+<div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+<div class="flex items-center justify-center w-6 h-6 rounded-full border-2 border-outline-variant bg-surface-container-lowest text-on-surface-variant shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+<span class="font-data-mono text-[10px]">3</span>
+</div>
+<div class="w-[calc(100%-2.5rem)] md:w-[calc(50%-1.5rem)] p-sm rounded bg-surface-container-lowest opacity-60">
+<p class="font-body-md text-body-md text-on-surface-variant">Behavioral</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

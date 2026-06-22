@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Interview Preparation | Logikality AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Geist:wght@600;700&amp;family=JetBrains+Mono:wght@450&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "secondary-fixed": "#acedff",
+                            "on-tertiary": "#ffffff",
+                            "on-surface-variant": "#464555",
+                            "outline-variant": "#c7c4d8",
+                            "on-surface": "#0b1c30",
+                            "on-secondary-container": "#006172",
+                            "on-primary-fixed": "#0f0069",
+                            "on-error-container": "#93000a",
+                            "on-tertiary-container": "#ffd2be",
+                            "on-primary": "#ffffff",
+                            "surface-container-highest": "#d3e4fe",
+                            "error-container": "#ffdad6",
+                            "on-tertiary-fixed-variant": "#7b2f00",
+                            "surface-variant": "#d3e4fe",
+                            "primary-container": "#4f46e5",
+                            "on-secondary-fixed-variant": "#004e5c",
+                            "surface-container-low": "#eff4ff",
+                            "inverse-primary": "#c3c0ff",
+                            "on-primary-fixed-variant": "#3323cc",
+                            "on-primary-container": "#dad7ff",
+                            "on-background": "#0b1c30",
+                            "surface-container-lowest": "#ffffff",
+                            "on-error": "#ffffff",
+                            "error": "#ba1a1a",
+                            "surface-dim": "#cbdbf5",
+                            "on-secondary-fixed": "#001f26",
+                            "outline": "#777587",
+                            "on-tertiary-fixed": "#351000",
+                            "primary-fixed-dim": "#c3c0ff",
+                            "on-secondary": "#ffffff",
+                            "tertiary": "#7e3000",
+                            "surface-tint": "#4d44e3",
+                            "surface": "#f8f9ff",
+                            "surface-container": "#e5eeff",
+                            "surface-bright": "#f8f9ff",
+                            "background": "#f8f9ff",
+                            "secondary-fixed-dim": "#4cd7f6",
+                            "primary": "#3525cd",
+                            "tertiary-fixed-dim": "#ffb695",
+                            "tertiary-container": "#a44100",
+                            "tertiary-fixed": "#ffdbcc",
+                            "secondary-container": "#57dffe",
+                            "surface-container-high": "#dce9ff",
+                            "secondary": "#00687a",
+                            "inverse-on-surface": "#eaf1ff",
+                            "primary-fixed": "#e2dfff",
+                            "inverse-surface": "#213145"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "0.5rem",
+                            "xl": "0.75rem",
+                            "full": "9999px"
+                    },
+                    "spacing": {
+                            "lg": "24px",
+                            "base": "4px",
+                            "md": "16px",
+                            "xs": "4px",
+                            "gutter": "24px",
+                            "sm": "8px",
+                            "xl": "40px",
+                            "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                            "body-md": ["Inter"],
+                            "headline-lg": ["Geist"],
+                            "body-lg": ["Inter"],
+                            "headline-sm": ["Geist"],
+                            "label-caps": ["Inter"],
+                            "headline-md": ["Geist"],
+                            "headline-lg-mobile": ["Geist"],
+                            "display-lg": ["Geist"],
+                            "data-mono": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                            "body-md": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                            "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                            "body-lg": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                            "headline-sm": ["18px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                            "label-caps": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                            "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                            "headline-lg-mobile": ["24px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                            "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700" }],
+                            "data-mono": ["13px", { "lineHeight": "1.4", "fontWeight": "450" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #F8FAFC;
+        }
+        .card-shadow {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
+        }
+        .ai-insight-bg {
+            background-color: #ECFEFF;
+            border-left: 2px solid #06B6D4;
+        }
+        
+        /* Subtle pulse for the active system checks */
+        @keyframes subtle-pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .pulse-indicator {
+            animation: subtle-pulse 2s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen flex flex-col font-body-md text-on-surface">
+<!-- Top Navigation (Simplified for focus state, no side nav as this is a focused pre-flight screen) -->
+<header class="bg-surface/80 backdrop-blur-md fixed top-0 w-full h-16 border-b border-outline-variant z-40 flex items-center justify-between px-lg">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">psychology</span>
+<span class="font-headline-sm text-headline-sm text-primary">Logikality AI</span>
+</div>
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-xs font-body-md text-body-md">
+<span class="material-symbols-outlined text-sm">help</span>
+                Support
+            </button>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-xs font-body-md text-body-md border border-outline-variant rounded-full px-4 py-1.5">
+                 Cancel
+            </button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-[104px] pb-xl px-4 md:px-lg w-full max-w-container-max mx-auto flex flex-col md:flex-row gap-lg justify-center">
+<!-- Left Column: Instructions & Persona -->
+<div class="flex flex-col gap-lg w-full md:w-5/12 max-w-lg">
+<div class="flex flex-col gap-sm">
+<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Interview Pre-flight</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Please complete the system checks below before joining the session.</p>
+</div>
+<!-- AI Persona Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg card-shadow flex flex-col gap-md">
+<div class="flex items-start gap-md">
+<img alt="AI Persona" class="w-16 h-16 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of a confident, diverse woman in business attire against a clean, modern white background. The lighting is soft and flattering, typical of a high-end corporate portrait. This image represents the AI interviewer persona 'Sarah'. The overall aesthetic is modern, clean, and reliable, fitting the corporate minimalist style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2bgkFPTrOuzOu7IqNnt8fZzTg9aI7iffM93AElR_eMpQpHUE0rlk2Y1EQq4HgK9712yLZNRvpVCruGjcb8uR0yE0rg7zJ75fOx8PAkcoQkvFUX3l4Rl0crP6Zius0KFTObMm8X7bJ12WnEvtIjUdtvsfYr5cwoyk1YtLweCqesdc5QX1kXCENBdBRcgVoKIJZAuxjWnhv_bWCIHO7nrJBAqOA_JkYlliV_fkOdViiCj_8fMoYs4P-V4Je4rbeEsqnhGvnoliYaVZa"/>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-outline uppercase tracking-wider mb-xs">Your Interviewer</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Sarah AI</h2>
+<span class="font-body-md text-body-md text-on-surface-variant flex items-center gap-xs mt-1">
+<span class="material-symbols-outlined text-sm">code</span> Technical Lead
+                        </span>
+</div>
+</div>
+<div class="h-px bg-outline-variant w-full my-sm"></div>
+<div class="ai-insight-bg p-md rounded-lg flex gap-md">
+<span class="material-symbols-outlined text-[#06B6D4] mt-0.5">colors_spark</span>
+<div class="flex flex-col gap-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface">Focus Areas</span>
+<p class="font-body-md text-body-md text-on-surface-variant">Sarah will primarily evaluate your system architecture knowledge and problem-solving approach. The session is expected to take 45 minutes.</p>
+</div>
+</div>
+</div>
+<!-- Guidelines -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg card-shadow flex flex-col gap-md">
+<h3 class="font-headline-sm text-headline-sm text-on-surface border-b border-outline-variant pb-sm">Interview Guidelines</h3>
+<ul class="flex flex-col gap-sm">
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-primary text-sm mt-0.5">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Ensure you are in a quiet, well-lit environment.</span>
+</li>
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-primary text-sm mt-0.5">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Speak clearly and at a moderate pace for the AI to transcribe accurately.</span>
+</li>
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-primary text-sm mt-0.5">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface-variant">You can ask Sarah to repeat or rephrase questions if needed.</span>
+</li>
+</ul>
+</div>
+</div>
+<!-- Right Column: System Checks & CTA -->
+<div class="flex flex-col gap-lg w-full md:w-7/12 max-w-2xl">
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg card-shadow flex flex-col h-full">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-lg">System Diagnostics</h3>
+<!-- Video Preview Area -->
+<div class="relative w-full aspect-video bg-inverse-surface rounded-lg overflow-hidden mb-lg flex items-center justify-center">
+<!-- Placeholder for actual video feed -->
+<img alt="Video Preview" class="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-luminosity" data-alt="A view of a modern, minimal home office setup focusing on a laptop webcam view. The lighting is natural and bright, coming from an unseen window. The scene represents a clean, professional environment ready for a video interview. The aesthetic aligns with the modern corporate minimalism of the platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgX1M11aA23sK7KqF5qLgLieqzZTGTQvkPirKntK0vsh5ufgETF00hl0LkIl0GBQaouMcoos-NUlYGu7qt3uNm6H6LZT1tFuSlZq6SuK3Hzz4iuFiRU651V4yUYfFDqelCRsyY-0FgyCsZFuJWN4bbGumb3wKjerfLkQ61d43hdBKo4dAkTN25p1Wi5U-FUSpvErLCBF2hrtC9q_cBLZ2aXkNDJqkRHacMb9rCeeNK9R5PBN6ijb9TJoIuISWZJJTMWxW4ec0v5KIa"/>
+<div class="z-10 flex flex-col items-center gap-md">
+<div class="w-16 h-16 rounded-full bg-surface/20 backdrop-blur-sm border border-surface/30 flex items-center justify-center pulse-indicator">
+<span class="material-symbols-outlined text-on-primary text-3xl">videocam</span>
+</div>
+<span class="font-body-md text-body-md text-on-primary font-medium tracking-wide">Initializing Camera...</span>
+</div>
+<!-- Overlays -->
+<div class="absolute bottom-4 left-4 bg-background/80 backdrop-blur-md px-3 py-1.5 rounded-md border border-outline-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface text-sm">mic</span>
+<div class="flex gap-1 h-2 items-end">
+<div class="w-1 bg-primary rounded-t h-full"></div>
+<div class="w-1 bg-primary rounded-t h-3/4"></div>
+<div class="w-1 bg-primary rounded-t h-1/2"></div>
+<div class="w-1 bg-outline-variant rounded-t h-full"></div>
+<div class="w-1 bg-outline-variant rounded-t h-full"></div>
+</div>
+</div>
+</div>
+<!-- Check Items -->
+<div class="flex flex-col gap-4 mb-auto">
+<!-- Camera -->
+<div class="flex items-center justify-between p-4 rounded-lg border border-outline-variant bg-surface">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface">videocam</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">Camera</span>
+<span class="font-body-md text-body-md text-on-surface-variant">MacBook Pro Camera</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary text-xl">check_circle</span>
+</div>
+<!-- Microphone -->
+<div class="flex items-center justify-between p-4 rounded-lg border border-outline-variant bg-surface">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface">mic</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">Microphone</span>
+<span class="font-body-md text-body-md text-on-surface-variant">External Mic (USB)</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary text-xl">check_circle</span>
+</div>
+<!-- Connection -->
+<div class="flex items-center justify-between p-4 rounded-lg border border-outline-variant bg-surface">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface">wifi</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">Connection</span>
+<span class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1">Stable <span class="w-1.5 h-1.5 rounded-full bg-secondary inline-block"></span> 45ms ping</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary text-xl">check_circle</span>
+</div>
+</div>
+<div class="h-px bg-outline-variant w-full my-lg"></div>
+<!-- Action Area -->
+<div class="flex items-center justify-between">
+<span class="font-body-md text-body-md text-on-surface-variant">All systems nominal. Ready when you are.</span>
+<button class="bg-primary hover:bg-primary/90 text-on-primary font-headline-sm text-headline-sm px-6 py-3 rounded-lg transition-colors flex items-center gap-sm shadow-sm hover:shadow-md">
+                        Join Interview Room
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

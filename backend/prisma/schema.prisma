@@ -1,0 +1,555 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum AppRole {
+  admin
+  recruiter
+  candidate
+}
+
+model Organization {
+  id                    String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                  String
+  industry              String?
+  size                  String?
+  status                String?                @default("active")
+  created_at            DateTime               @default(now()) @db.Timestamptz
+  profiles              Profile[]
+  job_descriptions      JobDescription[]
+  personas              Persona[]
+  persona_versions      PersonaVersion[]
+  questions             Question[]
+  candidates            Candidate[]
+  interviews            Interview[]
+  interview_sessions    InterviewSession[]
+  proctoring_snapshots  ProctoringSnapshot[]
+  interview_reports     InterviewReport[]
+  ai_jobs               AiJob[]
+  notification_outbox   NotificationOutbox[]
+  audit_events          AuditEvent[]
+  interview_slots       InterviewSlot[]
+  interview_templates   InterviewTemplate[]
+  identity_verifications IdentityVerification[]
+
+  @@map("organizations")
+}
+
+model Profile {
+  id           String        @id @db.Uuid
+  full_name    String?
+  email        String?
+  avatar_url   String?
+  org_id       String?       @db.Uuid
+  title        String?
+  created_at   DateTime      @default(now()) @db.Timestamptz
+  updated_at   DateTime      @default(now()) @db.Timestamptz
+  organization Organization? @relation(fields: [org_id], references: [id], onDelete: SetNull)
+
+  @@map("profiles")
+}
+
+model UserRole {
+  id      String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id String  @db.Uuid
+  role    AppRole
+
+  @@unique([user_id, role])
+  @@map("user_roles")
+}
+
+model JobDescription {
+  id             String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  org_id         String?           @db.Uuid
+  created_by     String            @db.Uuid
+  title          String
+  department     String?
+  location       String?
+  employment_type String?
+  description    String?
+  requirements   String?
+  status         String            @default("draft")
+  competencies   Json              @default("{}")
+  seniority      String?
+  salary_min     Decimal?          @db.Decimal
+  salary_max     Decimal?          @db.Decimal
+  salary_currency String?
+  persona_id     String?           @db.Uuid
+  created_at     DateTime          @default(now()) @db.Timestamptz
+  updated_at     DateTime          @default(now()) @db.Timestamptz
+  deleted_at     DateTime?         @db.Timestamptz
+  organization   Organization?     @relation(fields: [org_id], references: [id], onDelete: SetNull)
+  interviews     Interview[]
+  persona        Persona?          @relation(fields: [persona_id], references: [id], onDelete: SetNull)
+  matches        JdCandidateMatch[]
+  templates      InterviewTemplate[]
+
+  @@map("job_descriptions")
+}
+
+model Persona {
+  id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  org_id           String?            @db.Uuid
+  created_by       String             @db.Uuid
+  name             String
+  persona_type     String             @default("technical")
+  tone             String?
+  difficulty       String?
+  prompt           String?
+  config           Json               @default("{}")
+  created_at       DateTime           @default(now()) @db.Timestamptz
+  updated_at       DateTime           @default(now()) @db.Timestamptz
+  organization     Organization?      @relation(fields: [org_id], references: [id], onDelete: SetNull)
+  job_descriptions JobDescription[]
+  interviews       Interview[]
+  versions         PersonaVersion[]
+  templates        InterviewTemplate[]
+
+  @@map("personas")
+}
+
+model PersonaVersion {
+  id             String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  persona_id     String            @db.Uuid
+  org_id         String            @db.Uuid
+  version        Int
+  system_prompt  String
+  rubric         Json              @default("{}")
+  created_by     String            @db.Uuid
+  created_at     DateTime          @default(now()) @db.Timestamptz
+  persona        Persona           @relation(fields: [persona_id], references: [id], onDelete: Cascade)
+  organization   Organization      @relation(fields: [org_id], references: [id], onDelete: Cascade)
+  questions      PersonaQuestion[]
+  interviews     Interview[]
+
+  @@unique([persona_id, version])
+  @@map("persona_versions")
+}
+
+model Question {
+  id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  org_id           String             @db.Uuid
+  created_by       String             @db.Uuid
+  competency       String?
+  difficulty       String?
+  type             String             @default("open")
+  prompt           String
+  expected_signals Json               @default("[]")
+  created_at       DateTime           @default(now()) @db.Timestamptz
+  updated_at       DateTime           @default(now()) @db.Timestamptz
+  deleted_at       DateTime?          @db.Timestamptz
+  organization     Organization       @relation(fields: [org_id], references: [id], onDelete: Cascade)
+  personas         PersonaQuestion[]
+  interviews       InterviewQuestion[]
+
+  @@map("questions")
+}
+
+model PersonaQuestion {
+  persona_version_id String         @db.Uuid
+  question_id        String         @db.Uuid
+  ordering           Int            @default(0)
+  persona_version    PersonaVersion @relation(fields: [persona_version_id], references: [id], onDelete: Cascade)
+  question           Question       @relation(fields: [question_id], references: [id], onDelete: Cascade)
+
+  @@id([persona_version_id, question_id])
+  @@map("persona_questions")
+}
+
+model Candidate {
+  id                    String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  org_id                String?                @db.Uuid
+  user_id               String?                @db.Uuid
+  created_by            String                 @db.Uuid
+  full_name             String
+  email                 String
+  phone                 String?
+  role_applied          String?
+  status                String                 @default("new")
+  ai_score              Decimal?               @db.Decimal
+  resume_url            String?
+  resume_summary        String?
+  skills                String[]
+  experience_years      Decimal?               @db.Decimal
+  created_at            DateTime               @default(now()) @db.Timestamptz
+  updated_at            DateTime               @default(now()) @db.Timestamptz
+  deleted_at            DateTime?              @db.Timestamptz
+  organization          Organization?          @relation(fields: [org_id], references: [id], onDelete: SetNull)
+  interviews            Interview[]
+  timeline              CandidateTimeline[]
+  matches               JdCandidateMatch[]
+  identity_verifications IdentityVerification[]
+
+  @@map("candidates")
+}
+
+model Interview {
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  org_id            String?             @db.Uuid
+  created_by        String              @db.Uuid
+  candidate_id      String              @db.Uuid
+  job_id            String?             @db.Uuid
+  persona_id        String?             @db.Uuid
+  persona_version_id String?            @db.Uuid
+  scheduled_at      DateTime?           @db.Timestamptz
+  duration_minutes  Int?                @default(45)
+  status            String              @default("scheduled")
+  transcript        Json                @default("[]")
+  evaluation        Json                @default("{}")
+  overall_score     Decimal?            @db.Decimal
+  recommendation    String?
+  integrity_score   Decimal?            @db.Decimal
+  evaluation_status String              @default("pending")
+  recruiter_id      String?             @db.Uuid
+  template_id       String?             @db.Uuid
+  created_at        DateTime            @default(now()) @db.Timestamptz
+  updated_at        DateTime            @default(now()) @db.Timestamptz
+  deleted_at        DateTime?           @db.Timestamptz
+  organization      Organization?       @relation(fields: [org_id], references: [id], onDelete: SetNull)
+  candidate         Candidate           @relation(fields: [candidate_id], references: [id], onDelete: Cascade)
+  job               JobDescription?     @relation(fields: [job_id], references: [id], onDelete: SetNull)
+  persona           Persona?            @relation(fields: [persona_id], references: [id], onDelete: SetNull)
+  persona_version   PersonaVersion?     @relation(fields: [persona_version_id], references: [id], onDelete: SetNull)
+  template          InterviewTemplate?  @relation(fields: [template_id], references: [id], onDelete: SetNull)
+  questions         InterviewQuestion[]
+  sessions          InterviewSession[]
+  proctoring_snapshots ProctoringSnapshot[]
+  verifications     IdentityVerification[]
+  reports           InterviewReport?
+  slots             InterviewSlot[]     @relation("InterviewSlotMapping")
+  invitations       InterviewInvitation[]
+  reschedules       InterviewReschedule[]
+
+  @@map("interviews")
+}
+
+model InterviewQuestion {
+  interview_id String    @db.Uuid
+  question_id  String    @db.Uuid
+  ordering     Int       @default(0)
+  source       String    @default("persona")
+  created_at   DateTime  @default(now()) @db.Timestamptz
+  interview    Interview @relation(fields: [interview_id], references: [id], onDelete: Cascade)
+  question     Question  @relation(fields: [question_id], references: [id], onDelete: Cascade)
+
+  @@id([interview_id, question_id])
+  @@map("interview_questions")
+}
+
+model InterviewSession {
+  id              String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  interview_id    String               @db.Uuid
+  org_id          String               @db.Uuid
+  started_at      DateTime             @default(now()) @db.Timestamptz
+  ended_at        DateTime?            @db.Timestamptz
+  device_info     Json                 @default("{}")
+  network_quality Json                 @default("{}")
+  created_at      DateTime             @default(now()) @db.Timestamptz
+  interview       Interview            @relation(fields: [interview_id], references: [id], onDelete: Cascade)
+  organization    Organization         @relation(fields: [org_id], references: [id], onDelete: Cascade)
+  turns           InterviewTurn[]
+  events          InterviewEvent[]
+  snapshots       ProctoringSnapshot[]
+
+  @@map("interview_sessions")
+}
+
+model InterviewTurn {
+  id         String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  session_id String           @db.Uuid
+  speaker    String
+  text       String
+  audio_path String?
+  started_at DateTime         @db.Timestamptz
+  ended_at   DateTime?        @db.Timestamptz
+  turn_score Json?
+  created_at DateTime         @default(now()) @db.Timestamptz
+  session    InterviewSession @relation(fields: [session_id], references: [id], onDelete: Cascade)
+
+  @@map("interview_turns")
+}
+
+model InterviewEvent {
+  id         String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  session_id String           @db.Uuid
+  type       String
+  payload    Json             @default("{}")
+  at         DateTime         @default(now()) @db.Timestamptz
+  session    InterviewSession @relation(fields: [session_id], references: [id], onDelete: Cascade)
+
+  @@map("interview_events")
+}
+
+model ProctoringSnapshot {
+  id           String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  org_id       String           @db.Uuid
+  session_id   String           @db.Uuid
+  interview_id String           @db.Uuid
+  kind         String
+  storage_path String
+  meta         Json?            @default("{}")
+  captured_at  DateTime         @default(now()) @db.Timestamptz
+  organization Organization     @relation(fields: [org_id], references: [id], onDelete: Cascade)
+  session      InterviewSession @relation(fields: [session_id], references: [id], onDelete: Cascade)
+  interview    Interview        @relation(fields: [interview_id], references: [id], onDelete: Cascade)
+
+  @@map("proctoring_snapshots")
+}
+
+model InterviewReport {
+  id                 String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  org_id             String       @db.Uuid
+  interview_id       String       @unique @db.Uuid
+  executive_summary  String?
+  scores             Json         @default("{}")
+  strengths          Json         @default("[]")
+  weaknesses         Json         @default("[]")
+  knowledge_gaps     Json         @default("[]")
+  integrity_score    Decimal?     @db.Decimal
+  integrity_timeline Json         @default("[]")
+  evidence           Json         @default("[]")
+  recommendation     String?
+  created_at         DateTime     @default(now()) @db.Timestamptz
+  updated_at         DateTime     @default(now()) @db.Timestamptz
+  organization       Organization @relation(fields: [org_id], references: [id], onDelete: Cascade)
+  interview          Interview    @relation(fields: [interview_id], references: [id], onDelete: Cascade)
+
+  @@map("interview_reports")
+}
+
+model AiJob {
+  id           String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  org_id       String       @db.Uuid
+  kind         String
+  entity_type  String
+  entity_id    String       @db.Uuid
+  status       String       @default("pending")
+  attempts     Int          @default(0)
+  last_error   String?
+  payload      Json         @default("{}")
+  run_after    DateTime     @default(now()) @db.Timestamptz
+  started_at   DateTime?    @db.Timestamptz
+  completed_at DateTime?    @db.Timestamptz
+  created_at   DateTime     @default(now()) @db.Timestamptz
+  updated_at   DateTime     @default(now()) @db.Timestamptz
+  organization Organization @relation(fields: [org_id], references: [id], onDelete: Cascade)
+
+  @@map("ai_jobs")
+}
+
+model NotificationOutbox {
+  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  org_id          String       @db.Uuid
+  kind            String
+  recipient_email String
+  payload         Json         @default("{}")
+  status          String       @default("pending")
+  error           String?
+  send_after      DateTime     @default(now()) @db.Timestamptz
+  sent_at         DateTime?    @db.Timestamptz
+  created_at      DateTime     @default(now()) @db.Timestamptz
+  organization    Organization @relation(fields: [org_id], references: [id], onDelete: Cascade)
+
+  @@map("notification_outbox")
+}
+
+model AuditEvent {
+  id           String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  org_id       String       @db.Uuid
+  actor_id     String?      @db.Uuid
+  entity_type  String
+  entity_id    String       @db.Uuid
+  action       String
+  diff         Json?
+  created_at   DateTime     @default(now()) @db.Timestamptz
+  organization Organization @relation(fields: [org_id], references: [id], onDelete: Cascade)
+
+  @@map("audit_events")
+}
+
+model IdentityVerification {
+  id                 String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  org_id             String       @db.Uuid
+  interview_id       String       @db.Uuid
+  candidate_id       String       @db.Uuid
+  selfie_path        String?
+  id_document_path   String?
+  match_score        Decimal?     @db.Decimal
+  status             String       @default("pending")
+  device_fingerprint Json?        @default("{}")
+  created_at         DateTime     @default(now()) @db.Timestamptz
+  updated_at         DateTime     @default(now()) @db.Timestamptz
+  organization       Organization @relation(fields: [org_id], references: [id], onDelete: Cascade)
+  interview          Interview    @relation(fields: [interview_id], references: [id], onDelete: Cascade)
+  candidate          Candidate    @relation(fields: [candidate_id], references: [id], onDelete: Cascade)
+
+  @@map("identity_verifications")
+}
+
+model InterviewSlot {
+  id           String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  org_id       String       @db.Uuid
+  recruiter_id String       @db.Uuid
+  starts_at    DateTime     @db.Timestamptz
+  ends_at      DateTime     @db.Timestamptz
+  status       String       @default("available")
+  created_at   DateTime     @default(now()) @db.Timestamptz
+  organization Organization @relation(fields: [org_id], references: [id], onDelete: Cascade)
+  interviews   Interview[]  @relation("InterviewSlotMapping")
+
+  @@map("interview_slots")
+}
+
+model InterviewInvitation {
+  id                   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  interview_id         String    @db.Uuid
+  candidate_token_hash String    @unique
+  expires_at           DateTime  @db.Timestamptz
+  accepted_at          DateTime? @db.Timestamptz
+  created_at           DateTime  @default(now()) @db.Timestamptz
+  interview            Interview @relation(fields: [interview_id], references: [id], onDelete: Cascade)
+
+  @@map("interview_invitations")
+}
+
+model InterviewReschedule {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  interview_id String    @db.Uuid
+  from_at      DateTime? @db.Timestamptz
+  to_at        DateTime  @db.Timestamptz
+  reason       String?
+  actor_id     String    @db.Uuid
+  created_at   DateTime  @default(now()) @db.Timestamptz
+  interview    Interview @relation(fields: [interview_id], references: [id], onDelete: Cascade)
+
+  @@map("interview_reschedules")
+}
+
+model WorkspaceSetting {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  org_id     String   @db.Uuid
+  key        String
+  value      Json
+  created_at DateTime @default(now()) @db.Timestamptz
+  updated_at DateTime @default(now()) @db.Timestamptz
+
+  @@unique([org_id, key])
+  @@map("workspace_settings")
+}
+
+model RateLimit {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  key        String   @unique
+  tokens     Int
+  last_pulse DateTime @default(now()) @db.Timestamptz
+
+  @@map("rate_limits")
+}
+
+model ErrorEvent {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  org_id     String?  @db.Uuid
+  error_msg  String
+  stack      String?
+  meta       Json?    @default("{}")
+  created_at DateTime @default(now()) @db.Timestamptz
+
+  @@map("error_events")
+}
+
+model GdprRequest {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  org_id       String    @db.Uuid
+  user_id      String    @db.Uuid
+  request_type String
+  status       String    @default("pending")
+  completed_at DateTime? @db.Timestamptz
+  created_at   DateTime  @default(now()) @db.Timestamptz
+
+  @@map("gdpr_requests")
+}
+
+model ReportExport {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  org_id       String   @db.Uuid
+  report_id    String   @db.Uuid
+  format       String
+  url          String
+  created_at   DateTime @default(now()) @db.Timestamptz
+
+  @@map("report_exports")
+}
+
+// ============================================================
+// Workflow and Architectural Tables (Seeded/Extended)
+// ============================================================
+
+model InterviewTemplate {
+  id                  String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String
+  org_id              String         @db.Uuid
+  job_id              String?        @db.Uuid
+  persona_id          String?        @db.Uuid
+  question_bank_ids   String[]       @db.Uuid
+  evaluation_criteria Json           @default("{}")
+  knowledge_base      String?
+  duration_minutes    Int            @default(45)
+  difficulty          String         @default("medium")
+  meeting_provider    String         @default("teams")
+  proctoring_policy   Json           @default("{}")
+  report_template     Json           @default("{}")
+  notification_rules  Json           @default("{}")
+  retry_policy        Json           @default("{}")
+  language            String         @default("en")
+  follow_up_strategy  String         @default("adaptive")
+  created_at          DateTime       @default(now()) @db.Timestamptz
+  updated_at          DateTime       @default(now()) @db.Timestamptz
+  organization        Organization   @relation(fields: [org_id], references: [id], onDelete: Cascade)
+  job                 JobDescription? @relation(fields: [job_id], references: [id], onDelete: SetNull)
+  persona             Persona?       @relation(fields: [persona_id], references: [id], onDelete: SetNull)
+  interviews          Interview[]
+
+  @@map("interview_templates")
+}
+
+model PromptLibrary {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String   @unique
+  prompt_type String
+  prompt_text String
+  created_at  DateTime @default(now()) @db.Timestamptz
+  updated_at  DateTime @default(now()) @db.Timestamptz
+
+  @@map("prompt_library")
+}
+
+model CandidateTimeline {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  candidate_id String    @db.Uuid
+  event_type   String
+  title        String
+  description  String?
+  meta         Json?
+  created_at   DateTime  @default(now()) @db.Timestamptz
+  candidate    Candidate @relation(fields: [candidate_id], references: [id], onDelete: Cascade)
+
+  @@map("candidate_timeline")
+}
+
+model JdCandidateMatch {
+  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  job_id       String         @db.Uuid
+  candidate_id String         @db.Uuid
+  match_score  Decimal        @db.Decimal
+  analysis     Json           @default("{}")
+  created_at   DateTime       @default(now()) @db.Timestamptz
+  job          JobDescription @relation(fields: [job_id], references: [id], onDelete: Cascade)
+  candidate    Candidate      @relation(fields: [candidate_id], references: [id], onDelete: Cascade)
+
+  @@map("jd_candidate_matches")
+}

@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Security &amp; Audit Logs - Logikality AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700;900&amp;family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@400;450&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#a44100",
+                        "primary-fixed": "#e2dfff",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#4f46e5",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-tertiary-container": "#ffd2be",
+                        "secondary": "#00687a",
+                        "on-secondary-fixed": "#001f26",
+                        "on-primary-fixed-variant": "#3323cc",
+                        "surface-container-high": "#dce9ff",
+                        "on-secondary-container": "#006172",
+                        "surface": "#f8f9ff",
+                        "on-primary-fixed": "#0f0069",
+                        "outline-variant": "#c7c4d8",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#213145",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#0b1c30",
+                        "on-tertiary-fixed": "#351000",
+                        "on-primary-container": "#dad7ff",
+                        "on-error": "#ffffff",
+                        "secondary-container": "#57dffe",
+                        "surface-variant": "#d3e4fe",
+                        "error": "#ba1a1a",
+                        "tertiary": "#7e3000",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "surface-tint": "#4d44e3",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container": "#e5eeff",
+                        "background": "#f8f9ff",
+                        "on-secondary-fixed-variant": "#004e5c",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "inverse-primary": "#c3c0ff",
+                        "on-surface-variant": "#464555",
+                        "primary": "#3525cd",
+                        "outline": "#777587",
+                        "on-background": "#0b1c30",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#acedff",
+                        "surface-bright": "#f8f9ff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#4cd7f6",
+                        "tertiary-fixed": "#ffdbcc",
+                        "surface-dim": "#cbdbf5",
+                        "on-tertiary-fixed-variant": "#7b2f00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "lg": "24px",
+                        "gutter": "24px",
+                        "container-max": "1440px",
+                        "md": "16px",
+                        "xl": "40px",
+                        "xs": "4px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Geist"],
+                        "body-lg": ["Inter"],
+                        "headline-lg-mobile": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "data-mono": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-lg": ["Geist"],
+                        "display-lg": ["Geist"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["18px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "data-mono": ["13px", { "lineHeight": "1.4", "fontWeight": "450" }],
+                        "body-md": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        .ai-insight {
+            background-color: #ECFEFF;
+            border-left: 2px solid #06B6D4;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+<!-- TopAppBar -->
+<nav class="bg-surface dark:bg-background docked full-width top-0 sticky z-40 border-b border-outline-variant dark:border-outline">
+<div class="flex justify-between items-center h-16 px-gutter ml-64">
+<div class="flex items-center gap-lg">
+<span class="font-headline-sm text-headline-sm font-black text-on-surface dark:text-on-background">Logikality AI</span>
+<div class="hidden md:flex gap-md">
+<a class="font-body-lg text-body-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors scale-100 active:scale-98 transition-transform" href="#">Reports</a>
+<a class="font-body-lg text-body-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors scale-100 active:scale-98 transition-transform" href="#">Automations</a>
+<a class="font-body-lg text-body-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors scale-100 active:scale-98 transition-transform" href="#">Team</a>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative">
+<span class="material-symbols-outlined text-on-surface-variant absolute left-3 top-1/2 -translate-y-1/2" style="font-variation-settings: 'FILL' 0;">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-lowest border border-outline-variant rounded-full text-body-md font-body-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary w-64" placeholder="Search logs..." type="text"/>
+</div>
+<button class="text-primary dark:text-primary-fixed font-label-caps text-label-caps hover:bg-surface-container-low px-4 py-2 rounded-full transition-colors">Switch Org</button>
+<div class="flex gap-sm text-on-surface-variant">
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors"><span class="material-symbols-outlined">notifications</span></button>
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors"><span class="material-symbols-outlined">apps</span></button>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-sm">
+                    U
+                </div>
+</div>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="bg-surface-container-lowest dark:bg-inverse-surface h-screen w-64 fixed left-0 top-0 border-r border-outline-variant dark:border-outline shadow-sm z-50">
+<div class="flex flex-col h-full py-lg px-md">
+<div class="mb-xl flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-primary">domain</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary dark:text-primary-fixed">Logikality AI</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Executive Recruitment</p>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary py-3 rounded-lg font-body-md text-body-md font-medium mb-lg hover:brightness-110 transition-all flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">add</span> Post New Job
+            </button>
+<nav class="flex-1 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 cursor-pointer transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 cursor-pointer transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-caps text-label-caps">Candidates</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 cursor-pointer transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined">work</span>
+<span class="font-label-caps text-label-caps">Active Jobs</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 cursor-pointer transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined">database</span>
+<span class="font-label-caps text-label-caps">Talent Pools</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 cursor-pointer transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="font-label-caps text-label-caps">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 cursor-pointer transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined">event</span>
+<span class="font-label-caps text-label-caps">Interviews</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors duration-200 cursor-pointer transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined">business_center</span>
+<span class="font-label-caps text-label-caps">Client Portal</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-primary dark:text-primary-fixed font-bold border-r-2 border-primary dark:border-primary-fixed bg-surface-container-low dark:bg-surface-container-highest cursor-pointer transition-all active:scale-95" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-outline-variant pt-4 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-caps text-label-caps">Support</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="font-label-caps text-label-caps">Account</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 flex-1 p-xl max-w-[1440px] mx-auto w-full">
+<header class="mb-xl flex justify-between items-end">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-background mb-2">Security &amp; Audit Logs</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Real-time monitoring of system activities and compliance events.</p>
+</div>
+<div class="flex gap-md">
+<button class="bg-surface-container-lowest border border-outline-variant text-on-background font-body-md text-body-md px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-surface-container-low transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[18px]">download</span> Export Report
+                </button>
+</div>
+</header>
+<!-- KPI Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-md mb-xl">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Active Sessions</span>
+<span class="material-symbols-outlined text-primary">groups</span>
+</div>
+<div class="font-headline-md text-headline-md text-on-background">1,248</div>
+<div class="font-body-md text-body-md text-primary mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">arrow_upward</span> 12% vs last hour
+                </div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Critical Alerts (24h)</span>
+<span class="material-symbols-outlined text-error">warning</span>
+</div>
+<div class="font-headline-md text-headline-md text-error">3</div>
+<div class="font-body-md text-body-md text-on-surface-variant mt-1">
+                    Requires immediate review
+                </div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">API Requests / min</span>
+<span class="material-symbols-outlined text-secondary">api</span>
+</div>
+<div class="font-headline-md text-headline-md text-on-background">4,592</div>
+<div class="font-body-md text-body-md text-on-surface-variant mt-1">
+                    Normal volume
+                </div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Failed Logins (24h)</span>
+<span class="material-symbols-outlined text-on-surface-variant">gpp_maybe</span>
+</div>
+<div class="font-headline-md text-headline-md text-on-background">87</div>
+<div class="font-body-md text-body-md text-primary mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">arrow_downward</span> 4% vs yesterday
+                </div>
+</div>
+</div>
+<!-- AI Insight -->
+<div class="ai-insight rounded-xl p-lg mb-xl flex items-start gap-md">
+<span class="material-symbols-outlined text-[#06B6D4] mt-1">auto_awesome</span>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-background mb-1">Unusual Activity Detected</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Multiple failed login attempts detected from IP range <span class="font-data-mono text-data-mono">192.168.1.x</span> targeting Administrative accounts between 02:00 and 02:15 UTC. Automated IP block enacted.</p>
+</div>
+</div>
+<!-- Audit Log Table Section -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+<!-- Table Controls -->
+<div class="p-md border-b border-outline-variant flex flex-col md:flex-row justify-between items-center gap-md bg-surface-container-lowest">
+<div class="flex gap-sm w-full md:w-auto">
+<div class="relative flex-1 md:w-64">
+<span class="material-symbols-outlined text-on-surface-variant absolute left-3 top-1/2 -translate-y-1/2 text-[18px]">filter_list</span>
+<select class="w-full pl-10 pr-4 py-2 bg-surface border border-outline-variant rounded-lg text-body-md font-body-md text-on-background focus:ring-1 focus:ring-primary focus:border-primary appearance-none cursor-pointer">
+<option>All Event Types</option>
+<option>Authentication</option>
+<option>Data Access</option>
+<option>System Config</option>
+</select>
+</div>
+<div class="relative flex-1 md:w-48">
+<select class="w-full px-4 py-2 bg-surface border border-outline-variant rounded-lg text-body-md font-body-md text-on-background focus:ring-1 focus:ring-primary focus:border-primary appearance-none cursor-pointer">
+<option>Last 24 Hours</option>
+<option>Last 7 Days</option>
+<option>Last 30 Days</option>
+</select>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="p-2 border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">refresh</span>
+</button>
+<button class="p-2 border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">view_column</span>
+</button>
+</div>
+</div>
+<!-- Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider border-b border-outline-variant">
+<th class="p-md font-semibold">Timestamp (UTC)</th>
+<th class="p-md font-semibold">Event Type</th>
+<th class="p-md font-semibold">User / IP</th>
+<th class="p-md font-semibold">Action Detail</th>
+<th class="p-md font-semibold">Status</th>
+<th class="p-md font-semibold text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md divide-y divide-outline-variant">
+<!-- Row 1: Critical -->
+<tr class="hover:bg-surface-container-lowest transition-colors bg-[#fff5f5]">
+<td class="p-md font-data-mono text-data-mono text-on-surface-variant">2024-05-20 14:32:01</td>
+<td class="p-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-error text-[18px]">security</span>
+<span class="font-medium text-on-background">Bulk Data Export</span>
+</div>
+</td>
+<td class="p-md">
+<div class="text-on-background">sarah.j@logikality.ai</div>
+<div class="font-data-mono text-data-mono text-on-surface-variant text-xs">IP: 203.0.113.42</div>
+</td>
+<td class="p-md text-on-surface-variant">Exported 10,000+ candidate records (Talent Pool: Engineering)</td>
+<td class="p-md">
+<span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-error-container text-on-error-container border border-[#fca5a5]">
+                                    Review Required
+                                </span>
+</td>
+<td class="p-md text-right">
+<button class="text-primary hover:underline font-medium">Investigate</button>
+</td>
+</tr>
+<!-- Row 2: Normal -->
+<tr class="hover:bg-surface transition-colors">
+<td class="p-md font-data-mono text-data-mono text-on-surface-variant">2024-05-20 14:28:15</td>
+<td class="p-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">edit_document</span>
+<span class="font-medium text-on-background">JD Modification</span>
+</div>
+</td>
+<td class="p-md">
+<div class="text-on-background">m.chen@logikality.ai</div>
+<div class="font-data-mono text-data-mono text-on-surface-variant text-xs">IP: 198.51.100.12</div>
+</td>
+<td class="p-md text-on-surface-variant">Updated salary bands for 'VP Engineering' Req-1042</td>
+<td class="p-md">
+<span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-surface-container-high text-on-surface-variant border border-outline-variant">
+                                    Success
+                                </span>
+</td>
+<td class="p-md text-right">
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined text-[20px]">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 3: Normal Login -->
+<tr class="hover:bg-surface transition-colors">
+<td class="p-md font-data-mono text-data-mono text-on-surface-variant">2024-05-20 14:15:00</td>
+<td class="p-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">login</span>
+<span class="font-medium text-on-background">Authentication</span>
+</div>
+</td>
+<td class="p-md">
+<div class="text-on-background">admin@client-acme.com</div>
+<div class="font-data-mono text-data-mono text-on-surface-variant text-xs">IP: 192.0.2.146</div>
+</td>
+<td class="p-md text-on-surface-variant">Successful SSO Login (Okta)</td>
+<td class="p-md">
+<span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-[#ecfdf5] text-[#065f46] border border-[#a7f3d0]">
+                                    Success
+                                </span>
+</td>
+<td class="p-md text-right">
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined text-[20px]">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 4: Failed Login -->
+<tr class="hover:bg-surface transition-colors">
+<td class="p-md font-data-mono text-data-mono text-on-surface-variant">2024-05-20 13:50:22</td>
+<td class="p-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">block</span>
+<span class="font-medium text-on-background">Auth Failure</span>
+</div>
+</td>
+<td class="p-md">
+<div class="text-on-background">unknown_user</div>
+<div class="font-data-mono text-data-mono text-on-surface-variant text-xs">IP: 45.33.x.x</div>
+</td>
+<td class="p-md text-on-surface-variant">Invalid credentials provided (Attempt 3/5)</td>
+<td class="p-md">
+<span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-[#fffbeb] text-[#92400e] border border-[#fde68a]">
+                                    Failed
+                                </span>
+</td>
+<td class="p-md text-right">
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined text-[20px]">more_vert</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="p-md border-t border-outline-variant flex justify-between items-center text-body-md text-on-surface-variant">
+<span>Showing 1 to 4 of 1,024 entries</span>
+<div class="flex gap-1">
+<button class="px-3 py-1 border border-outline-variant rounded-md hover:bg-surface-container-low disabled:opacity-50">Prev</button>
+<button class="px-3 py-1 bg-primary text-on-primary rounded-md">1</button>
+<button class="px-3 py-1 border border-outline-variant rounded-md hover:bg-surface-container-low">2</button>
+<button class="px-3 py-1 border border-outline-variant rounded-md hover:bg-surface-container-low">3</button>
+<button class="px-3 py-1 border border-outline-variant rounded-md hover:bg-surface-container-low">Next</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-low dark:bg-surface-container-highest w-full mt-auto border-t border-outline-variant dark:border-outline flex flex-col md:flex-row justify-between items-center py-lg px-gutter ml-64 z-40">
+<div class="font-headline-sm text-headline-sm text-on-surface-variant mb-4 md:mb-0">
+            © 2024 Logikality AI. Enterprise Grade Recruitment.
+        </div>
+<div class="flex gap-md font-label-caps text-label-caps text-on-surface-variant">
+<a class="hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Compliance</a>
+<a class="hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Security</a>
+<a class="hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">API Docs</a>
+<a class="hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Terms of Service</a>
+</div>
+</footer>
+</body></html>

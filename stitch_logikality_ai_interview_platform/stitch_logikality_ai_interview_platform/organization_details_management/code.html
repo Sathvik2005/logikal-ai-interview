@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Organization Details - Logikality AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#a44100",
+                        "primary-fixed": "#e2dfff",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#4f46e5",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-tertiary-container": "#ffd2be",
+                        "secondary": "#00687a",
+                        "on-secondary-fixed": "#001f26",
+                        "on-primary-fixed-variant": "#3323cc",
+                        "surface-container-high": "#dce9ff",
+                        "on-secondary-container": "#006172",
+                        "surface": "#f8f9ff",
+                        "on-primary-fixed": "#0f0069",
+                        "outline-variant": "#c7c4d8",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#213145",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#0b1c30",
+                        "on-tertiary-fixed": "#351000",
+                        "on-primary-container": "#dad7ff",
+                        "on-error": "#ffffff",
+                        "secondary-container": "#57dffe",
+                        "surface-variant": "#d3e4fe",
+                        "error": "#ba1a1a",
+                        "tertiary": "#7e3000",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "surface-tint": "#4d44e3",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container": "#e5eeff",
+                        "background": "#f8f9ff",
+                        "on-secondary-fixed-variant": "#004e5c",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "inverse-primary": "#c3c0ff",
+                        "on-surface-variant": "#464555",
+                        "primary": "#3525cd",
+                        "outline": "#777587",
+                        "on-background": "#0b1c30",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#acedff",
+                        "surface-bright": "#f8f9ff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#4cd7f6",
+                        "tertiary-fixed": "#ffdbcc",
+                        "surface-dim": "#cbdbf5",
+                        "on-tertiary-fixed-variant": "#7b2f00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "lg": "24px",
+                        "gutter": "24px",
+                        "container-max": "1440px",
+                        "md": "16px",
+                        "xl": "40px",
+                        "xs": "4px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Geist", "sans-serif"],
+                        "body-lg": ["Inter", "sans-serif"],
+                        "headline-lg-mobile": ["Geist", "sans-serif"],
+                        "headline-md": ["Geist", "sans-serif"],
+                        "data-mono": ["JetBrains Mono", "monospace"],
+                        "body-md": ["Inter", "sans-serif"],
+                        "label-caps": ["Inter", "sans-serif"],
+                        "headline-lg": ["Geist", "sans-serif"],
+                        "display-lg": ["Geist", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["18px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "data-mono": ["13px", { "lineHeight": "1.4", "fontWeight": "450" }],
+                        "body-md": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@450&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased h-screen flex overflow-hidden">
+<!-- SideNavBar -->
+<nav class="bg-surface-container-lowest h-screen w-64 fixed left-0 top-0 border-r border-outline-variant shadow-sm flex flex-col h-full py-lg px-md z-50">
+<div class="flex items-center gap-sm mb-xl px-sm">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-headline-md">
+                L
+            </div>
+<div>
+<div class="font-headline-sm text-headline-sm font-bold text-primary">Logikality AI</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant">Executive Recruitment</div>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary py-sm rounded-lg font-label-caps text-label-caps hover:brightness-110 transition-all mb-lg shadow-sm">
+            Post New Job
+        </button>
+<div class="flex-1 overflow-y-auto">
+<ul class="space-y-xs">
+<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer active:scale-95" href="#"><span class="material-symbols-outlined">dashboard</span> <span class="font-label-caps text-label-caps">Dashboard</span></a></li>
+<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer active:scale-95" href="#"><span class="material-symbols-outlined">group</span> <span class="font-label-caps text-label-caps">Candidates</span></a></li>
+<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer active:scale-95" href="#"><span class="material-symbols-outlined">work</span> <span class="font-label-caps text-label-caps">Active Jobs</span></a></li>
+<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer active:scale-95" href="#"><span class="material-symbols-outlined">database</span> <span class="font-label-caps text-label-caps">Talent Pools</span></a></li>
+<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer active:scale-95" href="#"><span class="material-symbols-outlined">bar_chart</span> <span class="font-label-caps text-label-caps">Analytics</span></a></li>
+<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer active:scale-95" href="#"><span class="material-symbols-outlined">event</span> <span class="font-label-caps text-label-caps">Interviews</span></a></li>
+<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-primary font-bold border-r-2 border-primary bg-surface-container-low transition-colors duration-200 cursor-pointer active:scale-95" href="#"><span class="material-symbols-outlined" data-weight="fill">business_center</span> <span class="font-label-caps text-label-caps">Client Portal</span></a></li>
+<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer active:scale-95" href="#"><span class="material-symbols-outlined">settings</span> <span class="font-label-caps text-label-caps">Settings</span></a></li>
+</ul>
+</div>
+<div class="mt-auto border-t border-outline-variant pt-md">
+<ul class="space-y-xs">
+<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer active:scale-95" href="#"><span class="material-symbols-outlined">help</span> <span class="font-label-caps text-label-caps">Support</span></a></li>
+<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors duration-200 cursor-pointer active:scale-95" href="#"><span class="material-symbols-outlined">account_circle</span> <span class="font-label-caps text-label-caps">Account</span></a></li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 ml-64 flex flex-col h-screen overflow-hidden">
+<!-- TopAppBar -->
+<header class="bg-surface docked full-width top-0 sticky z-40 border-b border-outline-variant flat no shadows flex justify-between items-center h-16 px-gutter">
+<div class="flex items-center gap-lg">
+<div class="font-headline-sm text-headline-sm font-black text-on-surface">Logikality AI</div>
+<div class="relative w-64 hidden lg:block">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-lowest border-outline-variant rounded-full py-1 pl-xl pr-sm text-body-md focus:ring-primary focus:border-primary shadow-inner" placeholder="Search..." type="text"/>
+</div>
+</div>
+<nav class="hidden md:flex items-center gap-lg">
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg" href="#">Reports</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-lg text-body-lg" href="#">Automations</a>
+<a class="text-primary border-b-2 border-primary pb-sm hover:text-primary transition-colors font-body-lg text-body-lg" href="#">Team</a>
+</nav>
+<div class="flex items-center gap-md">
+<button class="bg-surface-container-lowest border border-outline-variant text-on-surface px-sm py-1 rounded font-label-caps text-label-caps hover:bg-surface-container-high transition-colors">
+                    Switch Org
+                </button>
+<button class="text-on-surface-variant hover:text-primary transition-colors p-1 rounded-full"><span class="material-symbols-outlined">notifications</span></button>
+<button class="text-on-surface-variant hover:text-primary transition-colors p-1 rounded-full"><span class="material-symbols-outlined">apps</span></button>
+<img alt="User Profile" class="w-8 h-8 rounded-full border border-outline-variant object-cover" data-alt="A small, circular profile picture showing a professional headshot of a user. The image is cropped tightly and framed by a subtle gray border. The lighting is bright and corporate, fitting a modern SaaS dashboard. The background is neutral, ensuring focus on the subject." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdHxgsyISt6913aFqqXuezirxdN_HT1h2MuKwchYBqy9TB2B13A_a1SN79FpfyRzAJqUQUvVwhIguTEecSxuFpucY94R68qjZKC1HOpCMS6FmcmwRdHlvxdFyAhfCBxfxqBnr1cVkuSiillzp6jXMQf_FZJn9vQoUdhNJOi-sTlwW3cpZhQOoeCF12-Wd2Qd0i5TS5uJ3PXlah8gZmgEoGpqXUIaOq-LkyOh6c8Xhn96PgC6gM9mikXJFymN91CQ75f_AksJnZ9R18"/>
+</div>
+</header>
+<!-- Canvas -->
+<main class="flex-1 overflow-y-auto p-xl">
+<div class="max-w-container-max mx-auto space-y-lg">
+<!-- Org Header -->
+<div class="bg-surface-container-lowest rounded-xl p-lg border border-outline-variant shadow-sm flex items-start justify-between">
+<div class="flex items-center gap-lg">
+<div class="w-20 h-20 bg-surface-container-highest rounded-lg flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-4xl text-primary">domain</span>
+</div>
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Acme Corp Global</h1>
+<div class="flex items-center gap-md text-on-surface-variant font-body-md">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">location_on</span> San Francisco, CA</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">category</span> Enterprise Software</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">verified</span> Enterprise Tier</span>
+</div>
+</div>
+</div>
+<div class="flex gap-md">
+<button class="px-md py-sm rounded-lg border border-outline-variant text-on-surface bg-surface-container-lowest hover:bg-surface-container-high font-label-caps text-label-caps transition-colors">
+                            Edit Org
+                        </button>
+<button class="px-md py-sm rounded-lg border border-error text-error bg-surface-container-lowest hover:bg-error-container font-label-caps text-label-caps transition-colors">
+                            Suspend Account
+                        </button>
+</div>
+</div>
+<!-- Bento Grid for Metrics -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<!-- Metric 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-lg border border-outline-variant shadow-sm flex flex-col justify-between">
+<div class="flex justify-between items-start mb-md">
+<span class="font-label-caps text-label-caps text-on-surface-variant">Active Jobs</span>
+<span class="material-symbols-outlined text-primary">work</span>
+</div>
+<div>
+<div class="font-display-lg text-display-lg text-on-surface font-data-mono">142</div>
+<div class="text-secondary font-body-md mt-1 flex items-center gap-1"><span class="material-symbols-outlined text-sm">trending_up</span> +12% from last month</div>
+</div>
+</div>
+<!-- Metric 2 -->
+<div class="bg-surface-container-lowest rounded-xl p-lg border border-outline-variant shadow-sm flex flex-col justify-between">
+<div class="flex justify-between items-start mb-md">
+<span class="font-label-caps text-label-caps text-on-surface-variant">Total Candidates</span>
+<span class="material-symbols-outlined text-primary">group</span>
+</div>
+<div>
+<div class="font-display-lg text-display-lg text-on-surface font-data-mono">8,405</div>
+<div class="text-secondary font-body-md mt-1 flex items-center gap-1"><span class="material-symbols-outlined text-sm">trending_up</span> +5% from last month</div>
+</div>
+</div>
+<!-- Metric 3 (AI Insights Style) -->
+<div class="bg-[#ECFEFF] border-l-2 border-[#06B6D4] rounded-xl p-lg shadow-sm flex flex-col justify-between relative overflow-hidden">
+<div class="absolute -right-4 -top-4 opacity-10">
+<span class="material-symbols-outlined text-9xl text-[#06B6D4]">auto_awesome</span>
+</div>
+<div class="flex justify-between items-start mb-md relative z-10">
+<span class="font-label-caps text-label-caps text-on-secondary-fixed-variant">AI Minutes Consumed</span>
+<span class="material-symbols-outlined text-[#06B6D4]">auto_awesome</span>
+</div>
+<div class="relative z-10">
+<div class="font-display-lg text-display-lg text-on-secondary-fixed-variant font-data-mono">12.4k</div>
+<div class="text-on-secondary-fixed-variant font-body-md mt-1">Approaching 15k limit</div>
+</div>
+<div class="w-full bg-surface-container-highest h-2 mt-4 rounded-full relative z-10">
+<div class="bg-[#06B6D4] h-2 rounded-full" style="width: 82%;"></div>
+</div>
+</div>
+</div>
+<!-- Recruiter Performance Table -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+<div class="p-lg border-b border-outline-variant flex justify-between items-center">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Active Recruiters</h2>
+<button class="text-primary text-body-md hover:underline">View All</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="p-md font-label-caps text-label-caps text-on-surface-variant">Name</th>
+<th class="p-md font-label-caps text-label-caps text-on-surface-variant">Role</th>
+<th class="p-md font-label-caps text-label-caps text-on-surface-variant">Active Jobs</th>
+<th class="p-md font-label-caps text-label-caps text-on-surface-variant">Candidates Placed</th>
+<th class="p-md font-label-caps text-label-caps text-on-surface-variant text-right">Actions</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-outline-variant hover:bg-surface-container-low transition-colors">
+<td class="p-md">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center font-label-caps">JD</div>
+<span class="font-body-md text-on-surface font-semibold">Jane Doe</span>
+</div>
+</td>
+<td class="p-md font-body-md text-on-surface-variant">Lead Recruiter</td>
+<td class="p-md font-data-mono text-data-mono text-on-surface">12</td>
+<td class="p-md font-data-mono text-data-mono text-on-surface">45</td>
+<td class="p-md text-right">
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="p-md">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center font-label-caps">JS</div>
+<span class="font-body-md text-on-surface font-semibold">John Smith</span>
+</div>
+</td>
+<td class="p-md font-body-md text-on-surface-variant">Technical Sourcer</td>
+<td class="p-md font-data-mono text-data-mono text-on-surface">8</td>
+<td class="p-md font-data-mono text-data-mono text-on-surface">22</td>
+<td class="p-md text-right">
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-low w-full mt-auto border-t border-outline-variant flat no shadows flex flex-col md:flex-row justify-between items-center py-lg px-gutter">
+<div class="font-headline-sm text-headline-sm text-on-surface-variant mb-md md:mb-0">
+                © 2024 Logikality AI. Enterprise Grade Recruitment.
+            </div>
+<nav class="flex flex-wrap gap-md">
+<a class="text-on-surface-variant font-label-caps text-label-caps hover:text-primary transition-colors" href="#">Compliance</a>
+<a class="text-on-surface-variant font-label-caps text-label-caps hover:text-primary transition-colors" href="#">Security</a>
+<a class="text-on-surface-variant font-label-caps text-label-caps hover:text-primary transition-colors" href="#">API Docs</a>
+<a class="text-on-surface-variant font-label-caps text-label-caps hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant font-label-caps text-label-caps hover:text-primary transition-colors" href="#">Terms of Service</a>
+</nav>
+</footer>
+</div>
+</body></html>

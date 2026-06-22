@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Interview Scheduler - Logikality AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Geist:wght@600;700&amp;family=JetBrains+Mono:wght@450&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-fixed": "#acedff",
+                      "on-tertiary": "#ffffff",
+                      "on-surface-variant": "#464555",
+                      "outline-variant": "#c7c4d8",
+                      "on-surface": "#0b1c30",
+                      "on-secondary-container": "#006172",
+                      "on-primary-fixed": "#0f0069",
+                      "on-error-container": "#93000a",
+                      "on-tertiary-container": "#ffd2be",
+                      "on-primary": "#ffffff",
+                      "surface-container-highest": "#d3e4fe",
+                      "error-container": "#ffdad6",
+                      "on-tertiary-fixed-variant": "#7b2f00",
+                      "surface-variant": "#d3e4fe",
+                      "primary-container": "#4f46e5",
+                      "on-secondary-fixed-variant": "#004e5c",
+                      "surface-container-low": "#eff4ff",
+                      "inverse-primary": "#c3c0ff",
+                      "on-primary-fixed-variant": "#3323cc",
+                      "on-primary-container": "#dad7ff",
+                      "on-background": "#0b1c30",
+                      "surface-container-lowest": "#ffffff",
+                      "on-error": "#ffffff",
+                      "error": "#ba1a1a",
+                      "surface-dim": "#cbdbf5",
+                      "on-secondary-fixed": "#001f26",
+                      "outline": "#777587",
+                      "on-tertiary-fixed": "#351000",
+                      "primary-fixed-dim": "#c3c0ff",
+                      "on-secondary": "#ffffff",
+                      "tertiary": "#7e3000",
+                      "surface-tint": "#4d44e3",
+                      "surface": "#f8f9ff",
+                      "surface-container": "#e5eeff",
+                      "surface-bright": "#f8f9ff",
+                      "background": "#f8f9ff",
+                      "secondary-fixed-dim": "#4cd7f6",
+                      "primary": "#3525cd",
+                      "tertiary-fixed-dim": "#ffb695",
+                      "tertiary-container": "#a44100",
+                      "tertiary-fixed": "#ffdbcc",
+                      "secondary-container": "#57dffe",
+                      "surface-container-high": "#dce9ff",
+                      "secondary": "#00687a",
+                      "inverse-on-surface": "#eaf1ff",
+                      "primary-fixed": "#e2dfff",
+                      "inverse-surface": "#213145"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "lg": "24px",
+                      "base": "4px",
+                      "md": "16px",
+                      "xs": "4px",
+                      "gutter": "24px",
+                      "sm": "8px",
+                      "xl": "40px",
+                      "container-max": "1440px"
+              },
+              "fontFamily": {
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Geist"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-sm": [
+                              "Geist"
+                      ],
+                      "label-caps": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Geist"
+                      ],
+                      "headline-lg-mobile": [
+                              "Geist"
+                      ],
+                      "display-lg": [
+                              "Geist"
+                      ],
+                      "data-mono": [
+                              "JetBrains Mono"
+                      ]
+              },
+              "fontSize": {
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-sm": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.4",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-caps": [
+                              "12px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.04em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "data-mono": [
+                              "13px",
+                              {
+                                      "lineHeight": "1.4",
+                                      "fontWeight": "450"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: 60px repeat(7, 1fr);
+            gap: 1px;
+            background-color: theme('colors.outline-variant');
+        }
+        .calendar-cell {
+            background-color: theme('colors.surface-container-lowest');
+            min-height: 120px;
+            padding: 8px;
+        }
+        .time-label {
+            background-color: theme('colors.surface-container-lowest');
+            padding: 8px;
+            text-align: right;
+            border-right: 1px solid theme('colors.outline-variant');
+        }
+        .modal-overlay {
+            background-color: rgba(11, 28, 48, 0.4);
+            backdrop-filter: blur(4px);
+        }
+        
+        /* Level 1 (Cards/Surface) */
+        .surface-level-1 {
+            background-color: theme('colors.surface-container-lowest');
+            border: 1px solid theme('colors.outline-variant');
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
+        }
+        
+        /* AI Insights Custom Component */
+        .ai-insight {
+            background-color: #ECFEFF; /* Custom light cyan per guidance */
+            border-left: 2px solid #06B6D4;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md text-body-md antialiased min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-surface/80 backdrop-blur-md sticky top-0 z-40 w-full shadow-sm flex justify-between items-center h-16 px-lg max-w-container-max mx-auto">
+<div class="flex items-center gap-md">
+<span class="font-headline-sm text-headline-sm font-black text-on-surface">Logikality AI</span>
+</div>
+<!-- Search placeholder -->
+<div class="flex-1 max-w-md mx-md hidden md:block">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2 pl-10 pr-4 text-body-md font-body-md focus:border-primary focus:ring-1 focus:ring-primary/20 shadow-sm transition-all" placeholder="Search candidates, jobs..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant hover:bg-surface-container-low transition-all p-2 rounded-full">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-low transition-all p-2 rounded-full">
+<span class="material-symbols-outlined">history</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-low transition-all p-2 rounded-full">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+<div class="h-6 w-px bg-outline-variant mx-2"></div>
+<button class="text-primary font-body-md font-semibold hover:bg-surface-container-low transition-all px-4 py-2 rounded-lg">Switch Org</button>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- SideNavBar -->
+<nav class="bg-surface h-screen sticky left-0 top-0 w-64 border-r border-outline-variant hidden md:flex flex-col p-md">
+<!-- Organization Header Info (optional, top app bar has product name) -->
+<div class="mb-lg px-4 flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary-container text-primary flex items-center justify-center font-bold font-headline-sm">
+                    L
+                </div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Logikality AI</h2>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Enterprise Plan</p>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary py-3 px-4 rounded-lg font-semibold hover:brightness-110 transition-all mb-lg flex justify-center items-center gap-2 shadow-sm" onclick="document.getElementById('new-interview-modal').classList.remove('hidden')">
+<span class="material-symbols-outlined text-sm">add</span> New Interview
+            </button>
+<div class="flex-1 overflow-y-auto space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+<span class="font-label-caps text-label-caps">Candidates</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+<span class="font-label-caps text-label-caps">Persona Builder</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-label-caps text-label-caps">JD Builder</span>
+</a>
+<!-- Active Item -->
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-semibold opacity-90 scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today" data-weight="fill">calendar_today</span>
+<span class="font-label-caps text-label-caps">Scheduling</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="video_chat">video_chat</span>
+<span class="font-label-caps text-label-caps">Interview Room</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-caps text-label-caps">AI Reports</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="monitoring">monitoring</span>
+<span class="font-label-caps text-label-caps">Analytics</span>
+</a>
+</div>
+<div class="mt-auto border-t border-outline-variant pt-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+<span class="font-label-caps text-label-caps">Support</span>
+</a>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col h-screen overflow-hidden bg-background">
+<!-- Calendar Header Controls -->
+<div class="px-xl py-lg flex justify-between items-center bg-surface-container-lowest border-b border-outline-variant z-10">
+<div class="flex items-center gap-lg">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Scheduling</h1>
+<p class="text-on-surface-variant mt-1">October 2024</p>
+</div>
+<div class="flex bg-surface-container rounded-lg p-1 border border-outline-variant">
+<button class="px-4 py-1.5 rounded text-on-surface-variant font-label-caps text-label-caps hover:bg-surface-container-highest transition-colors">Day</button>
+<button class="px-4 py-1.5 rounded bg-surface-container-lowest text-on-surface shadow-sm font-label-caps text-label-caps">Week</button>
+<button class="px-4 py-1.5 rounded text-on-surface-variant font-label-caps text-label-caps hover:bg-surface-container-highest transition-colors">Month</button>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-2 mr-4">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">schedule</span>
+<select class="bg-transparent border-none text-on-surface-variant text-sm focus:ring-0 cursor-pointer">
+<option>PST (UTC-8)</option>
+<option>EST (UTC-5)</option>
+<option>UTC</option>
+</select>
+</div>
+<div class="flex gap-2">
+<button class="p-2 border border-outline-variant rounded-lg hover:bg-surface-container-highest transition-colors bg-surface-container-lowest">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="px-4 py-2 border border-outline-variant rounded-lg hover:bg-surface-container-highest transition-colors bg-surface-container-lowest font-body-md">
+                            Today
+                        </button>
+<button class="p-2 border border-outline-variant rounded-lg hover:bg-surface-container-highest transition-colors bg-surface-container-lowest">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Calendar Canvas (Week View Example) -->
+<div class="flex-1 overflow-y-auto bg-surface-container-highest relative p-lg">
+<div class="max-w-container-max mx-auto surface-level-1 rounded-xl overflow-hidden flex flex-col h-full">
+<!-- Days Header -->
+<div class="grid grid-cols-[60px_repeat(7,1fr)] bg-slate-50 border-b border-outline-variant">
+<div class="p-3 text-center text-on-surface-variant font-label-caps text-label-caps border-r border-outline-variant flex items-end justify-end pb-2">
+                            UTC-8
+                        </div>
+<!-- Mon - Sun -->
+<div class="p-3 text-center border-r border-outline-variant">
+<div class="font-label-caps text-label-caps text-on-surface-variant mb-1">MON</div>
+<div class="font-headline-sm text-headline-sm">14</div>
+</div>
+<div class="p-3 text-center border-r border-outline-variant">
+<div class="font-label-caps text-label-caps text-on-surface-variant mb-1">TUE</div>
+<div class="font-headline-sm text-headline-sm text-primary">15</div> <!-- Current day -->
+</div>
+<div class="p-3 text-center border-r border-outline-variant">
+<div class="font-label-caps text-label-caps text-on-surface-variant mb-1">WED</div>
+<div class="font-headline-sm text-headline-sm">16</div>
+</div>
+<div class="p-3 text-center border-r border-outline-variant">
+<div class="font-label-caps text-label-caps text-on-surface-variant mb-1">THU</div>
+<div class="font-headline-sm text-headline-sm">17</div>
+</div>
+<div class="p-3 text-center border-r border-outline-variant">
+<div class="font-label-caps text-label-caps text-on-surface-variant mb-1">FRI</div>
+<div class="font-headline-sm text-headline-sm">18</div>
+</div>
+<div class="p-3 text-center border-r border-outline-variant opacity-50 bg-surface-container-low">
+<div class="font-label-caps text-label-caps text-on-surface-variant mb-1">SAT</div>
+<div class="font-headline-sm text-headline-sm">19</div>
+</div>
+<div class="p-3 text-center opacity-50 bg-surface-container-low">
+<div class="font-label-caps text-label-caps text-on-surface-variant mb-1">SUN</div>
+<div class="font-headline-sm text-headline-sm">20</div>
+</div>
+</div>
+<!-- Grid Body -->
+<div class="flex-1 overflow-y-auto">
+<div class="calendar-grid">
+<!-- 9 AM -->
+<div class="time-label font-data-mono text-data-mono text-on-surface-variant">09:00</div>
+<div class="calendar-cell"></div>
+<div class="calendar-cell relative">
+<!-- Event Block -->
+<div class="absolute top-2 left-2 right-2 bg-secondary-container/30 border-l-4 border-secondary p-2 rounded text-sm cursor-pointer hover:shadow-md transition-shadow">
+<div class="font-semibold text-on-surface truncate">Senior React Dev Screen</div>
+<div class="text-on-surface-variant text-xs mt-1 truncate">Sarah Jenkins</div>
+<div class="font-data-mono text-data-mono text-[10px] mt-1 text-secondary">09:30 - 10:15</div>
+</div>
+</div>
+<div class="calendar-cell"></div>
+<div class="calendar-cell"></div>
+<div class="calendar-cell"></div>
+<div class="calendar-cell bg-surface-container-low"></div>
+<div class="calendar-cell bg-surface-container-low"></div>
+<!-- 10 AM -->
+<div class="time-label font-data-mono text-data-mono text-on-surface-variant">10:00</div>
+<div class="calendar-cell"></div>
+<div class="calendar-cell"></div>
+<div class="calendar-cell relative">
+<!-- Event Block -->
+<div class="absolute top-0 left-2 right-2 h-16 bg-primary-container/20 border-l-4 border-primary p-2 rounded text-sm cursor-pointer hover:shadow-md transition-shadow">
+<div class="font-semibold text-on-surface truncate">AI Persona Sync</div>
+<div class="font-data-mono text-data-mono text-[10px] mt-1 text-primary">10:00 - 10:30</div>
+</div>
+</div>
+<div class="calendar-cell"></div>
+<div class="calendar-cell"></div>
+<div class="calendar-cell bg-surface-container-low"></div>
+<div class="calendar-cell bg-surface-container-low"></div>
+<!-- 11 AM -->
+<div class="time-label font-data-mono text-data-mono text-on-surface-variant">11:00</div>
+<div class="calendar-cell"></div>
+<div class="calendar-cell"></div>
+<div class="calendar-cell"></div>
+<div class="calendar-cell relative">
+<!-- Event Block -->
+<div class="absolute top-4 left-2 right-2 h-24 bg-tertiary-container/20 border-l-4 border-tertiary p-2 rounded text-sm cursor-pointer hover:shadow-md transition-shadow">
+<div class="font-semibold text-on-surface truncate">Data Engineer Final</div>
+<div class="text-on-surface-variant text-xs mt-1 truncate">Michael Chang</div>
+<div class="font-data-mono text-data-mono text-[10px] mt-1 text-tertiary">11:15 - 12:15</div>
+<!-- AI Insight indicator inside card -->
+<div class="absolute bottom-1 right-1">
+<span class="material-symbols-outlined text-[14px] text-tertiary">auto_awesome</span>
+</div>
+</div>
+</div>
+<div class="calendar-cell"></div>
+<div class="calendar-cell bg-surface-container-low"></div>
+<div class="calendar-cell bg-surface-container-low"></div>
+<!-- 12 PM -->
+<div class="time-label font-data-mono text-data-mono text-on-surface-variant">12:00</div>
+<div class="calendar-cell border-b-2 border-dashed border-outline-variant/50 relative">
+<div class="absolute inset-0 bg-surface-container flex items-center justify-center opacity-50">
+<span class="text-xs font-label-caps text-on-surface-variant tracking-widest">LUNCH BLOCK</span>
+</div>
+</div>
+<div class="calendar-cell border-b-2 border-dashed border-outline-variant/50 relative">
+<div class="absolute inset-0 bg-surface-container flex items-center justify-center opacity-50">
+<span class="text-xs font-label-caps text-on-surface-variant tracking-widest">LUNCH BLOCK</span>
+</div>
+</div>
+<div class="calendar-cell border-b-2 border-dashed border-outline-variant/50 relative">
+<div class="absolute inset-0 bg-surface-container flex items-center justify-center opacity-50">
+<span class="text-xs font-label-caps text-on-surface-variant tracking-widest">LUNCH BLOCK</span>
+</div>
+</div>
+<div class="calendar-cell border-b-2 border-dashed border-outline-variant/50 relative">
+<div class="absolute inset-0 bg-surface-container flex items-center justify-center opacity-50">
+<span class="text-xs font-label-caps text-on-surface-variant tracking-widest">LUNCH BLOCK</span>
+</div>
+</div>
+<div class="calendar-cell border-b-2 border-dashed border-outline-variant/50 relative">
+<div class="absolute inset-0 bg-surface-container flex items-center justify-center opacity-50">
+<span class="text-xs font-label-caps text-on-surface-variant tracking-widest">LUNCH BLOCK</span>
+</div>
+</div>
+<div class="calendar-cell bg-surface-container-low"></div>
+<div class="calendar-cell bg-surface-container-low"></div>
+<!-- 1 PM -->
+<div class="time-label font-data-mono text-data-mono text-on-surface-variant">13:00</div>
+<div class="calendar-cell"></div>
+<div class="calendar-cell"></div>
+<div class="calendar-cell"></div>
+<div class="calendar-cell"></div>
+<div class="calendar-cell"></div>
+<div class="calendar-cell bg-surface-container-low"></div>
+<div class="calendar-cell bg-surface-container-low"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest w-full py-lg border-t border-outline-variant flex flex-col md:flex-row justify-between items-center px-lg max-w-container-max mx-auto z-10">
+<div class="font-headline-sm text-headline-sm font-bold text-on-surface mb-4 md:mb-0">
+                    Logikality AI
+                </div>
+<div class="text-on-surface-variant text-body-md mb-4 md:mb-0">
+                    © 2024 Logikality AI. Executive-grade recruitment intelligence.
+                </div>
+<div class="flex gap-4">
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Security</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">API Documentation</a>
+</div>
+</footer>
+</main>
+</div>
+<!-- New Interview Modal (Hidden by default) -->
+<div class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden" id="new-interview-modal">
+<div class="surface-level-1 rounded-xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[921px]">
+<!-- Modal Header -->
+<div class="px-lg py-md border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest">
+<h3 class="font-headline-md text-headline-md text-on-surface">Schedule New Interview</h3>
+<button class="text-on-surface-variant hover:text-on-surface p-1" onclick="document.getElementById('new-interview-modal').classList.add('hidden')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Modal Body -->
+<div class="p-lg overflow-y-auto bg-surface flex-1">
+<form class="space-y-6">
+<!-- Candidate Selection -->
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant mb-2">Select Candidate</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">person_search</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2 pl-10 pr-4 text-body-md font-body-md focus:border-primary focus:ring-1 focus:ring-primary/20 shadow-inner" placeholder="Search by name or email..." type="text"/>
+</div>
+<!-- Mock Suggestion -->
+<div class="mt-2 surface-level-1 p-2 rounded-lg flex items-center gap-3 cursor-pointer hover:bg-surface-container-low border border-outline-variant">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-secondary flex items-center justify-center font-bold text-xs">SJ</div>
+<div>
+<div class="text-sm font-semibold">Sarah Jenkins</div>
+<div class="text-xs text-on-surface-variant">sarah.j@example.com</div>
+</div>
+</div>
+</div>
+<!-- Persona / JD Selection -->
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant mb-2">Evaluation Persona (JD)</label>
+<select class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2 px-3 text-body-md font-body-md focus:border-primary focus:ring-1 focus:ring-primary/20 shadow-inner appearance-none">
+<option>Senior React Developer - Q3 (Tech-Heavy)</option>
+<option>Product Manager - B2B SaaS</option>
+<option>Data Engineer - Pipeline Focus</option>
+</select>
+</div>
+<!-- AI Insight Suggestion -->
+<div class="ai-insight p-4 rounded-lg flex gap-3 text-sm">
+<span class="material-symbols-outlined text-[#06B6D4]">auto_awesome</span>
+<div>
+<span class="font-semibold text-on-surface">AI Recommendation:</span>
+<span class="text-on-surface-variant"> Based on the selected JD, a 45-minute technical screen is recommended to cover React internals and system design adequately.</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-md">
+<!-- Date -->
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant mb-2">Date</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2 px-3 text-body-md font-body-md focus:border-primary focus:ring-1 focus:ring-primary/20 shadow-inner" type="date"/>
+</div>
+<!-- Time -->
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant mb-2">Start Time</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2 px-3 text-body-md font-body-md focus:border-primary focus:ring-1 focus:ring-primary/20 shadow-inner" type="time"/>
+</div>
+</div>
+<!-- Duration -->
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant mb-2">Duration</label>
+<div class="flex gap-2">
+<label class="flex-1">
+<input class="peer sr-only" name="duration" type="radio" value="15"/>
+<div class="text-center py-2 border border-outline-variant rounded-lg peer-checked:bg-primary-container peer-checked:text-primary peer-checked:border-primary cursor-pointer hover:bg-surface-container-low transition-colors text-sm font-data-mono">
+                                    15m
+                                </div>
+</label>
+<label class="flex-1">
+<input class="peer sr-only" name="duration" type="radio" value="30"/>
+<div class="text-center py-2 border border-outline-variant rounded-lg peer-checked:bg-primary-container peer-checked:text-primary peer-checked:border-primary cursor-pointer hover:bg-surface-container-low transition-colors text-sm font-data-mono">
+                                    30m
+                                </div>
+</label>
+<label class="flex-1">
+<input checked="" class="peer sr-only" name="duration" type="radio" value="45"/>
+<div class="text-center py-2 border border-outline-variant rounded-lg peer-checked:bg-primary-container peer-checked:text-primary peer-checked:border-primary cursor-pointer hover:bg-surface-container-low transition-colors text-sm font-data-mono">
+                                    45m
+                                </div>
+</label>
+<label class="flex-1">
+<input class="peer sr-only" name="duration" type="radio" value="60"/>
+<div class="text-center py-2 border border-outline-variant rounded-lg peer-checked:bg-primary-container peer-checked:text-primary peer-checked:border-primary cursor-pointer hover:bg-surface-container-low transition-colors text-sm font-data-mono">
+                                    60m
+                                </div>
+</label>
+</div>
+</div>
+</form>
+</div>
+<!-- Modal Footer -->
+<div class="px-lg py-md border-t border-outline-variant bg-surface-container-lowest flex justify-end gap-3">
+<button class="bg-surface-container-lowest border border-slate-200 text-slate-900 px-4 py-2 rounded-lg font-semibold hover:bg-surface-container-low transition-colors text-sm" onclick="document.getElementById('new-interview-modal').classList.add('hidden')">
+                    Cancel
+                </button>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-semibold hover:brightness-110 transition-colors text-sm shadow-sm" onclick="document.getElementById('new-interview-modal').classList.add('hidden')">
+                    Schedule Interview
+                </button>
+</div>
+</div>
+</div>
+</body></html>
