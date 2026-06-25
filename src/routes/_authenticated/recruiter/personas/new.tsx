@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { CardShadow, Icon } from "@/components/recruiter/RecruiterShell";
+import { CardShadow, Icon, PageHeader } from "@/components/recruiter/RecruiterShell";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/recruiter/personas/new")({
@@ -39,19 +39,19 @@ function NewPersona() {
 
   return (
     <>
-      <Link
-        to="/recruiter/personas"
-        className="text-primary text-body-md hover:underline mb-md inline-flex items-center gap-1"
-      >
-        <Icon name="arrow_back" />
-        Back to personas
-      </Link>
-      <div className="mb-lg">
-        <h2 className="text-headline-lg">New AI Persona</h2>
-        <p className="text-body-lg text-on-surface-variant">
-          Configure how your AI interviewer behaves.
-        </p>
+      <div className="mb-md">
+        <Link
+          to="/recruiter/personas"
+          className="text-primary text-body-md hover:underline inline-flex items-center gap-1"
+        >
+          <Icon name="arrow_back" />
+          Back to personas
+        </Link>
       </div>
+      <PageHeader
+        title="New AI Persona"
+        subtitle="Configure how your AI interviewer behaves."
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg">
         <CardShadow className="lg:col-span-2 p-lg space-y-md">

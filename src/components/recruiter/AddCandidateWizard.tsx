@@ -3,7 +3,9 @@ import { toast } from "sonner";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Icon } from "@/components/recruiter/RecruiterShell";
 import { type Candidate } from "@/components/recruiter/mock-data";
-import { makeInitials, useCreateCandidate } from "@/components/recruiter/use-candidates";
+import { makeInitials, useCreateCandidate, uploadCandidateResume } from "@/components/recruiter/use-candidates";
+import { useJobsQuery } from "@/components/recruiter/use-jobs";
+import { useServerFn } from "@tanstack/react-start";
 
 // ============================================================================
 // Types
@@ -11,6 +13,17 @@ import { makeInitials, useCreateCandidate } from "@/components/recruiter/use-can
 
 type Source = "Referral" | "LinkedIn" | "Career site" | "Import" | "Other";
 type Seniority = "Junior" | "Mid" | "Senior" | "Staff" | "Principal";
+
+type CustomRole = {
+  roleTitle: string;
+  department: string;
+  experienceLevel: string;
+  employmentType: string;
+  location: string;
+  skills: string[];
+  responsibilities: string;
+  notes: string;
+};
 
 type Form = {
   name: string;
@@ -25,9 +38,13 @@ type Form = {
   source: Source;
   skills: string[];
   resumeName: string | null;
+  resumeFile: File | null;
   notes: string;
   sendWelcome: boolean;
   scheduleAfter: boolean;
+  alignmentType: "jd" | "custom";
+  jobId: string | null;
+  customRole: CustomRole | null;
 };
 
 const DEFAULT: Form = {
@@ -43,9 +60,22 @@ const DEFAULT: Form = {
   source: "Career site",
   skills: [],
   resumeName: null,
+  resumeFile: null,
   notes: "",
   sendWelcome: true,
   scheduleAfter: false,
+  alignmentType: "jd",
+  jobId: null,
+  customRole: {
+    roleTitle: "",
+    department: "",
+    experienceLevel: "Mid",
+    employmentType: "Full-time",
+    location: "",
+    skills: [],
+    responsibilities: "",
+    notes: "",
+  },
 };
 
 const STEPS = [
@@ -98,17 +128,26 @@ export function AddCandidateWizard({
   onScheduleRequest?: (candidate: Candidate) => void;
 }) {
   const createMutation = useCreateCandidate();
+  const uploadResumeFn = useServerFn(uploadCandidateResume);
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<Form>(DEFAULT);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const set = <K extends keyof Form>(k: K, v: Form[K]) => setForm((f) => ({ ...f, [k]: v }));
 
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim());
   const phoneValid = form.phone.trim().length >= 5;
-  const notesValid = form.notes.trim().length >= 40;
+  const notesValid = form.resumeFile ? true : form.notes.trim().length >= 40;
+
   const canAdvance = useMemo(() => {
     if (step === 1) return form.name.trim().length >= 2 && emailValid && phoneValid;
-    if (step === 2) return form.role.trim().length > 0 && form.experienceYears > 0;
+    if (step === 2) {
+      if (form.alignmentType === "jd") {
+        return !!form.jobId && form.experienceYears > 0;
+      } else {
+        return !!form.customRole?.roleTitle?.trim() && form.experienceYears > 0;
+      }
+    }
     if (step === 3) return form.skills.length >= 3 && notesValid;
     return true;
   }, [step, form, emailValid, phoneValid, notesValid]);
@@ -121,8 +160,22 @@ export function AddCandidateWizard({
     }, 200);
   };
 
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64String = reader.result as string;
+        const base64Data = base64String.split(",")[1];
+        resolve(base64Data);
+      };
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
   const submit = async () => {
     try {
+      setIsProcessing(true);
       const created = await createMutation.mutateAsync({
         name: form.name.trim(),
         email: form.email.trim(),
@@ -133,7 +186,27 @@ export function AddCandidateWizard({
         skills: form.skills,
         notes: form.notes.trim() || null,
         sendWelcome: form.sendWelcome,
+        jobId: form.alignmentType === "jd" ? form.jobId : null,
+        customRole: form.alignmentType === "custom" ? form.customRole : null,
       });
+
+      if (form.resumeFile) {
+        try {
+          const fileBase64 = await fileToBase64(form.resumeFile);
+          await uploadResumeFn({
+            data: {
+              id: created.id,
+              fileName: form.resumeFile.name,
+              fileBase64,
+              mimeType: form.resumeFile.type,
+            }
+          });
+          toast.success("Resume processed and analyzed by Gemini.");
+        } catch (uploadErr) {
+          console.error("Resume processing failed:", uploadErr);
+          toast.error("Candidate created, but resume parsing failed. You can upload/retry from their profile.");
+        }
+      }
 
       toast.success(
         form.sendWelcome
@@ -158,12 +231,21 @@ export function AddCandidateWizard({
       close();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to add candidate");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={(o) => (o ? onOpenChange(true) : close())}>
-      <DialogContent className="p-0 gap-0 bg-white border border-outline-variant shadow-2xl rounded-2xl overflow-hidden max-w-[960px] w-[96vw] max-h-[88vh] sm:max-w-[960px] flex flex-col [&>button]:hidden">
+      <DialogContent className="relative p-0 gap-0 bg-white border border-outline-variant shadow-2xl rounded-2xl overflow-hidden max-w-[960px] w-[96vw] max-h-[88vh] sm:max-w-[960px] flex flex-col [&>button]:hidden">
+        {isProcessing && (
+          <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center gap-3">
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm font-semibold text-on-surface">Processing Candidate Profile...</p>
+            <p className="text-xs text-on-surface-variant">Gemini is extracting resume details & aligning to the role.</p>
+          </div>
+        )}
         {/* Header */}
         <header className="px-6 py-3.5 border-b border-outline-variant bg-white/95 backdrop-blur flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
@@ -427,62 +509,214 @@ function StepRole({
   form: Form;
   set: <K extends keyof Form>(k: K, v: Form[K]) => void;
 }) {
+  const { data: jobs } = useJobsQuery();
+
   return (
     <StepFrame title="Role & pipeline" subtitle="Where does this candidate fit?">
-      <div className="grid sm:grid-cols-2 gap-4">
-        <Field label="Target role">
-          <input
-            list="role-suggestions"
-            className={inputCls}
-            value={form.role}
-            onChange={(e) => set("role", e.target.value)}
-            placeholder="e.g. Senior Software Engineer"
-          />
-          <datalist id="role-suggestions">
-            {ALL_ROLES.map((r) => (
-              <option key={r} value={r} />
-            ))}
-          </datalist>
-        </Field>
-        <Field label="Seniority">
-          <select
-            className={inputCls}
-            value={form.seniority}
-            onChange={(e) => set("seniority", e.target.value as Seniority)}
-          >
-            {(["Junior", "Mid", "Senior", "Staff", "Principal"] as const).map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
-        </Field>
-        <Field label={`Experience — ${form.experienceYears} yrs`}>
-          <input
-            type="range"
-            min={0}
-            max={20}
-            value={form.experienceYears}
-            onChange={(e) => set("experienceYears", Number(e.target.value))}
-            className="w-full accent-primary"
-          />
-        </Field>
-        <Field label="Pipeline status">
-          <select
-            className={inputCls}
-            value={form.status}
-            onChange={(e) => set("status", e.target.value as Candidate["status"])}
-          >
-            {(["new", "screening", "interviewing", "evaluated", "offer", "rejected"] as const).map(
-              (s) => (
+      <div className="flex gap-2 mb-6">
+        <button
+          type="button"
+          onClick={() => {
+            set("alignmentType", "jd");
+            set("role", "");
+          }}
+          className={`flex-1 py-2 text-center text-sm font-semibold rounded-lg border transition ${
+            form.alignmentType === "jd"
+              ? "bg-primary text-on-primary border-primary shadow-sm"
+              : "bg-white text-on-surface border-outline-variant hover:bg-surface-container-low"
+          }`}
+        >
+          Existing Job Description
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            set("alignmentType", "custom");
+            set("role", form.customRole?.roleTitle || "");
+          }}
+          className={`flex-1 py-2 text-center text-sm font-semibold rounded-lg border transition ${
+            form.alignmentType === "custom"
+              ? "bg-primary text-on-primary border-primary shadow-sm"
+              : "bg-white text-on-surface border-outline-variant hover:bg-surface-container-low"
+          }`}
+        >
+          Custom Role
+        </button>
+      </div>
+
+      {form.alignmentType === "jd" ? (
+        <div className="grid sm:grid-cols-2 gap-4">
+          <Field label="Job Description">
+            <select
+              className={inputCls}
+              value={form.jobId || ""}
+              onChange={(e) => {
+                const val = e.target.value;
+                const selectedJob = jobs?.find(j => j.id === val);
+                set("jobId", val || null);
+                set("role", selectedJob ? selectedJob.title : "");
+              }}
+            >
+              <option value="">Select an existing JD...</option>
+              {jobs?.map((j) => (
+                <option key={j.id} value={j.id}>
+                  {j.title} {j.department ? `(${j.department})` : ""}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Seniority">
+            <select
+              className={inputCls}
+              value={form.seniority}
+              onChange={(e) => set("seniority", e.target.value as Seniority)}
+            >
+              {(["Junior", "Mid", "Senior", "Staff", "Principal"] as const).map((s) => (
                 <option key={s} value={s}>
                   {s}
                 </option>
-              ),
-            )}
-          </select>
-        </Field>
-      </div>
+              ))}
+            </select>
+          </Field>
+          <Field label={`Experience — ${form.experienceYears} yrs`}>
+            <input
+              type="range"
+              min={0}
+              max={20}
+              value={form.experienceYears}
+              onChange={(e) => set("experienceYears", Number(e.target.value))}
+              className="w-full accent-primary"
+            />
+          </Field>
+          <Field label="Pipeline status">
+            <select
+              className={inputCls}
+              value={form.status}
+              onChange={(e) => set("status", e.target.value as Candidate["status"])}
+            >
+              {(["new", "screening", "interviewing", "evaluated", "offer", "rejected"] as const).map(
+                (s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ),
+              )}
+            </select>
+          </Field>
+        </div>
+      ) : (
+        <div className="grid sm:grid-cols-2 gap-4">
+          <Field label="Role Title">
+            <input
+              className={inputCls}
+              value={form.customRole?.roleTitle || ""}
+              onChange={(e) => {
+                const val = e.target.value;
+                set("customRole", { ...form.customRole!, roleTitle: val });
+                set("role", val);
+              }}
+              placeholder="e.g. Lead Frontend Architect"
+            />
+          </Field>
+          <Field label="Department">
+            <input
+              className={inputCls}
+              value={form.customRole?.department || ""}
+              onChange={(e) => set("customRole", { ...form.customRole!, department: e.target.value })}
+              placeholder="e.g. Engineering"
+            />
+          </Field>
+          <Field label="Experience Level">
+            <select
+              className={inputCls}
+              value={form.customRole?.experienceLevel || "Mid"}
+              onChange={(e) => set("customRole", { ...form.customRole!, experienceLevel: e.target.value })}
+            >
+              <option value="Junior">Junior</option>
+              <option value="Mid">Mid</option>
+              <option value="Senior">Senior</option>
+              <option value="Lead">Lead</option>
+              <option value="Director/VP">Director/VP</option>
+            </select>
+          </Field>
+          <Field label="Employment Type">
+            <select
+              className={inputCls}
+              value={form.customRole?.employmentType || "Full-time"}
+              onChange={(e) => set("customRole", { ...form.customRole!, employmentType: e.target.value })}
+            >
+              <option value="Full-time">Full-time</option>
+              <option value="Part-time">Part-time</option>
+              <option value="Contract">Contract</option>
+              <option value="Internship">Internship</option>
+            </select>
+          </Field>
+          <Field label="Location">
+            <input
+              className={inputCls}
+              value={form.customRole?.location || ""}
+              onChange={(e) => set("customRole", { ...form.customRole!, location: e.target.value })}
+              placeholder="e.g. Remote (US/Canada)"
+            />
+          </Field>
+          <Field label="Skills (comma separated)">
+            <input
+              className={inputCls}
+              value={form.customRole?.skills?.join(", ") || ""}
+              onChange={(e) => {
+                const skillsArr = e.target.value.split(",").map(s => s.trim()).filter(Boolean);
+                set("customRole", { ...form.customRole!, skills: skillsArr });
+              }}
+              placeholder="e.g. React, Node.js, TypeScript"
+            />
+          </Field>
+          <div className="sm:col-span-2">
+            <Field label="Responsibilities">
+              <textarea
+                className={`${inputCls} min-h-[60px]`}
+                value={form.customRole?.responsibilities || ""}
+                onChange={(e) => set("customRole", { ...form.customRole!, responsibilities: e.target.value })}
+                placeholder="List core responsibilities of this custom role..."
+              />
+            </Field>
+          </div>
+          <div className="sm:col-span-2">
+            <Field label="Custom Role Notes">
+              <textarea
+                className={`${inputCls} min-h-[60px]`}
+                value={form.customRole?.notes || ""}
+                onChange={(e) => set("customRole", { ...form.customRole!, notes: e.target.value })}
+                placeholder="Any specific instructions or expectations for this candidate..."
+              />
+            </Field>
+          </div>
+          <Field label={`Experience — ${form.experienceYears} yrs`}>
+            <input
+              type="range"
+              min={0}
+              max={20}
+              value={form.experienceYears}
+              onChange={(e) => set("experienceYears", Number(e.target.value))}
+              className="w-full accent-primary"
+            />
+          </Field>
+          <Field label="Pipeline status">
+            <select
+              className={inputCls}
+              value={form.status}
+              onChange={(e) => set("status", e.target.value as Candidate["status"])}
+            >
+              {(["new", "screening", "interviewing", "evaluated", "offer", "rejected"] as const).map(
+                (s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ),
+              )}
+            </select>
+          </Field>
+        </div>
+      )}
 
       <div className="mt-6">
         <p className="text-xs font-semibold text-on-surface mb-2">Source</p>
@@ -524,10 +758,6 @@ function StepRole({
     </StepFrame>
   );
 }
-
-// ============================================================================
-// Step 3 — Skills & Resume
-// ============================================================================
 
 function StepSkills({
   form,
@@ -618,7 +848,11 @@ function StepSkills({
             type="file"
             accept=".pdf,.doc,.docx"
             className="hidden"
-            onChange={(e) => set("resumeName", e.target.files?.[0]?.name ?? null)}
+            onChange={(e) => {
+              const file = e.target.files?.[0] ?? null;
+              set("resumeName", file ? file.name : null);
+              set("resumeFile", file);
+            }}
           />
           <Icon name="upload_file" className="text-outline text-2xl" />
           <p className="text-sm font-medium text-on-surface mt-1">
@@ -630,10 +864,10 @@ function StepSkills({
 
       <div className="mt-5">
         <Field
-          label={`Resume summary * (${form.notes.trim().length}/40+ chars)`}
-          hint="Required — short summary used for AI matching and interview prep"
+          label={form.resumeFile ? `Resume summary (Optional when resume uploaded)` : `Resume summary * (${form.notes.trim().length}/40+ chars)`}
+          hint={form.resumeFile ? "Optional — Gemini will automatically generate a summary from the uploaded resume file" : "Required — short summary used for AI matching and interview prep"}
           error={
-            form.notes.trim().length > 0 && form.notes.trim().length < 40
+            !form.resumeFile && form.notes.trim().length > 0 && form.notes.trim().length < 40
               ? "Write at least 40 characters"
               : undefined
           }

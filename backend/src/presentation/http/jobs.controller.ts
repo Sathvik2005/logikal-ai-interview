@@ -51,6 +51,7 @@ export class JobsController {
           requirements: body.requirements,
           status: body.status,
           persona_id: body.personaId || null,
+          competencies: body.competencies !== undefined ? body.competencies : undefined,
           updated_at: new Date(),
         },
       });
@@ -69,6 +70,7 @@ export class JobsController {
         requirements: body.requirements,
         status: body.status || "draft",
         persona_id: body.personaId || null,
+        competencies: body.competencies || {},
       },
     });
   }
@@ -77,5 +79,20 @@ export class JobsController {
   @Roles("recruiter", "admin")
   async suggest(@Body() body: { title: string; department?: string }) {
     return this.aiOrchestrator.suggestJd(body.title, body.department);
+  }
+
+  @Post("ai-assist")
+  @Roles("recruiter", "admin")
+  async aiAssist(
+    @Body()
+    body: {
+      title: string;
+      department?: string;
+      experienceLevel: string;
+      location?: string;
+      employmentType: string;
+    },
+  ) {
+    return this.aiOrchestrator.generateJDAssist(body);
   }
 }

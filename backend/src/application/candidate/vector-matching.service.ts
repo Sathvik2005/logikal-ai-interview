@@ -1,4 +1,4 @@
-import { Injectable, Inject, Logger, forwardRef } from "@nestjs/common";
+import { Injectable, Inject, Logger, forwardRef, OnModuleInit } from "@nestjs/common";
 import { PrismaService } from "../../infrastructure/database/prisma.service";
 import { IAIOrchestrator, IAIOrchestratorToken } from "../common/ai/ai-orchestrator.interface";
 import { CandidateWorkflowService } from "./candidate-workflow.service";
@@ -6,9 +6,10 @@ import {
   ICandidateRepository,
   ICandidateRepositoryToken,
 } from "../../domain/candidate/candidate.repository.interface";
+import { IQueueService, IQueueServiceToken } from "../common/queue/queue.service";
 
 @Injectable()
-export class VectorMatchingService {
+export class VectorMatchingService implements OnModuleInit {
   private readonly logger = new Logger(VectorMatchingService.name);
 
   constructor(
@@ -18,19 +19,33 @@ export class VectorMatchingService {
     private readonly workflow: CandidateWorkflowService,
     @Inject(ICandidateRepositoryToken)
     private readonly candidateRepo: ICandidateRepository,
+    @Inject(IQueueServiceToken)
+    private readonly queue: IQueueService,
   ) {}
+
+  onModuleInit() {
+    this.queue.registerProcessor("match-candidate-jd", async (payload: { candidateId: string }) => {
+      await this.matchCandidateToAllJobs(payload.candidateId);
+    });
+  }
 
   async matchCandidateToAllJobs(candidateId: string): Promise<void> {
     this.logger.log(`Matching candidate [${candidateId}] against open roles...`);
     const candidate = await this.candidateRepo.findById(candidateId);
     if (!candidate) return;
 
+    const query: any = {
+      org_id: candidate.orgId,
+      deleted_at: null,
+    };
+    if (candidate.jobId) {
+      query.id = candidate.jobId;
+    } else {
+      query.status = "open";
+    }
+
     const jds = await this.prisma.jobDescription.findMany({
-      where: {
-        org_id: candidate.orgId,
-        status: "open",
-        deleted_at: null,
-      },
+      where: query,
     });
 
     if (jds.length === 0) {
@@ -48,7 +63,28 @@ export class VectorMatchingService {
     let bestMatchJobTitle = "";
 
     for (const jd of jds) {
-      const jdRequirements = `${jd.title}\nRequirements: ${jd.requirements || ""}\nDescription: ${jd.description || ""}`;
+      let jdRequirements = `${jd.title}\nRequirements: ${jd.requirements || ""}\nDescription: ${jd.description || ""}`;
+      if (jd.competencies) {
+        try {
+          const comp = (typeof jd.competencies === "string" ? JSON.parse(jd.competencies) : jd.competencies) as any;
+          if (comp) {
+            if (Array.isArray(comp.requiredSkills) && comp.requiredSkills.length > 0) {
+              jdRequirements += `\nRequired Skills: ${comp.requiredSkills.join(", ")}`;
+            }
+            if (Array.isArray(comp.technicalSkills) && comp.technicalSkills.length > 0) {
+              jdRequirements += `\nTechnical Skills: ${comp.technicalSkills.join(", ")}`;
+            }
+            if (Array.isArray(comp.softSkills) && comp.softSkills.length > 0) {
+              jdRequirements += `\nSoft Skills: ${comp.softSkills.join(", ")}`;
+            }
+            if (Array.isArray(comp.minimumQualifications) && comp.minimumQualifications.length > 0) {
+              jdRequirements += `\nMinimum Qualifications: ${comp.minimumQualifications.join(", ")}`;
+            }
+          }
+        } catch (e) {
+          // ignore parsing issues
+        }
+      }
 
       const candidateProfile = {
         name: candidate.name,

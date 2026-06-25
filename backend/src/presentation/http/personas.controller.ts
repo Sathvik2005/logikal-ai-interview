@@ -1,12 +1,17 @@
-import { Controller, Get, Post, Param, Body, Req, UseGuards } from "@nestjs/common";
+import { Controller, Get, Post, Param, Body, Req, UseGuards, Inject } from "@nestjs/common";
 import { SupabaseAuthGuard } from "../guards/supabase-auth.guard";
 import { Roles, RolesGuard } from "../guards/roles.guard";
 import { PrismaService } from "../../infrastructure/database/prisma.service";
+import { IAIOrchestrator, IAIOrchestratorToken } from "../../application/common/ai/ai-orchestrator.interface";
 
 @Controller("personas")
 @UseGuards(SupabaseAuthGuard, RolesGuard)
 export class PersonasController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(IAIOrchestratorToken)
+    private readonly aiOrchestrator: IAIOrchestrator,
+  ) {}
 
   @Get()
   async list(@Req() req: any) {
@@ -80,5 +85,12 @@ export class PersonasController {
     });
 
     return persona;
+  }
+
+  @Post("generate-prompt")
+  @Roles("recruiter", "admin")
+  async generatePrompt(@Body() body: any) {
+    const promptText = await this.aiOrchestrator.generatePersonaPrompt(body);
+    return { promptText };
   }
 }

@@ -1,6 +1,17 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { getRequest } from "@tanstack/react-start/server";
+
+function getBackendUrl(): string {
+  return process.env.BACKEND_URL || "http://localhost:3000";
+}
+
+function getAuthHeader(): Record<string, string> {
+  const request = getRequest();
+  const auth = request?.headers?.get("authorization");
+  return auth ? { Authorization: auth } : {};
+}
 
 const CandidateRow = z.object({
   name: z.string().trim().min(1).max(200),
@@ -23,101 +34,25 @@ export type BulkImportRow = z.input<typeof CandidateRow>;
 export const bulkImportCandidates = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => BulkInput.parse(d))
-  .handler(async ({ data, context }) => {
-    const { userId } = context;
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  .handler(async ({ data }) => {
+    const res = await fetch(`${getBackendUrl()}/api/candidates/bulk-import`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
+      body: JSON.stringify(data),
+    });
 
-    const { data: prof } = await supabaseAdmin
-      .from("profiles")
-      .select("org_id")
-      .eq("id", userId)
-      .maybeSingle();
-    let orgId = prof?.org_id as string | null;
-    if (!orgId) {
-      const { data: org, error: orgErr } = await supabaseAdmin
-        .from("organizations")
-        .insert({ name: "My Workspace", status: "active" })
-        .select("id")
-        .single();
-      if (orgErr || !org) throw new Error(orgErr?.message ?? "Failed to create workspace");
-      orgId = org.id as string;
-      await supabaseAdmin.from("profiles").update({ org_id: orgId }).eq("id", userId);
-      await supabaseAdmin
-        .from("user_roles")
-        .upsert(
-          { user_id: userId, role: "recruiter", org_id: orgId },
-          { onConflict: "user_id,org_id,role" },
-        );
-    }
-    const orgIdSafe: string = orgId;
-
-    // Dedupe by email within org
-    const emails = data.rows.map((r) => r.email.toLowerCase());
-    const { data: existing } = await supabaseAdmin
-      .from("candidates")
-      .select("email")
-      .in("email", emails)
-      .eq("org_id", orgId);
-    const existingSet = new Set(
-      (existing ?? []).map((r: { email: string }) => r.email.toLowerCase()),
-    );
-
-    const toInsert = data.rows
-      .filter((r) => !existingSet.has(r.email.toLowerCase()))
-      .map((r) => ({
-        org_id: orgIdSafe,
-        created_by: userId,
-        full_name: r.name,
-        email: r.email,
-        phone: r.phone ?? null,
-        role_applied: r.role ?? null,
-        status: "new" as const,
-        experience_years: r.experienceYears ?? 0,
-        skills: r.skills,
-        resume_url: r.resumeUrl ?? null,
-        resume_summary: r.resumeSummary ?? null,
-      }));
-
-    let inserted: Array<{ id: string; email: string }> = [];
-    if (toInsert.length > 0) {
-      const { data: rows, error } = await supabaseAdmin
-        .from("candidates")
-        .insert(toInsert)
-        .select("id, email");
-      if (error) throw new Error(error.message);
-      inserted = (rows ?? []) as typeof inserted;
+    if (!res.ok) {
+      throw new Error(`Failed to bulk import candidates: ${res.statusText}`);
     }
 
-    // Audit
-    if (inserted.length > 0) {
-      await supabaseAdmin.from("audit_events").insert({
-        org_id: orgIdSafe,
-        actor_id: userId,
-        entity_type: "candidate",
-        entity_id: inserted[0].id,
-        action: "bulk_import",
-        diff: { count: inserted.length, jobId: data.jobId ?? null } as never,
-      });
-    }
-
-    // If job provided, queue an ai_job per candidate for match scoring
-    if (data.jobId && inserted.length > 0) {
-      const jobs = inserted.map((c) => ({
-        org_id: orgIdSafe,
-        kind: "jd_match",
-        status: "pending",
-        entity_type: "candidate",
-        entity_id: c.id,
-        payload: { jobId: data.jobId, candidateId: c.id } as never,
-      }));
-      await supabaseAdmin.from("ai_jobs").insert(jobs);
-    }
-
-    return {
-      imported: inserted.length,
-      skipped: data.rows.length - inserted.length,
-      candidateIds: inserted.map((c) => c.id),
-    };
+    return res.json() as Promise<{
+      imported: number;
+      skipped: number;
+      candidateIds: string[];
+    }>;
   });
 
 // ---- JD match (sync, single candidate) ----

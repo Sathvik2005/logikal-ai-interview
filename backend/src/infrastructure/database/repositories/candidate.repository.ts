@@ -23,6 +23,10 @@ export class PrismaCandidateRepository implements ICandidateRepository {
       row.experience_years ? Number(row.experience_years) : 0,
       row.resume_url,
       row.resume_summary,
+      row.role_applied,
+      row.job_id,
+      row.custom_role,
+      row.resume_analysis,
     );
   }
 
@@ -40,6 +44,10 @@ export class PrismaCandidateRepository implements ICandidateRepository {
         experience_years: candidate.experienceYears,
         resume_url: candidate.resumeUrl,
         resume_summary: candidate.resumeSummary,
+        role_applied: candidate.roleApplied,
+        job_id: candidate.jobId,
+        custom_role: candidate.customRole || {},
+        resume_analysis: candidate.resumeAnalysis || {},
       },
     });
   }
@@ -56,6 +64,10 @@ export class PrismaCandidateRepository implements ICandidateRepository {
         experience_years: candidate.experienceYears,
         resume_url: candidate.resumeUrl,
         resume_summary: candidate.resumeSummary,
+        role_applied: candidate.roleApplied,
+        job_id: candidate.jobId,
+        custom_role: candidate.customRole || {},
+        resume_analysis: candidate.resumeAnalysis || {},
         updated_at: new Date(),
       },
     });

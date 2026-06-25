@@ -7,12 +7,14 @@ import {
   archiveCandidate,
   updateCandidateStatus,
   updateCandidateProfile,
+  uploadCandidateResume,
   type CandidateDTO,
   type CandidateStatus,
   type CreateCandidateInput,
 } from "@/lib/candidates.functions";
 
 export type { CandidateDTO, CandidateStatus, CreateCandidateInput };
+export { uploadCandidateResume };
 
 export const candidatesKeys = {
   all: ["candidates"] as const,
@@ -37,7 +39,18 @@ export function candidateDetailOptions(id: string) {
 }
 
 export function useCandidatesQuery(filters?: { status?: CandidateStatus; search?: string }) {
-  return useQuery(candidatesListOptions(filters));
+  const options = candidatesListOptions(filters);
+  return useQuery({
+    ...options,
+    refetchInterval: (query) => {
+      const data = query.state.data as CandidateDTO[] | undefined;
+      const hasProcessing = data?.some((c) => {
+        const status = c.resumeAnalysis?.processingStatus;
+        return status === "queued" || status === "processing";
+      });
+      return hasProcessing ? 4000 : false;
+    },
+  });
 }
 
 export function useCandidateQuery(id: string) {
@@ -81,6 +94,9 @@ export type UpdateProfileInput = {
   experienceYears?: number;
   skills?: string[];
   resumeSummary?: string;
+  jobId?: string | null;
+  customRole?: any;
+  resumeAnalysis?: any;
 };
 
 export function useUpdateCandidateProfile() {

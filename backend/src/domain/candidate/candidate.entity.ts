@@ -30,6 +30,10 @@ export class Candidate {
     public experienceYears: number = 0,
     public resumeUrl: string | null = null,
     public resumeSummary: string | null = null,
+    public roleApplied: string | null = null,
+    public jobId: string | null = null,
+    public customRole: any = null,
+    public resumeAnalysis: any = null,
   ) {}
 
   addEvent(event: DomainEvent): void {

@@ -71,6 +71,17 @@ export class InterviewsController {
       templateId = temp.id;
     }
 
+    let personaVersionId: string | null = null;
+    if (body.personaId) {
+      const latestVersion = await this.prisma.personaVersion.findFirst({
+        where: { persona_id: body.personaId },
+        orderBy: { version: "desc" },
+      });
+      if (latestVersion) {
+        personaVersionId = latestVersion.id;
+      }
+    }
+
     // 2. Create Interview linking to Template
     const interview = await this.prisma.interview.create({
       data: {
@@ -79,6 +90,7 @@ export class InterviewsController {
         candidate_id: body.candidateId,
         job_id: body.jobId || null,
         persona_id: body.personaId || null,
+        persona_version_id: personaVersionId,
         template_id: templateId,
         scheduled_at: body.scheduledAt ? new Date(body.scheduledAt) : null,
         duration_minutes: body.durationMinutes || 45,

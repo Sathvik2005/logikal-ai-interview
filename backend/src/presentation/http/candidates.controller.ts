@@ -66,8 +66,46 @@ export class CandidatesController {
   @Roles("recruiter", "admin")
   async create(@Req() req: any, @Body() body: any) {
     const orgId = req.user.orgId || "00000000-0000-0000-0000-000000000000";
-    const id = await this.workflow.apply(orgId, body.name, body.email, body.phone);
+    const id = await this.workflow.apply(
+      orgId,
+      body.name,
+      body.email,
+      body.phone,
+      body.role,
+      body.skills,
+      body.experienceYears,
+      body.notes,
+      body.jobId,
+      body.customRole,
+      body.resumeAnalysis,
+    );
     return { id, message: "Candidate profile registered successfully." };
+  }
+
+  @Patch(":id")
+  @Roles("recruiter", "admin")
+  async updateCandidate(@Param("id") id: string, @Body() body: any) {
+    const candidate = await this.prisma.candidate.findUnique({
+      where: { id },
+    });
+    if (!candidate) throw new Error("Candidate not found");
+
+    const updated = await this.prisma.candidate.update({
+      where: { id },
+      data: {
+        full_name: body.name !== undefined ? body.name : candidate.full_name,
+        email: body.email !== undefined ? body.email : candidate.email,
+        phone: body.phone !== undefined ? body.phone : candidate.phone,
+        skills: body.skills !== undefined ? body.skills : candidate.skills,
+        experience_years: body.experienceYears !== undefined ? body.experienceYears : candidate.experience_years,
+        resume_summary: body.resumeSummary !== undefined ? body.resumeSummary : candidate.resume_summary,
+        role_applied: body.role !== undefined ? body.role : candidate.role_applied,
+        job_id: body.jobId !== undefined ? body.jobId : candidate.job_id,
+        custom_role: body.customRole !== undefined ? body.customRole : (candidate.custom_role ?? {}),
+        resume_analysis: body.resumeAnalysis !== undefined ? body.resumeAnalysis : (candidate.resume_analysis ?? {}),
+      },
+    });
+    return updated;
   }
 
   @Patch(":id/status")
@@ -177,5 +215,20 @@ export class CandidatesController {
       upcoming: mapped.filter((i) => i.status === "scheduled" || i.status === "in_progress"),
       past: mapped.filter((i) => i.status !== "scheduled" && i.status !== "in_progress"),
     };
+  }
+
+  @Post("bulk-import")
+  @Roles("recruiter", "admin")
+  async bulkImport(@Req() req: any, @Body() body: any) {
+    const orgId = req.user.orgId || "00000000-0000-0000-0000-000000000000";
+    const userId = req.user.userId;
+    return this.workflow.bulkImport(orgId, userId, body.rows, body.jobId);
+  }
+
+  @Post(":id/retry-resume")
+  @Roles("recruiter", "admin")
+  async retryResume(@Param("id") id: string) {
+    await this.filePipeline.queueResumeParsing(id);
+    return { message: "Candidate resume processing re-queued successfully." };
   }
 }

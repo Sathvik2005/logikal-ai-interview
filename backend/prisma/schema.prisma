@@ -26,6 +26,7 @@ model Organization {
   persona_versions      PersonaVersion[]
   questions             Question[]
   candidates            Candidate[]
+  question_banks        QuestionBank[]
   interviews            Interview[]
   interview_sessions    InterviewSession[]
   proctoring_snapshots  ProctoringSnapshot[]
@@ -88,6 +89,7 @@ model JobDescription {
   persona        Persona?          @relation(fields: [persona_id], references: [id], onDelete: SetNull)
   matches        JdCandidateMatch[]
   templates      InterviewTemplate[]
+  candidates     Candidate[]       @relation("JobCandidates")
 
   @@map("job_descriptions")
 }
@@ -147,6 +149,18 @@ model Question {
   personas         PersonaQuestion[]
   interviews       InterviewQuestion[]
 
+  question_bank_id   String?            @db.Uuid
+  question_bank      QuestionBank?      @relation(fields: [question_bank_id], references: [id], onDelete: Cascade)
+  expected_answer    String?
+  mandatory          Boolean?           @default(false)
+  ai_follow_up       Boolean?           @default(true)
+  estimated_time     Int?
+  evaluation_weight  Int?               @default(1)
+  keywords           String[]           @default([])
+  notes              String?
+  priority           Int?               @default(1)
+  section_title      String?
+
   @@map("questions")
 }
 
@@ -176,10 +190,14 @@ model Candidate {
   resume_summary        String?
   skills                String[]
   experience_years      Decimal?               @db.Decimal
+  job_id                String?                @db.Uuid
+  custom_role           Json?                  @default("{}")
+  resume_analysis       Json?                  @default("{}")
   created_at            DateTime               @default(now()) @db.Timestamptz
   updated_at            DateTime               @default(now()) @db.Timestamptz
   deleted_at            DateTime?              @db.Timestamptz
   organization          Organization?          @relation(fields: [org_id], references: [id], onDelete: SetNull)
+  job                   JobDescription?        @relation("JobCandidates", fields: [job_id], references: [id], onDelete: SetNull)
   interviews            Interview[]
   timeline              CandidateTimeline[]
   matches               JdCandidateMatch[]
@@ -552,4 +570,28 @@ model JdCandidateMatch {
   candidate    Candidate      @relation(fields: [candidate_id], references: [id], onDelete: Cascade)
 
   @@map("jd_candidate_matches")
+}
+
+model QuestionBank {
+  id               String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  org_id           String                 @db.Uuid
+  created_by       String                 @db.Uuid
+  title            String
+  job_title        String?
+  department       String?
+  experience_level String?
+  interview_type   String?
+  description      String?
+  tags             String[]               @default([])
+  difficulty_level String?
+  category         String?
+  status           String                 @default("active") // active, draft, archived
+  created_at       DateTime               @default(now()) @db.Timestamptz
+  updated_at       DateTime               @default(now()) @db.Timestamptz
+  deleted_at       DateTime?              @db.Timestamptz
+  
+  organization     Organization           @relation(fields: [org_id], references: [id], onDelete: Cascade)
+  questions        Question[]
+
+  @@map("question_banks")
 }

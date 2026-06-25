@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CardShadow, Icon, EmptyState, SkeletonCard } from "@/components/recruiter/RecruiterShell";
+import { CardShadow, Icon, EmptyState, SkeletonCard, PageHeader } from "@/components/recruiter/RecruiterShell";
 import { usePersonasQuery, type PersonaDTO } from "@/components/recruiter/use-personas";
 
 export const Route = createFileRoute("/_authenticated/recruiter/personas/")({
@@ -12,30 +12,28 @@ function PersonasList() {
 
   return (
     <>
-      <div className="mb-lg grid grid-cols-[minmax(0,1fr)_auto] items-center gap-md sm:flex sm:flex-wrap sm:justify-between">
-        <div className="min-w-0">
-          <h2 className="text-headline-lg">AI Persona Builder</h2>
-          <p className="text-body-lg text-on-surface-variant">
-            Design AI interviewers tuned for your roles, tone, and difficulty.
-          </p>
-        </div>
-        <div className="flex gap-sm">
-          <Link
-            to="/recruiter/personas/prompt"
-            className="px-4 py-2 border border-outline-variant rounded-lg flex items-center gap-2 hover:bg-surface-container-low"
-          >
-            <Icon name="terminal" />
-            Prompt Editor
-          </Link>
-          <Link
-            to="/recruiter/personas/new"
-            className="px-4 py-2 bg-primary text-on-primary rounded-lg flex items-center gap-2 hover:brightness-110"
-          >
-            <Icon name="add" />
-            New Persona
-          </Link>
-        </div>
-      </div>
+      <PageHeader
+        title="AI Persona Builder"
+        subtitle="Design AI interviewers tuned for your roles, tone, and difficulty."
+        actions={
+          <>
+            <Link
+              to="/recruiter/personas/prompt"
+              className="px-4 py-2 border border-outline-variant rounded-lg flex items-center gap-2 hover:bg-surface-container-low"
+            >
+              <Icon name="terminal" />
+              Prompt Editor
+            </Link>
+            <Link
+              to="/recruiter/personas/new"
+              className="px-4 py-2 bg-primary text-on-primary rounded-lg flex items-center gap-2 hover:brightness-110"
+            >
+              <Icon name="add" />
+              New Persona
+            </Link>
+          </>
+        }
+      />
 
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">

@@ -80,22 +80,68 @@ export function ScheduleInterviewWizard({
   const { data: jobsData } = useJobsQuery();
   const { data: personasData } = usePersonasQuery();
 
-  const jds: JD[] = useMemo(
-    () =>
-      (jobsData ?? []).map((j) => ({
-        id: j.id,
-        role: j.title,
-        department: j.department ?? "—",
-        level: j.seniority ?? "—",
-        skills: (j.requirements ?? "")
-          .split(/[,\n]/)
-          .map((s) => s.trim())
-          .filter(Boolean)
-          .slice(0, 8),
-        updatedAt: j.createdAt.slice(0, 10),
-      })),
-    [jobsData],
-  );
+  const jds: JD[] = useMemo(() => {
+    const list: JD[] = (jobsData ?? []).map((j) => ({
+      id: j.id,
+      role: j.title,
+      department: j.department ?? "—",
+      level: j.seniority ?? "—",
+      skills: (j.requirements ?? "")
+        .split(/[,\n]/)
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .slice(0, 8),
+      updatedAt: j.createdAt.slice(0, 10),
+    }));
+
+    if (state.candidate?.customRole && state.candidate.customRole.roleTitle) {
+      const virtualJd: JD = {
+        id: `custom-${state.candidate.id}`,
+        role: `[Custom Role] ${state.candidate.customRole.roleTitle}`,
+        department: state.candidate.customRole.department || "Custom",
+        level: state.candidate.customRole.experienceLevel || "Custom",
+        skills: state.candidate.customRole.skills || [],
+        updatedAt: new Date().toISOString().slice(0, 10),
+      };
+      return [virtualJd, ...list];
+    }
+
+    return list;
+  }, [jobsData, state.candidate]);
+
+  // Auto-select custom role or aligned JD when candidate is selected
+  useEffect(() => {
+    if (state.candidate) {
+      if (state.candidate.customRole && state.candidate.customRole.roleTitle) {
+        const virtualJd: JD = {
+          id: `custom-${state.candidate.id}`,
+          role: `[Custom Role] ${state.candidate.customRole.roleTitle}`,
+          department: state.candidate.customRole.department || "Custom",
+          level: state.candidate.customRole.experienceLevel || "Custom",
+          skills: state.candidate.customRole.skills || [],
+          updatedAt: new Date().toISOString().slice(0, 10),
+        };
+        setState((s) => ({ ...s, jd: virtualJd }));
+      } else if (state.candidate.jobId && jobsData) {
+        const alignedJd = jobsData.find((j) => j.id === state.candidate!.jobId);
+        if (alignedJd) {
+          const mappedJd: JD = {
+            id: alignedJd.id,
+            role: alignedJd.title,
+            department: alignedJd.department ?? "—",
+            level: alignedJd.seniority ?? "—",
+            skills: (alignedJd.requirements ?? "")
+              .split(/[,\n]/)
+              .map((s) => s.trim())
+              .filter(Boolean)
+              .slice(0, 8),
+            updatedAt: alignedJd.createdAt.slice(0, 10),
+          };
+          setState((s) => ({ ...s, jd: mappedJd }));
+        }
+      }
+    }
+  }, [state.candidate, jobsData]);
 
   const personas: Persona[] = useMemo(
     () =>
@@ -177,7 +223,7 @@ export function ScheduleInterviewWizard({
       durationMin: state.duration,
       persona: state.persona?.name ?? "AI Interviewer",
       status: "scheduled",
-      jobId: state.jd?.id ?? null,
+      jobId: state.jd && !state.jd.id.startsWith("custom-") ? state.jd.id : null,
       personaId: state.persona?.id ?? null,
     };
     onScheduled?.(interview, state.candidate.email);

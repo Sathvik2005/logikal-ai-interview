@@ -157,6 +157,15 @@ export class InterviewEngineService {
       }
     }
 
+    // Load Candidate Context
+    const candidate = await this.prisma.candidate.findUnique({
+      where: { id: interview.candidate_id },
+    });
+    let candidateContext = "";
+    if (candidate) {
+      candidateContext = `Candidate Name: ${candidate.full_name}\nResume Summary: ${candidate.resume_summary || ""}\nSkills: ${candidate.skills.join(", ")}`;
+    }
+
     // Load Job Description context
     let jdContext = "";
     if (interview.job_id) {
@@ -166,15 +175,18 @@ export class InterviewEngineService {
       if (jd) {
         jdContext = `Job Title: ${jd.title}\nRequirements: ${jd.requirements || ""}`;
       }
-    }
-
-    // Load Candidate Context
-    const candidate = await this.prisma.candidate.findUnique({
-      where: { id: interview.candidate_id },
-    });
-    let candidateContext = "";
-    if (candidate) {
-      candidateContext = `Candidate Name: ${candidate.full_name}\nResume Summary: ${candidate.resume_summary || ""}\nSkills: ${candidate.skills.join(", ")}`;
+    } else if (candidate && (candidate as any).custom_role) {
+      const cr = (candidate as any).custom_role as any;
+      if (cr && cr.roleTitle) {
+        jdContext = `Job Title (Custom Candidate Role): ${cr.roleTitle}
+Department: ${cr.department || "N/A"}
+Experience Level: ${cr.experienceLevel || "N/A"}
+Employment Type: ${cr.employmentType || "N/A"}
+Location: ${cr.location || "N/A"}
+Skills: ${Array.isArray(cr.skills) ? cr.skills.join(", ") : (cr.skills || "")}
+Responsibilities: ${cr.responsibilities || ""}
+Notes: ${cr.notes || ""}`;
+      }
     }
 
     // Fetch previous turns in the session

@@ -108,6 +108,7 @@ const UpsertInput = z.object({
   requirements: z.string().max(20000).optional().nullable(),
   personaId: z.string().uuid().optional().nullable(),
   status: z.enum(["draft", "open", "paused", "closed", "archived"]).default("draft"),
+  competencies: z.any().optional(),
 });
 
 export const upsertJob = createServerFn({ method: "POST" })
@@ -175,4 +176,32 @@ export const suggestJobDescription = createServerFn({ method: "POST" })
     }
 
     return res.json() as Promise<{ description: string; requirements: string }>;
+  });
+
+const JDAssistInput = z.object({
+  title: z.string().min(2).max(200),
+  department: z.string().optional().nullable(),
+  experienceLevel: z.string(),
+  location: z.string().optional().nullable(),
+  employmentType: z.string(),
+});
+
+export const runJDAssist = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => JDAssistInput.parse(input))
+  .handler(async ({ data }) => {
+    const res = await fetch(`${getBackendUrl()}/api/jobs/ai-assist`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to generate AI JD Assist: ${res.statusText}`);
+    }
+
+    return res.json() as Promise<any>;
   });

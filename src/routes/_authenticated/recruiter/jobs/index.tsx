@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { CardShadow, Icon, EmptyState, SkeletonCard } from "@/components/recruiter/RecruiterShell";
+import { CardShadow, Icon, EmptyState, SkeletonCard, PageHeader } from "@/components/recruiter/RecruiterShell";
 import { useJobsQuery, type JobDTO } from "@/components/recruiter/use-jobs";
 import { ImportCandidatesWizard } from "@/components/recruiter/ImportCandidatesWizard";
 
@@ -23,21 +23,19 @@ function JobsList() {
 
   return (
     <>
-      <div className="mb-lg grid grid-cols-[minmax(0,1fr)_auto] items-center gap-md sm:flex sm:flex-wrap sm:justify-between">
-        <div className="min-w-0">
-          <h2 className="text-headline-lg">Job Description Builder</h2>
-          <p className="text-body-lg text-on-surface-variant">
-            Author and publish JD specs your AI personas will interview against.
-          </p>
-        </div>
-        <Link
-          to="/recruiter/jobs/new"
-          className="px-4 py-2 bg-primary text-on-primary rounded-lg flex items-center gap-2 hover:brightness-110"
-        >
-          <Icon name="add" />
-          New Job Description
-        </Link>
-      </div>
+      <PageHeader
+        title="Job Description Builder"
+        subtitle="Author and publish JD specs your AI personas will interview against."
+        actions={
+          <Link
+            to="/recruiter/jobs/new"
+            className="px-4 py-2 bg-primary text-on-primary rounded-lg flex items-center gap-2 hover:brightness-110"
+          >
+            <Icon name="add" />
+            New Job Description
+          </Link>
+        }
+      />
 
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">

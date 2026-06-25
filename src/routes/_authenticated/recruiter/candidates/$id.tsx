@@ -11,6 +11,7 @@ import {
   type UpdateProfileInput,
 } from "@/components/recruiter/use-candidates";
 import { useInterviewsQuery } from "@/components/recruiter/use-interviews";
+import { useJobsQuery } from "@/components/recruiter/use-jobs";
 import {
   FIELD_LABELS,
   completenessPct,
@@ -54,6 +55,12 @@ function CandidateProfile() {
   const complete = c ? isProfileComplete(c) : false;
   const pct = c ? completenessPct(c) : 0;
 
+  const { data: jobs } = useJobsQuery();
+  const alignedJob = useMemo(() => {
+    if (!c?.jobId || !jobs) return null;
+    return jobs.find((j) => j.id === c.jobId);
+  }, [c?.jobId, jobs]);
+
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({
     phone: "",
@@ -61,6 +68,15 @@ function CandidateProfile() {
     experienceYears: 0,
     skillsCsv: "",
     resumeSummary: "",
+    jobId: "",
+    customRoleTitle: "",
+    customDepartment: "",
+    customExperienceLevel: "Mid",
+    customEmploymentType: "Full-time",
+    customLocation: "",
+    customSkillsCsv: "",
+    customResponsibilities: "",
+    customNotes: "",
   });
 
   useEffect(() => {
@@ -71,6 +87,15 @@ function CandidateProfile() {
         experienceYears: c.experienceYears,
         skillsCsv: c.skills.join(", "),
         resumeSummary: c.resumeSummary ?? "",
+        jobId: c.jobId ?? "",
+        customRoleTitle: c.customRole?.roleTitle ?? "",
+        customDepartment: c.customRole?.department ?? "",
+        customExperienceLevel: c.customRole?.experienceLevel ?? "Mid",
+        customEmploymentType: c.customRole?.employmentType ?? "Full-time",
+        customLocation: c.customRole?.location ?? "",
+        customSkillsCsv: c.customRole?.skills?.join(", ") ?? "",
+        customResponsibilities: c.customRole?.responsibilities ?? "",
+        customNotes: c.customRole?.notes ?? "",
       });
       if (!isProfileComplete(c)) setEditing(true);
     }
@@ -89,6 +114,24 @@ function CandidateProfile() {
     if (JSON.stringify(skills) !== JSON.stringify(c.skills)) patch.skills = skills;
     if (form.resumeSummary.trim() !== (c.resumeSummary ?? ""))
       patch.resumeSummary = form.resumeSummary.trim();
+    if (form.jobId !== (c.jobId ?? "")) patch.jobId = form.jobId || null;
+
+    if (c.customRole || form.jobId === "") {
+      const customSkills = form.customSkillsCsv
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      patch.customRole = {
+        roleTitle: form.customRoleTitle.trim(),
+        department: form.customDepartment.trim(),
+        experienceLevel: form.customExperienceLevel,
+        employmentType: form.customEmploymentType,
+        location: form.customLocation.trim(),
+        skills: customSkills,
+        responsibilities: form.customResponsibilities.trim(),
+        notes: form.customNotes.trim(),
+      };
+    }
 
     try {
       await updateMut.mutateAsync(patch);
@@ -232,7 +275,129 @@ function CandidateProfile() {
                 placeholder="Background, key strengths, screening highlights…"
               />
             </label>
-            <div className="md:col-span-2 flex items-center justify-end gap-2">
+
+            <label className="block md:col-span-2">
+              <span className="block text-label-caps uppercase text-on-surface-variant mb-1">
+                Aligned Job Description
+              </span>
+              <select
+                className={inputCls}
+                value={form.jobId}
+                onChange={(e) => setForm((f) => ({ ...f, jobId: e.target.value }))}
+              >
+                <option value="">No alignment (Custom Role / Virtual JD)</option>
+                {jobs?.map((j) => (
+                  <option key={j.id} value={j.id}>
+                    {j.title} {j.department ? `(${j.department})` : ""}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            {form.jobId === "" && (
+              <div className="md:col-span-2 pt-md border-t border-outline-variant mt-md grid grid-cols-1 md:grid-cols-2 gap-md">
+                <h4 className="text-headline-sm font-semibold col-span-2">Custom Role Specification</h4>
+                <label className="block">
+                  <span className="block text-label-caps uppercase text-on-surface-variant mb-1">
+                    Role Title
+                  </span>
+                  <input
+                    className={inputCls}
+                    value={form.customRoleTitle}
+                    onChange={(e) => setForm((f) => ({ ...f, customRoleTitle: e.target.value }))}
+                    placeholder="e.g. Lead Frontend Architect"
+                  />
+                </label>
+                <label className="block">
+                  <span className="block text-label-caps uppercase text-on-surface-variant mb-1">
+                    Department
+                  </span>
+                  <input
+                    className={inputCls}
+                    value={form.customDepartment}
+                    onChange={(e) => setForm((f) => ({ ...f, customDepartment: e.target.value }))}
+                    placeholder="e.g. Engineering"
+                  />
+                </label>
+                <label className="block">
+                  <span className="block text-label-caps uppercase text-on-surface-variant mb-1">
+                    Experience Level
+                  </span>
+                  <select
+                    className={inputCls}
+                    value={form.customExperienceLevel}
+                    onChange={(e) => setForm((f) => ({ ...f, customExperienceLevel: e.target.value }))}
+                  >
+                    <option value="Junior">Junior</option>
+                    <option value="Mid">Mid</option>
+                    <option value="Senior">Senior</option>
+                    <option value="Lead">Lead</option>
+                    <option value="Director/VP">Director/VP</option>
+                  </select>
+                </label>
+                <label className="block">
+                  <span className="block text-label-caps uppercase text-on-surface-variant mb-1">
+                    Employment Type
+                  </span>
+                  <select
+                    className={inputCls}
+                    value={form.customEmploymentType}
+                    onChange={(e) => setForm((f) => ({ ...f, customEmploymentType: e.target.value }))}
+                  >
+                    <option value="Full-time">Full-time</option>
+                    <option value="Part-time">Part-time</option>
+                    <option value="Contract">Contract</option>
+                    <option value="Internship">Internship</option>
+                  </select>
+                </label>
+                <label className="block">
+                  <span className="block text-label-caps uppercase text-on-surface-variant mb-1">
+                    Location
+                  </span>
+                  <input
+                    className={inputCls}
+                    value={form.customLocation}
+                    onChange={(e) => setForm((f) => ({ ...f, customLocation: e.target.value }))}
+                    placeholder="e.g. Remote (US/Canada)"
+                  />
+                </label>
+                <label className="block">
+                  <span className="block text-label-caps uppercase text-on-surface-variant mb-1">
+                    Custom Role Target Skills (comma-separated)
+                  </span>
+                  <input
+                    className={inputCls}
+                    value={form.customSkillsCsv}
+                    onChange={(e) => setForm((f) => ({ ...f, customSkillsCsv: e.target.value }))}
+                    placeholder="React, Node.js, TypeScript"
+                  />
+                </label>
+                <label className="block md:col-span-2">
+                  <span className="block text-label-caps uppercase text-on-surface-variant mb-1">
+                    Responsibilities
+                  </span>
+                  <textarea
+                    className={`${inputCls} min-h-[60px] resize-y`}
+                    value={form.customResponsibilities}
+                    onChange={(e) => setForm((f) => ({ ...f, customResponsibilities: e.target.value }))}
+                    placeholder="List core responsibilities..."
+                  />
+                </label>
+                <label className="block md:col-span-2">
+                  <span className="block text-label-caps uppercase text-on-surface-variant mb-1">
+                    Role Notes
+                  </span>
+                  <textarea
+                    className={`${inputCls} min-h-[60px] resize-y`}
+                    value={form.customNotes}
+                    onChange={(e) => setForm((f) => ({ ...f, customNotes: e.target.value }))}
+                    placeholder="Any specific expectations..."
+                  />
+                </label>
+              </div>
+            )}
+
+            <div className="md:col-span-2 flex items-center justify-end gap-2 pt-md border-t border-outline-variant">
               <button
                 type="button"
                 onClick={() => setEditing(false)}
@@ -263,7 +428,20 @@ function CandidateProfile() {
               </div>
               <div className="flex-1">
                 <h2 className="text-headline-lg">{c.name}</h2>
-                <p className="text-body-lg text-on-surface-variant">{c.role || "Role not set"}</p>
+                <p className="text-body-lg text-on-surface-variant flex items-center flex-wrap gap-2">
+                  {c.role || "Role not set"}
+                  {alignedJob ? (
+                    <span className="text-[11px] font-semibold text-primary bg-primary-fixed px-2 py-0.5 rounded-full inline-flex items-center gap-1">
+                      <Icon name="link" className="text-[12px]" />
+                      Aligned to JD: {alignedJob.title}
+                    </span>
+                  ) : c.customRole?.roleTitle ? (
+                    <span className="text-[11px] font-semibold text-secondary bg-secondary-fixed px-2 py-0.5 rounded-full inline-flex items-center gap-1">
+                      <Icon name="work_outline" className="text-[12px]" />
+                      Custom Role
+                    </span>
+                  ) : null}
+                </p>
                 <div className="flex flex-wrap gap-2 mt-2">
                   <span
                     className={`px-2 py-1 rounded-full text-label-caps uppercase ${STATUS_TONE[c.status]}`}
@@ -295,6 +473,63 @@ function CandidateProfile() {
               </div>
             </div>
           </CardShadow>
+
+          {c.customRole && c.customRole.roleTitle && (
+            <CardShadow className="p-lg">
+              <h3 className="text-headline-sm mb-md flex items-center gap-2">
+                <Icon name="work_outline" className="text-secondary" />
+                Custom Role Specifications
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-md text-body-md mb-4 pb-4 border-b border-outline-variant">
+                <div>
+                  <p className="text-label-caps uppercase text-on-surface-variant">Role Title</p>
+                  <p className="font-semibold text-on-surface">{c.customRole.roleTitle}</p>
+                </div>
+                <div>
+                  <p className="text-label-caps uppercase text-on-surface-variant">Department</p>
+                  <p>{c.customRole.department || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-label-caps uppercase text-on-surface-variant">Experience Level</p>
+                  <p>{c.customRole.experienceLevel || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-label-caps uppercase text-on-surface-variant">Employment Type</p>
+                  <p>{c.customRole.employmentType || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-label-caps uppercase text-on-surface-variant">Location</p>
+                  <p>{c.customRole.location || "—"}</p>
+                </div>
+              </div>
+              <div className="space-y-sm text-body-md">
+                {c.customRole.skills && c.customRole.skills.length > 0 && (
+                  <div>
+                    <p className="text-label-caps uppercase text-on-surface-variant">Target Skills</p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {c.customRole.skills.map((s: string) => (
+                        <span key={s} className="px-1.5 py-0.5 rounded bg-surface-container text-on-surface text-xs">
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {c.customRole.responsibilities && (
+                  <div className="mt-2">
+                    <p className="text-label-caps uppercase text-on-surface-variant">Responsibilities</p>
+                    <p className="mt-1 text-on-surface-variant whitespace-pre-line">{c.customRole.responsibilities}</p>
+                  </div>
+                )}
+                {c.customRole.notes && (
+                  <div className="mt-2">
+                    <p className="text-label-caps uppercase text-on-surface-variant">Notes</p>
+                    <p className="mt-1 text-on-surface-variant whitespace-pre-line">{c.customRole.notes}</p>
+                  </div>
+                )}
+              </div>
+            </CardShadow>
+          )}
 
           <CardShadow className="p-lg ai-insight">
             <h3 className="text-headline-sm mb-2 flex items-center gap-2">

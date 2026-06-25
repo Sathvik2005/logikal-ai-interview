@@ -27,6 +27,9 @@ export type CandidateDTO = {
   experienceYears: number;
   phone: string | null;
   resumeSummary: string | null;
+  jobId: string | null;
+  customRole: any;
+  resumeAnalysis: any;
 };
 
 function initials(name: string): string {
@@ -52,6 +55,9 @@ type DbRow = {
   phone: string | null;
   resume_summary: string | null;
   created_at: string;
+  job_id: string | null;
+  custom_role: any;
+  resume_analysis: any;
 };
 
 function mapRow(r: DbRow): CandidateDTO {
@@ -87,6 +93,9 @@ function mapRow(r: DbRow): CandidateDTO {
     experienceYears: r.experience_years == null ? 0 : Number(r.experience_years),
     phone: r.phone,
     resumeSummary: r.resume_summary,
+    jobId: r.job_id,
+    customRole: r.custom_role,
+    resumeAnalysis: r.resume_analysis,
   };
 }
 
@@ -166,7 +175,12 @@ const createInput = z.object({
   skills: z.array(z.string().trim().min(1).max(60)).max(50).default([]),
   notes: z.string().trim().max(2000).optional().nullable(),
   sendWelcome: z.boolean().default(true),
+  jobId: z.string().uuid().optional().nullable(),
+  customRole: z.any().optional().nullable(),
+  resumeAnalysis: z.any().optional().nullable(),
 });
+
+export type CreateCandidateInput = z.infer<typeof createInput>;
 
 export const createCandidate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -252,22 +266,21 @@ export const updateCandidateProfile = createServerFn({ method: "POST" })
         experienceYears: z.number().min(0).max(60).optional(),
         skills: z.array(z.string().trim().min(1).max(60)).max(50).optional(),
         resumeSummary: z.string().trim().min(1).max(4000).optional(),
+        jobId: z.string().uuid().optional().nullable(),
+        customRole: z.any().optional().nullable(),
+        resumeAnalysis: z.any().optional().nullable(),
       })
       .parse(data),
   )
   .handler(async ({ data }) => {
-    // Call candidate status update endpoint with profile data if needed
-    const res = await fetch(`${getBackendUrl()}/api/candidates/${data.id}/status`, {
+    // Call candidate update endpoint directly to bypass strict transitions
+    const res = await fetch(`${getBackendUrl()}/api/candidates/${data.id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
         ...getAuthHeader(),
       },
-      body: JSON.stringify({
-        status: "resume_parsed", // force reload
-        reason: "Updated candidate profile attributes directly.",
-        meta: data,
-      }),
+      body: JSON.stringify(data),
     });
 
     if (!res.ok) {
@@ -299,4 +312,74 @@ export const archiveCandidate = createServerFn({ method: "POST" })
     }
 
     return { ok: true } as const;
+  });
+
+// ---------- upload resume ----------
+const UploadResumeInput = z.object({
+  id: z.string().uuid(),
+  fileName: z.string(),
+  fileBase64: z.string(),
+  mimeType: z.string(),
+});
+
+export const uploadCandidateResume = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => UploadResumeInput.parse(input))
+  .handler(async ({ data }) => {
+    const fileBuffer = Buffer.from(data.fileBase64, "base64");
+    const formData = new FormData();
+    const blob = new Blob([fileBuffer], { type: data.mimeType });
+    formData.append("file", blob, data.fileName);
+
+    const res = await fetch(`${getBackendUrl()}/api/candidates/${data.id}/upload-resume`, {
+      method: "POST",
+      headers: {
+        ...getAuthHeader(),
+      },
+      body: formData,
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to upload resume: ${res.statusText}`);
+    }
+
+    return res.json() as Promise<{ message: string }>;
+  });
+
+export const retryResumeParsing = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data }) => {
+    const res = await fetch(`${getBackendUrl()}/api/candidates/${data.id}/retry-resume`, {
+      method: "POST",
+      headers: {
+        ...getAuthHeader(),
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to retry resume processing: ${res.statusText}`);
+    }
+
+    return { ok: true } as const;
+  });
+
+export const updateCandidateSummary = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid(), resumeSummary: z.string() }).parse(input))
+  .handler(async ({ data }) => {
+    const res = await fetch(`${getBackendUrl()}/api/candidates/${data.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
+      body: JSON.stringify({ resumeSummary: data.resumeSummary }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to update candidate summary: ${res.statusText}`);
+    }
+
+    return res.json();
   });

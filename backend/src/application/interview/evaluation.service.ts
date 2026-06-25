@@ -86,9 +86,25 @@ export class EvaluationService implements OnModuleInit {
       });
 
       // 6. Generate detailed report
-      const jdContext = interview.job
-        ? { title: interview.job.title, requirements: interview.job.requirements }
-        : {};
+      let jdContext: any = {};
+      if (interview.job) {
+        jdContext = { title: interview.job.title, requirements: interview.job.requirements };
+      } else if (interview.candidate && (interview.candidate as any).custom_role) {
+        const cr = (interview.candidate as any).custom_role as any;
+        if (cr && cr.roleTitle) {
+          jdContext = {
+            title: cr.roleTitle,
+            requirements: `Department: ${cr.department || "N/A"}
+Experience Level: ${cr.experienceLevel || "N/A"}
+Employment Type: ${cr.employmentType || "N/A"}
+Location: ${cr.location || "N/A"}
+Skills: ${Array.isArray(cr.skills) ? cr.skills.join(", ") : (cr.skills || "")}
+Responsibilities: ${cr.responsibilities || ""}
+Notes: ${cr.notes || ""}`
+          };
+        }
+      }
+
       const reportMarkdown = await this.aiOrchestrator.generateReportMarkdown(
         { name: interview.candidate.full_name, email: interview.candidate.email },
         jdContext,
