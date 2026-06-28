@@ -1,5 +1,6 @@
 CREATE TABLE public.workspace_settings (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id uuid UNIQUE REFERENCES public.organizations(id) ON DELETE CASCADE,
   org_name text NOT NULL DEFAULT 'Logikality AI',
   logo_url text,
   primary_color text DEFAULT '#3b82f6',

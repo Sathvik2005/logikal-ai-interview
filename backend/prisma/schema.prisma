@@ -37,6 +37,7 @@ model Organization {
   interview_slots       InterviewSlot[]
   interview_templates   InterviewTemplate[]
   identity_verifications IdentityVerification[]
+  workspace_settings    WorkspaceSetting[]
 
   @@map("organizations")
 }
@@ -449,14 +450,19 @@ model InterviewReschedule {
 }
 
 model WorkspaceSetting {
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  org_id     String   @db.Uuid
-  key        String
-  value      Json
-  created_at DateTime @default(now()) @db.Timestamptz
-  updated_at DateTime @default(now()) @db.Timestamptz
+  id               String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  org_id           String?       @unique @db.Uuid
+  org_name         String        @default("Logikality AI")
+  logo_url         String?
+  primary_color    String?       @default("#3b82f6")
+  require_mfa      Boolean       @default(false)
+  allowed_domains  String[]      @default([])
+  retention_months Int           @default(12)
+  updated_by       String?       @db.Uuid
+  updated_at       DateTime      @default(now()) @db.Timestamptz
+  created_at       DateTime      @default(now()) @db.Timestamptz
+  organization     Organization? @relation(fields: [org_id], references: [id], onDelete: Cascade)
 
-  @@unique([org_id, key])
   @@map("workspace_settings")
 }
 

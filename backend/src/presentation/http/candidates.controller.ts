@@ -217,6 +217,18 @@ export class CandidatesController {
     };
   }
 
+  @Get("notifications")
+  @Roles("recruiter", "admin")
+  async listNotifications(@Req() req: any, @Query("limit") limit?: string) {
+    const orgId = req.user.orgId || "00000000-0000-0000-0000-000000000000";
+    const lim = limit ? parseInt(limit, 10) : 20;
+    return this.prisma.notificationOutbox.findMany({
+      where: { org_id: orgId },
+      orderBy: { created_at: "desc" },
+      take: Math.min(lim, 100),
+    });
+  }
+
   @Post("bulk-import")
   @Roles("recruiter", "admin")
   async bulkImport(@Req() req: any, @Body() body: any) {

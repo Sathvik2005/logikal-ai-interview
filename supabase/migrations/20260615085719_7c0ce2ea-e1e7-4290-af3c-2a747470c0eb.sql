@@ -74,7 +74,7 @@ CREATE POLICY "Owner creates own gdpr requests" ON public.gdpr_requests FOR INSE
 CREATE TRIGGER touch_gdpr_requests BEFORE UPDATE ON public.gdpr_requests
   FOR EACH ROW EXECUTE FUNCTION public.touch_updated_at();
 
--- Retention job: anonymise soft-deleted candidates past retention_days
+-- Retention job: anonymise soft-deleted candidates past retention_months
 CREATE OR REPLACE FUNCTION public.anonymise_expired_candidates()
 RETURNS int
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
@@ -84,9 +84,9 @@ DECLARE
 BEGIN
   WITH expired AS (
     SELECT c.id FROM public.candidates c
-    JOIN public.workspace_settings w ON w.org_id = c.org_id
+    LEFT JOIN public.workspace_settings w ON w.org_id = c.org_id
     WHERE c.deleted_at IS NOT NULL
-      AND c.deleted_at < now() - (COALESCE(w.retention_days, 365) || ' days')::interval
+      AND c.deleted_at < now() - (COALESCE(w.retention_months, (SELECT retention_months FROM public.workspace_settings WHERE org_id IS NULL LIMIT 1), 12) || ' months')::interval
       AND c.email NOT LIKE 'anonymised+%'
   )
   UPDATE public.candidates c

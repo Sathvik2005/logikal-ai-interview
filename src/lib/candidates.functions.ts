@@ -30,6 +30,7 @@ export type CandidateDTO = {
   jobId: string | null;
   customRole: any;
   resumeAnalysis: any;
+  resumeUrl: string | null;
 };
 
 function initials(name: string): string {
@@ -58,6 +59,7 @@ type DbRow = {
   job_id: string | null;
   custom_role: any;
   resume_analysis: any;
+  resume_url: string | null;
 };
 
 function mapRow(r: DbRow): CandidateDTO {
@@ -96,6 +98,7 @@ function mapRow(r: DbRow): CandidateDTO {
     jobId: r.job_id,
     customRole: r.custom_role,
     resumeAnalysis: r.resume_analysis,
+    resumeUrl: r.resume_url,
   };
 }
 
@@ -213,6 +216,16 @@ export const createCandidate = createServerFn({ method: "POST" })
   });
 
 // ---------- list sent notifications ----------
+export type NotificationDTO = {
+  id: string;
+  kind: string;
+  recipient_email: string;
+  status: string;
+  created_at: string;
+  sent_at: string | null;
+  error?: string | null;
+};
+
 export const listNotifications = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) =>
@@ -221,9 +234,18 @@ export const listNotifications = createServerFn({ method: "POST" })
       .default({ limit: 20 })
       .parse(data ?? {}),
   )
-  .handler(async ({ data }) => {
-    // Standard mock list as outbox logging is managed in background
-    return [];
+  .handler(async ({ data }): Promise<NotificationDTO[]> => {
+    const res = await fetch(`${getBackendUrl()}/api/candidates/notifications?limit=${data.limit}`, {
+      headers: {
+        ...getAuthHeader(),
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to list notifications: ${res.statusText}`);
+    }
+
+    return (await res.json()) as NotificationDTO[];
   });
 
 // ---------- update status ----------

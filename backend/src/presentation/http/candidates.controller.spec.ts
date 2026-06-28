@@ -34,6 +34,9 @@ describe("CandidatesController", () => {
       findFirst: jest.fn(),
       findMany: jest.fn(),
     },
+    notificationOutbox: {
+      findMany: jest.fn(),
+    },
   };
 
   beforeEach(async () => {
