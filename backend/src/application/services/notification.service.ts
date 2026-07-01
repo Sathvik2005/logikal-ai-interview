@@ -66,9 +66,13 @@ export class NotificationService implements OnModuleInit {
       return;
     }
 
+    const fromName = process.env.EMAIL_FROM_NAME || "Lokality AI Recruitment";
+    const fromAddress = process.env.EMAIL_FROM_ADDRESS || "onboarding@resend.dev";
+    let fromHeader = `${fromName} <${fromAddress}>`;
+
     try {
       await this.resend.emails.send({
-        from: "Lokality AI Recruitment <recruitment@lokality.ai>",
+        from: fromHeader,
         to: recipientEmail,
         subject,
         html,
@@ -79,13 +83,43 @@ export class NotificationService implements OnModuleInit {
         data: { status: "sent", sent_at: new Date() },
       });
       this.logger.log(`Email successfully dispatched via Resend to ${recipientEmail}`);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      this.logger.error(`Resend email delivery failed: ${msg}`);
-      await this.prisma.notificationOutbox.update({
-        where: { id: outboxRecord.id },
-        data: { status: "failed", error: msg },
-      });
+    } catch (err: any) {
+      const originalMsg = err instanceof Error ? err.message : String(err);
+      this.logger.error(`Resend email delivery failed with sender [${fromHeader}]: ${originalMsg}`);
+
+      const isSandboxPossible = fromAddress !== "onboarding@resend.dev";
+      if (isSandboxPossible) {
+        this.logger.warn(`Attempting sandbox mode fallback email dispatch via onboarding@resend.dev...`);
+        try {
+          fromHeader = `${fromName} <onboarding@resend.dev>`;
+          await this.resend.emails.send({
+            from: fromHeader,
+            to: recipientEmail,
+            subject,
+            html,
+          });
+
+          await this.prisma.notificationOutbox.update({
+            where: { id: outboxRecord.id },
+            data: { status: "sent", sent_at: new Date(), error: `Fallback used. Original error: ${originalMsg}` },
+          });
+          this.logger.log(`Email successfully dispatched via Resend fallback to ${recipientEmail}`);
+          return;
+        } catch (fallbackErr: any) {
+          const fallbackMsg = fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr);
+          this.logger.error(`Resend fallback email delivery failed: ${fallbackMsg}`);
+          
+          await this.prisma.notificationOutbox.update({
+            where: { id: outboxRecord.id },
+            data: { status: "failed", error: `Original: ${originalMsg} | Fallback: ${fallbackMsg}` },
+          });
+        }
+      } else {
+        await this.prisma.notificationOutbox.update({
+          where: { id: outboxRecord.id },
+          data: { status: "failed", error: originalMsg },
+        });
+      }
     }
   }
 

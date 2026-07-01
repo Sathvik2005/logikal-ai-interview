@@ -98,10 +98,14 @@ export class VectorMatchingService implements OnModuleInit {
       // Save match record
       await this.prisma.jdCandidateMatch.create({
         data: {
+          org_id: candidate.orgId || "00000000-0000-0000-0000-000000000000",
           job_id: jd.id,
           candidate_id: candidateId,
           match_score: result.matchScore,
-          analysis: { explanation: result.analysis } as any,
+          missing_skills: result.missingSkills || [],
+          strengths: result.strengths || [],
+          focus_areas: result.focusAreas || [],
+          shortlisted: result.matchScore >= 80,
         },
       });
 

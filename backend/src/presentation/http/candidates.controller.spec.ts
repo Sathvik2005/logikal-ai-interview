@@ -5,6 +5,7 @@ import { FileProcessingPipelineService } from "../../application/candidate/file-
 import { PrismaService } from "../../infrastructure/database/prisma.service";
 import { SupabaseAuthGuard } from "../guards/supabase-auth.guard";
 import { RolesGuard } from "../guards/roles.guard";
+import { StorageService } from "../../application/services/storage.service";
 
 describe("CandidatesController", () => {
   let controller: CandidatesController;
@@ -19,6 +20,10 @@ describe("CandidatesController", () => {
 
   const mockFilePipeline = {
     processResume: jest.fn(),
+  };
+
+  const mockStorage = {
+    getFileSignedUrl: jest.fn(),
   };
 
   const mockPrisma = {
@@ -56,6 +61,10 @@ describe("CandidatesController", () => {
         {
           provide: PrismaService,
           useValue: mockPrisma,
+        },
+        {
+          provide: StorageService,
+          useValue: mockStorage,
         },
       ],
     })
@@ -181,6 +190,21 @@ describe("CandidatesController", () => {
         orderBy: { created_at: "asc" },
       });
       expect(result).toEqual([]);
+    });
+  });
+
+  describe("getResumeUrl", () => {
+    it("should return signed URL if recruiter/admin checks it", async () => {
+      const candidate = { id: "c1", resume_url: "http://localhost:3000/resumes/c1-resume.pdf", user_id: "user-123" };
+      mockPrisma.candidate.findUnique.mockResolvedValue(candidate);
+      mockStorage.getFileSignedUrl.mockResolvedValue("http://localhost:3000/signed/c1-resume.pdf");
+
+      const req = { user: { role: "recruiter", userId: "user-456" } };
+      const result = await controller.getResumeUrl(req, "c1");
+
+      expect(mockPrisma.candidate.findUnique).toHaveBeenCalledWith({ where: { id: "c1" } });
+      expect(mockStorage.getFileSignedUrl).toHaveBeenCalledWith("resumes", "c1-resume.pdf");
+      expect(result).toEqual({ url: "http://localhost:3000/signed/c1-resume.pdf" });
     });
   });
 });

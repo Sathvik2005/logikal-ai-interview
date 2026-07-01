@@ -405,3 +405,20 @@ export const updateCandidateSummary = createServerFn({ method: "POST" })
 
     return res.json();
   });
+
+export const getCandidateResumeUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
+  .handler(async ({ data }): Promise<{ url: string | null }> => {
+    const res = await fetch(`${getBackendUrl()}/api/candidates/${data.id}/resume-url`, {
+      headers: {
+        ...getAuthHeader(),
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch resume signed URL: ${res.statusText}`);
+    }
+
+    return (await res.json()) as { url: string | null };
+  });

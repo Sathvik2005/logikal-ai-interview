@@ -29,4 +29,32 @@ export class AppConfigService {
   getTimeouts(): number {
     return parseInt(this.get("INTERVIEW_TIMEOUT_SECONDS", "1800"), 10);
   }
+
+  getGeminiFlashModel(): string {
+    return this.get("GEMINI_FLASH_MODEL", "gemini-2.0-flash");
+  }
+
+  getGeminiProModel(): string {
+    return this.get("GEMINI_PRO_MODEL", "gemini-1.5-pro");
+  }
+
+  getAiTemperature(): number {
+    return parseFloat(this.get("AI_TEMPERATURE", "0.2"));
+  }
+
+  getAiTopP(): number {
+    return parseFloat(this.get("AI_TOP_P", "0.95"));
+  }
+
+  getAiMaxTokens(): number {
+    return parseInt(this.get("AI_MAX_TOKENS", "2048"), 10);
+  }
+
+  getAiRetryCount(): number {
+    return parseInt(this.get("AI_RETRY_COUNT", "3"), 10);
+  }
+
+  getAiTimeoutMs(): number {
+    return parseInt(this.get("AI_TIMEOUT_MS", "30000"), 10);
+  }
 }

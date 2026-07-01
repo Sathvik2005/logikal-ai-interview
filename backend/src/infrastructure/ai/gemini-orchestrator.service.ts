@@ -35,6 +35,57 @@ export class GeminiOrchestratorService implements IAIOrchestrator {
     return this.genAI !== null;
   }
 
+  /**
+   * Helper method to call Gemini API with retry logic, timeout, safety settings, and fallback.
+   */
+  private async generateWithRetry(
+    modelName: string,
+    prompt: any,
+    generationConfig?: any,
+    attempt: number = 1,
+  ): Promise<any> {
+    const maxRetries = this.config.getAiRetryCount();
+    const timeoutMs = this.config.getAiTimeoutMs();
+
+    const apiCall = (async () => {
+      const model = this.genAI!.getGenerativeModel({
+        model: modelName,
+        generationConfig: {
+          temperature: this.config.getAiTemperature(),
+          topP: this.config.getAiTopP(),
+          maxOutputTokens: this.config.getAiMaxTokens(),
+          ...generationConfig,
+        },
+      });
+      return await model.generateContent(prompt);
+    })();
+
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("AI operation timed out")), timeoutMs),
+    );
+
+    try {
+      return await Promise.race([apiCall, timeoutPromise]);
+    } catch (err: any) {
+      this.logger.warn(`AI call to ${modelName} failed on attempt ${attempt}/${maxRetries}: ${err.message}`);
+      if (attempt < maxRetries) {
+        // Exponential backoff
+        await new Promise((resolve) => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+        return this.generateWithRetry(modelName, prompt, generationConfig, attempt + 1);
+      }
+
+      // Fallback: if Pro fails, try Flash
+      const proModel = this.config.getGeminiProModel();
+      const flashModel = this.config.getGeminiFlashModel();
+      if (modelName === proModel && flashModel !== proModel) {
+        this.logger.warn(`Falling back from Pro model (${proModel}) to Flash model (${flashModel}) due to continuous failures.`);
+        return this.generateWithRetry(flashModel, prompt, generationConfig, 1);
+      }
+
+      throw err;
+    }
+  }
+
   async parseResume(
     resumeText: string,
     mimeType?: string,
@@ -106,11 +157,6 @@ Return ONLY a valid JSON object matching the keys listed above. Do not wrap in m
     }
 
     try {
-      const model = this.genAI!.getGenerativeModel({
-        model: "gemini-2.5-flash",
-        generationConfig: { responseMimeType: "application/json" },
-      });
-
       const userText = `Resume text:\n${resumeText}${jdContext ? `\n\nTarget Job Description:\n${jdContext}` : ""}`;
       const contentParts: any[] = [{ text: defaultParserPrompt }];
 
@@ -128,7 +174,11 @@ Return ONLY a valid JSON object matching the keys listed above. Do not wrap in m
         contentParts.push({ text: userText });
       }
 
-      const response = await model.generateContent(contentParts);
+      const response = await this.generateWithRetry(
+        this.config.getGeminiFlashModel(),
+        contentParts,
+        { responseMimeType: "application/json" }
+      );
       const content = response.response.text();
       const parsed = JSON.parse(content);
       return {
@@ -168,15 +218,15 @@ Return ONLY a valid JSON object matching the keys listed above. Do not wrap in m
     }
 
     try {
-      const model = this.genAI!.getGenerativeModel({
-        model: "gemini-2.5-flash",
-        generationConfig: { responseMimeType: "application/json" },
-      });
       const prompt = `Generate a realistic job description and requirements for a "${title}" position${department ? ` in the ${department} department` : ""}.
 Return STRICT JSON format with exactly two keys: "description" and "requirements".
 "description" should be a high-quality job summary paragraph.
 "requirements" should be a bulleted string listing core qualifications.`;
-      const response = await model.generateContent(prompt);
+      const response = await this.generateWithRetry(
+        this.config.getGeminiFlashModel(),
+        prompt,
+        { responseMimeType: "application/json" }
+      );
       const parsed = JSON.parse(response.response.text());
       return {
         description: String(parsed.description ?? ""),
@@ -202,20 +252,26 @@ Return STRICT JSON format with exactly two keys: "description" and "requirements
       return {
         matchScore: Math.round(score),
         analysis: `Candidate has skills (${skills.join(", ")}). Match evaluation indicates suitable technical alignment with core JD requirements.`,
+        missingSkills: ["Kubernetes", "GraphQL"],
+        strengths: ["React", "TypeScript", "Node.js"],
+        focusAreas: ["Scale design", "Error logs"],
       };
     }
 
     try {
-      const model = this.genAI!.getGenerativeModel({
-        model: "gemini-2.5-flash",
-        generationConfig: { responseMimeType: "application/json" },
-      });
       const userPrompt = `JD Requirements:\n${jdRequirements}\n\nCandidate Profile:\n${JSON.stringify(candidateProfile)}`;
-      const response = await model.generateContent([{ text: systemPrompt }, { text: userPrompt }]);
+      const response = await this.generateWithRetry(
+        this.config.getGeminiFlashModel(),
+        [{ text: systemPrompt }, { text: userPrompt }],
+        { responseMimeType: "application/json" }
+      );
       const parsed = JSON.parse(response.response.text());
       return {
         matchScore: Number(parsed.matchScore ?? 50),
         analysis: String(parsed.analysis ?? ""),
+        missingSkills: Array.isArray(parsed.missingSkills) ? parsed.missingSkills.map(String) : [],
+        strengths: Array.isArray(parsed.strengths) ? parsed.strengths.map(String) : [],
+        focusAreas: Array.isArray(parsed.focusAreas) ? parsed.focusAreas.map(String) : [],
       };
     } catch (err) {
       this.logger.error(`Error matching candidate JD: ${err}`);
@@ -259,9 +315,6 @@ Return STRICT JSON format with exactly two keys: "description" and "requirements
         "Return ONLY the interviewer text. No markdown structure, no quotes, no JSON.",
       );
 
-      const model = this.genAI!.getGenerativeModel({
-        model: "gemini-2.5-flash",
-      });
       const contents = [{ role: "user", parts: [{ text: systemParts.join("\n\n") }] }];
       history.forEach((h) => {
         contents.push({
@@ -270,7 +323,10 @@ Return STRICT JSON format with exactly two keys: "description" and "requirements
         });
       });
 
-      const response = await model.generateContent({ contents } as any);
+      const response = await this.generateWithRetry(
+        this.config.getGeminiFlashModel(),
+        { contents } as any
+      );
       return response.response.text().trim();
     } catch (err) {
       this.logger.error(`Error generating interview question: ${err}`);
@@ -308,14 +364,14 @@ Return STRICT JSON format with exactly two keys: "description" and "requirements
     }
 
     try {
-      const model = this.genAI!.getGenerativeModel({
-        model: "gemini-2.5-pro", // Using Gemini 2.5 Pro for detailed grade analysis
-        generationConfig: { responseMimeType: "application/json" },
-      });
       const transcript = turns.map((t) => `${t.speaker.toUpperCase()}: ${t.text}`).join("\n");
       const userPrompt = `Rubric:\n${JSON.stringify(rubric)}\n\nIntegrity Violations Summary:\n${JSON.stringify(integrityFlags)}\n\nTranscript:\n${transcript}`;
 
-      const response = await model.generateContent([{ text: systemPrompt }, { text: userPrompt }]);
+      const response = await this.generateWithRetry(
+        this.config.getGeminiProModel(),
+        [{ text: systemPrompt }, { text: userPrompt }],
+        { responseMimeType: "application/json" }
+      );
       const parsed = JSON.parse(response.response.text());
       return {
         overallScore: Number(parsed.overallScore ?? 50),
@@ -360,11 +416,11 @@ ${evaluation.concerns.map((c) => `- ${c}`).join("\n")}
     }
 
     try {
-      const model = this.genAI!.getGenerativeModel({
-        model: "gemini-2.5-flash",
-      });
       const userPrompt = `Candidate Details:\n${JSON.stringify(candidateInfo)}\n\nJD Info:\n${JSON.stringify(jdContext)}\n\nEvaluation Details:\n${JSON.stringify(evaluation)}`;
-      const response = await model.generateContent([{ text: systemPrompt }, { text: userPrompt }]);
+      const response = await this.generateWithRetry(
+        this.config.getGeminiFlashModel(),
+        [{ text: systemPrompt }, { text: userPrompt }]
+      );
       return response.response.text();
     } catch (err) {
       this.logger.error(`Error generating report markdown: ${err}`);
@@ -412,10 +468,6 @@ Strictness level: ${params.strictness}. If the candidate deviates or gives shall
     }
 
     try {
-      const model = this.genAI!.getGenerativeModel({
-        model: "gemini-2.5-flash",
-      });
-
       const systemPrompt = `You are an expert AI prompt engineer specializing in designing specialized system prompts for AI recruiters/interviewers.
 Create a production-ready System Prompt for an AI interviewer based on the following parameters:
 - Persona Name: ${params.name}
@@ -441,7 +493,10 @@ The generated system prompt must be written in the first person (e.g., "You are 
 
 Return ONLY the generated system prompt text. Do not wrap in markdown code blocks, do not output JSON, do not include any preamble or extra text. Output the raw text of the system prompt directly.`;
 
-      const response = await model.generateContent(systemPrompt);
+      const response = await this.generateWithRetry(
+        this.config.getGeminiFlashModel(),
+        systemPrompt
+      );
       return response.response.text().trim();
     } catch (err) {
       this.logger.error(`Error generating persona prompt with Gemini: ${err}`);
@@ -518,11 +573,6 @@ Return ONLY the generated system prompt text. Do not wrap in markdown code block
     }
 
     try {
-      const model = this.genAI!.getGenerativeModel({
-        model: "gemini-2.5-flash",
-        generationConfig: { responseMimeType: "application/json" },
-      });
-
       const promptText = `You are a professional HR assistant and technical recruiter. Generate a comprehensive Job Description package for the following role:
 - Job Title: ${params.title}
 - Department: ${params.department || "n/a"}
@@ -551,7 +601,11 @@ Generate a JSON object containing exactly the following keys:
 
 Ensure the output is valid JSON matching this schema. Do not wrap in markdown tags or include any additional text outside the JSON.`;
 
-      const response = await model.generateContent(promptText);
+      const response = await this.generateWithRetry(
+        this.config.getGeminiFlashModel(),
+        promptText,
+        { responseMimeType: "application/json" }
+      );
       const text = response.response.text().trim();
       const parsed = JSON.parse(text);
 

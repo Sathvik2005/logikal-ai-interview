@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_authenticated/candidate/system-check")({
 
 type CheckState = "pending" | "running" | "ok" | "fail";
 
-type CheckKey = "browser" | "permissions" | "camera" | "mic" | "speaker" | "bandwidth";
+type CheckKey = "browser" | "permissions" | "camera" | "mic" | "speaker" | "bandwidth" | "fullscreen" | "screenshare";
 
 const CHECKS: { key: CheckKey; label: string; icon: string }[] = [
   { key: "browser", label: "Browser compatibility", icon: "public" },
@@ -19,6 +19,8 @@ const CHECKS: { key: CheckKey; label: string; icon: string }[] = [
   { key: "mic", label: "Microphone validation", icon: "mic" },
   { key: "speaker", label: "Speaker validation", icon: "volume_up" },
   { key: "bandwidth", label: "Internet connectivity (≥ 5 Mbps)", icon: "speed" },
+  { key: "fullscreen", label: "Fullscreen support", icon: "fullscreen" },
+  { key: "screenshare", label: "Screen sharing capability", icon: "monitor" },
 ];
 
 function SystemCheckPage() {
@@ -30,6 +32,8 @@ function SystemCheckPage() {
     mic: "pending",
     speaker: "pending",
     bandwidth: "pending",
+    fullscreen: "pending",
+    screenshare: "pending",
   });
 
   const run = async () => {
@@ -40,6 +44,8 @@ function SystemCheckPage() {
       mic: "pending",
       speaker: "pending",
       bandwidth: "pending",
+      fullscreen: "pending",
+      screenshare: "pending",
     });
 
     // 1. Browser check
@@ -57,56 +63,71 @@ function SystemCheckPage() {
         mic: "fail",
         speaker: "fail",
         bandwidth: "fail",
+        fullscreen: "fail",
+        screenshare: "fail",
       }));
       return;
     }
 
-    // 2. Bandwidth / internet check
+    // 2. Fullscreen support check
+    const fsOk = !!(document.fullscreenEnabled || (document as any).webkitFullscreenEnabled || (document as any).mozFullScreenEnabled);
+    setChecks((s) => ({ ...s, fullscreen: fsOk ? "ok" : "fail" }));
+
+    // 3. Screen sharing capability check
+    const ssOk = !!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia);
+    setChecks((s) => ({ ...s, screenshare: ssOk ? "ok" : "fail" }));
+
+    // 4. Bandwidth / internet check
     setChecks((s) => ({ ...s, bandwidth: "running" }));
     let latencyOk = false;
     try {
       const start = performance.now();
-      // Fetch small resource to check online latency
       await fetch("/favicon.ico", { cache: "no-store" });
       const duration = performance.now() - start;
-      // If duration is reasonable (less than 2000ms), we have a working connection
       latencyOk = navigator.onLine && duration < 2000;
     } catch {
-      latencyOk = navigator.onLine; // fallback
+      latencyOk = navigator.onLine;
     }
     setChecks((s) => ({ ...s, bandwidth: latencyOk ? "ok" : "fail" }));
 
-    // 3. Permissions, Camera, Mic & Speaker
+    // 5. Speaker validation
+    setChecks((s) => ({ ...s, speaker: "running" }));
+    const hasTts = typeof window !== "undefined" && "speechSynthesis" in window;
+    setChecks((s) => ({ ...s, speaker: hasTts ? "ok" : "fail" }));
+
+    // 6. Camera, Mic, and Permissions Check (Discrete)
     setChecks((s) => ({
       ...s,
       permissions: "running",
       camera: "running",
       mic: "running",
-      speaker: "running",
     }));
 
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      // Stop tracks immediately to release the device
-      stream.getTracks().forEach((track) => track.stop());
+    let camOk = false;
+    let micOk = false;
 
-      setChecks((s) => ({
-        ...s,
-        permissions: "ok",
-        camera: "ok",
-        mic: "ok",
-        speaker: "ok",
-      }));
-    } catch (err) {
-      console.error("Media permission check failed:", err);
-      setChecks((s) => ({
-        ...s,
-        permissions: "fail",
-        camera: "fail",
-        mic: "fail",
-        speaker: "fail",
-      }));
+    try {
+      const camStream = await navigator.mediaDevices.getUserMedia({ video: true });
+      camStream.getTracks().forEach((track) => track.stop());
+      camOk = true;
+      setChecks((s) => ({ ...s, camera: "ok" }));
+    } catch (e) {
+      console.warn("Camera check failed:", e);
+      setChecks((s) => ({ ...s, camera: "fail" }));
     }
+
+    try {
+      const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      micStream.getTracks().forEach((track) => track.stop());
+      micOk = true;
+      setChecks((s) => ({ ...s, mic: "ok" }));
+    } catch (e) {
+      console.warn("Microphone check failed:", e);
+      setChecks((s) => ({ ...s, mic: "fail" }));
+    }
+
+    const permissionsOk = camOk && micOk;
+    setChecks((s) => ({ ...s, permissions: permissionsOk ? "ok" : "fail" }));
   };
 
   useEffect(() => {

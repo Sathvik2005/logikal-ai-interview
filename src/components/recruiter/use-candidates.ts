@@ -8,13 +8,14 @@ import {
   updateCandidateStatus,
   updateCandidateProfile,
   uploadCandidateResume,
+  getCandidateResumeUrl,
   type CandidateDTO,
   type CandidateStatus,
   type CreateCandidateInput,
 } from "@/lib/candidates.functions";
 
 export type { CandidateDTO, CandidateStatus, CreateCandidateInput };
-export { uploadCandidateResume };
+export { uploadCandidateResume, getCandidateResumeUrl };
 
 export const candidatesKeys = {
   all: ["candidates"] as const,

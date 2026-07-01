@@ -28,6 +28,9 @@ export interface SuggestedJd {
 export interface JdMatchResult {
   matchScore: number;
   analysis: string;
+  missingSkills?: string[];
+  strengths?: string[];
+  focusAreas?: string[];
 }
 
 export interface EvaluationResult {

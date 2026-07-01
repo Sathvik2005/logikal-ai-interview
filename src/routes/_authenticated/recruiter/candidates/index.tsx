@@ -15,7 +15,7 @@ import { ScheduleInterviewWizard } from "@/components/recruiter/ScheduleIntervie
 import { useInterviewSchedule } from "@/components/recruiter/use-interview-schedule";
 import { isProfileComplete } from "@/components/recruiter/candidate-completeness";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { retryResumeParsing, updateCandidateSummary } from "@/lib/candidates.functions";
+import { retryResumeParsing, updateCandidateSummary, getCandidateResumeUrl } from "@/lib/candidates.functions";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useServerFn } from "@tanstack/react-start";
 
@@ -193,10 +193,53 @@ function CandidatesPage() {
                             </p>
                             <div className="mt-1 flex items-center gap-1.5">
                               {c.resumeUrl ? (
-                                <span className="text-[10px] px-1.5 py-0.5 bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20 rounded font-medium flex items-center gap-0.5">
-                                  <Icon name="description" className="text-[12px]" />
-                                  Resume
-                                </span>
+                                <div className="flex gap-1.5">
+                                  <button
+                                    type="button"
+                                    onClick={async (e) => {
+                                      e.stopPropagation();
+                                      try {
+                                        const res = await getCandidateResumeUrl({ data: { id: c.id } });
+                                        if (res.url) {
+                                          window.open(res.url, "_blank");
+                                        } else {
+                                          toast.error("Resume file URL is not available");
+                                        }
+                                      } catch (err: any) {
+                                        toast.error(`Error opening resume: ${err.message || err}`);
+                                      }
+                                    }}
+                                    className="text-[10px] px-1.5 py-0.5 bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20 rounded font-medium flex items-center gap-0.5 hover:bg-green-500/20 transition cursor-pointer"
+                                    title="View resume"
+                                  >
+                                    <Icon name="visibility" className="text-[12px]" />
+                                    View
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={async (e) => {
+                                      e.stopPropagation();
+                                      try {
+                                        const res = await getCandidateResumeUrl({ data: { id: c.id } });
+                                        if (res.url) {
+                                          const a = document.createElement("a");
+                                          a.href = res.url;
+                                          a.download = c.resumeUrl?.split("/").pop() || "resume.pdf";
+                                          a.click();
+                                        } else {
+                                          toast.error("Resume file URL is not available");
+                                        }
+                                      } catch (err: any) {
+                                        toast.error(`Error downloading resume: ${err.message || err}`);
+                                      }
+                                    }}
+                                    className="text-[10px] px-1.5 py-0.5 bg-primary-container/20 text-primary border border-primary/20 rounded font-medium flex items-center gap-0.5 hover:bg-primary-container/40 transition cursor-pointer"
+                                    title="Download resume"
+                                  >
+                                    <Icon name="download" className="text-[12px]" />
+                                    Download
+                                  </button>
+                                </div>
                               ) : (
                                 <span className="text-[10px] px-1.5 py-0.5 bg-outline-variant/30 text-on-surface-variant/70 border border-outline-variant/40 rounded font-medium flex items-center gap-0.5">
                                   No Resume

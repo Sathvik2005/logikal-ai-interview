@@ -38,6 +38,7 @@ model Organization {
   interview_templates   InterviewTemplate[]
   identity_verifications IdentityVerification[]
   workspace_settings    WorkspaceSetting[]
+  jd_candidate_matches  JdCandidateMatch[]
 
   @@map("organizations")
 }
@@ -378,15 +379,17 @@ model NotificationOutbox {
 }
 
 model AuditEvent {
-  id           String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  org_id       String       @db.Uuid
-  actor_id     String?      @db.Uuid
+  id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  org_id       String?       @db.Uuid
+  actor_id     String?       @db.Uuid
   entity_type  String
-  entity_id    String       @db.Uuid
+  entity_id    String?       @db.Uuid
   action       String
-  diff         Json?
-  created_at   DateTime     @default(now()) @db.Timestamptz
-  organization Organization @relation(fields: [org_id], references: [id], onDelete: Cascade)
+  diff         Json          @default("{}")
+  ip           String?
+  user_agent   String?
+  created_at   DateTime      @default(now()) @db.Timestamptz
+  organization Organization? @relation(fields: [org_id], references: [id], onDelete: SetNull)
 
   @@map("audit_events")
 }
@@ -467,20 +470,25 @@ model WorkspaceSetting {
 }
 
 model RateLimit {
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  key        String   @unique
-  tokens     Int
-  last_pulse DateTime @default(now()) @db.Timestamptz
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  key          String
+  window_start DateTime @db.Timestamptz
+  count        Int      @default(0)
 
+  @@unique([key, window_start])
   @@map("rate_limits")
 }
 
 model ErrorEvent {
   id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   org_id     String?  @db.Uuid
-  error_msg  String
+  actor_id   String?  @db.Uuid
+  source     String
+  level      String   @default("error")
+  message    String
   stack      String?
-  meta       Json?    @default("{}")
+  context    Json     @default("{}")
+  request_id String?
   created_at DateTime @default(now()) @db.Timestamptz
 
   @@map("error_events")
@@ -567,14 +575,21 @@ model CandidateTimeline {
 
 model JdCandidateMatch {
   id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  org_id       String         @db.Uuid
   job_id       String         @db.Uuid
   candidate_id String         @db.Uuid
   match_score  Decimal        @db.Decimal
-  analysis     Json           @default("{}")
+  missing_skills Json         @default("[]")
+  strengths    Json           @default("[]")
+  focus_areas  Json           @default("[]")
+  shortlisted  Boolean        @default(false)
   created_at   DateTime       @default(now()) @db.Timestamptz
+  updated_at   DateTime       @default(now()) @db.Timestamptz
+  organization Organization   @relation(fields: [org_id], references: [id], onDelete: Cascade)
   job          JobDescription @relation(fields: [job_id], references: [id], onDelete: Cascade)
   candidate    Candidate      @relation(fields: [candidate_id], references: [id], onDelete: Cascade)
 
+  @@unique([job_id, candidate_id])
   @@map("jd_candidate_matches")
 }
 

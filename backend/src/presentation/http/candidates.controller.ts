@@ -17,6 +17,7 @@ import { Roles, RolesGuard } from "../guards/roles.guard";
 import { CandidateWorkflowService } from "../../application/candidate/candidate-workflow.service";
 import { FileProcessingPipelineService } from "../../application/candidate/file-processing-pipeline.service";
 import { PrismaService } from "../../infrastructure/database/prisma.service";
+import { StorageService } from "../../application/services/storage.service";
 
 @Controller("candidates")
 @UseGuards(SupabaseAuthGuard, RolesGuard)
@@ -25,6 +26,7 @@ export class CandidatesController {
     private readonly workflow: CandidateWorkflowService,
     private readonly filePipeline: FileProcessingPipelineService,
     private readonly prisma: PrismaService,
+    private readonly storage: StorageService,
   ) {}
 
   @Get()
@@ -134,6 +136,27 @@ export class CandidatesController {
       where: { candidate_id: id },
       orderBy: { created_at: "asc" },
     });
+  }
+
+  @Get(":id/resume-url")
+  async getResumeUrl(@Req() req: any, @Param("id") id: string) {
+    const candidate = await this.prisma.candidate.findUnique({
+      where: { id },
+    });
+    if (!candidate || !candidate.resume_url) return { url: null };
+
+    const isRecruiterOrAdmin = req.user.role === "recruiter" || req.user.role === "admin";
+    const isSelf = candidate.user_id === req.user.userId;
+
+    if (!isRecruiterOrAdmin && !isSelf) {
+      throw new Error("Unauthorized to access this resume URL");
+    }
+
+    const fileKey = candidate.resume_url.split("/").pop()?.split("?")[0];
+    if (!fileKey) return { url: candidate.resume_url };
+
+    const url = await this.storage.getFileSignedUrl("resumes", fileKey);
+    return { url };
   }
 
   @Get("self/interview")

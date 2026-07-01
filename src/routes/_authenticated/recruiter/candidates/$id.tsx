@@ -8,6 +8,7 @@ import { ErrorState } from "@/components/shared/ErrorState";
 import {
   useCandidateQuery,
   useUpdateCandidateProfile,
+  getCandidateResumeUrl,
   type UpdateProfileInput,
 } from "@/components/recruiter/use-candidates";
 import { useInterviewsQuery } from "@/components/recruiter/use-interviews";
@@ -545,6 +546,17 @@ function CandidateProfile() {
                 </span>
               )}
             </p>
+            {c.resumeUrl && (
+              <div className="mb-md p-3 bg-surface-container rounded-lg flex items-center gap-2 border border-outline-variant">
+                <Icon name="description" className="text-secondary" />
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-on-surface-variant uppercase">Original Resume File</p>
+                  <p className="text-body-sm font-mono text-on-surface truncate" title={c.resumeUrl.split("/").pop()?.split("?")[0]}>
+                    {c.resumeUrl.split("/").pop()?.split("?")[0] || "resume.pdf"}
+                  </p>
+                </div>
+              </div>
+            )}
             <Link
               to="/recruiter/candidates/$id/resume"
               params={{ id: c.id }}
@@ -660,6 +672,51 @@ function CandidateProfile() {
               <Icon name="email" />
               Send Email
             </a>
+            {c.resumeUrl && (
+              <>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const res = await getCandidateResumeUrl({ data: { id: c.id } });
+                      if (res.url) {
+                        window.open(res.url, "_blank");
+                      } else {
+                        toast.error("Resume file URL is not available");
+                      }
+                    } catch (err: any) {
+                      toast.error(`Error opening resume: ${err.message || err}`);
+                    }
+                  }}
+                  className="w-full px-3 py-2 border border-outline-variant rounded-lg flex items-center justify-center gap-2 hover:bg-surface-container-low cursor-pointer"
+                >
+                  <Icon name="visibility" />
+                  View Original Resume
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      const res = await getCandidateResumeUrl({ data: { id: c.id } });
+                      if (res.url) {
+                        const a = document.createElement("a");
+                        a.href = res.url;
+                        a.download = c.resumeUrl?.split("/").pop() || "resume.pdf";
+                        a.click();
+                      } else {
+                        toast.error("Resume file URL is not available");
+                      }
+                    } catch (err: any) {
+                      toast.error(`Error downloading resume: ${err.message || err}`);
+                    }
+                  }}
+                  className="w-full px-3 py-2 border border-outline-variant rounded-lg flex items-center justify-center gap-2 hover:bg-surface-container-low cursor-pointer"
+                >
+                  <Icon name="download" />
+                  Download Resume File
+                </button>
+              </>
+            )}
           </CardShadow>
         </div>
       </div>

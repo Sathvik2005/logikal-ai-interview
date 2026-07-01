@@ -57,7 +57,31 @@ function ActiveMonitor() {
     queryFn: () => recordedFn({}),
   });
 
-  const live: LiveInterviewDTO | null = (liveQ.data as LiveInterviewDTO[] | undefined)?.[0] ?? null;
+  const liveSessions = (liveQ.data as LiveInterviewDTO[] | undefined) ?? [];
+  const [selectedLiveId, setSelectedLiveId] = useState<string | null>(null);
+
+  const live = useMemo(() => {
+    if (liveSessions.length === 0) return null;
+    return liveSessions.find((s) => s.id === selectedLiveId) || liveSessions[0];
+  }, [liveSessions, selectedLiveId]);
+
+  const [monitorSearch, setMonitorSearch] = useState("");
+  const [monitorFilterRole, setMonitorFilterRole] = useState("all");
+
+  const filteredLiveSessions = useMemo(() => {
+    return liveSessions.filter((s) => {
+      const matchesSearch = s.candidateName.toLowerCase().includes(monitorSearch.toLowerCase()) ||
+                            s.role.toLowerCase().includes(monitorSearch.toLowerCase());
+      const matchesRole = monitorFilterRole === "all" || s.role === monitorFilterRole;
+      return matchesSearch && matchesRole;
+    });
+  }, [liveSessions, monitorSearch, monitorFilterRole]);
+
+  const liveRoles = useMemo(() => {
+    const roles = liveSessions.map((s) => s.role);
+    return Array.from(new Set(roles));
+  }, [liveSessions]);
+
   const recorded: RecordedSessionDTO[] = (recordedQ.data as RecordedSessionDTO[] | undefined) ?? [];
   const [playback, setPlayback] = useState<RecordedSessionDTO | null>(null);
 
@@ -137,7 +161,75 @@ function ActiveMonitor() {
       {liveQ.isLoading ? (
         <SkeletonCard />
       ) : live ? (
-        <LiveSession live={live} />
+        <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-lg items-start">
+          {/* Active Sessions Sidebar Selector */}
+          <CardShadow className="p-md flex flex-col h-[650px] bg-white">
+            <h3 className="text-title-md font-semibold text-on-surface mb-2 flex items-center gap-1.5 border-b border-outline-variant pb-2">
+              <Icon name="groups" className="text-primary" /> Active Feed List
+            </h3>
+            
+            {/* Search Input */}
+            <div className="relative mb-2">
+              <Icon name="search" className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-outline" />
+              <input
+                value={monitorSearch}
+                onChange={(e) => setMonitorSearch(e.target.value)}
+                placeholder="Search feeds..."
+                className="w-full pl-8 pr-3 py-1.5 bg-surface border border-outline-variant rounded-md text-xs outline-none focus:ring-1 focus:ring-primary"
+              />
+            </div>
+
+            {/* Filter Dropdown */}
+            {liveRoles.length > 0 && (
+              <select
+                value={monitorFilterRole}
+                onChange={(e) => setMonitorFilterRole(e.target.value)}
+                className="w-full mb-3 px-2 py-1.5 bg-surface border border-outline-variant rounded-md text-xs"
+              >
+                <option value="all">All Roles</option>
+                {liveRoles.map((r) => (
+                  <option key={r} value={r}>{r}</option>
+                ))}
+              </select>
+            )}
+
+            {/* Session Cards List */}
+            <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+              {filteredLiveSessions.length === 0 ? (
+                <p className="text-body-sm text-on-surface-variant italic text-center mt-4">No matching sessions</p>
+              ) : (
+                filteredLiveSessions.map((session) => {
+                  const isSelected = session.id === live.id;
+                  return (
+                    <button
+                      key={session.id}
+                      type="button"
+                      onClick={() => setSelectedLiveId(session.id)}
+                      className={`w-full text-left p-3 rounded-lg border text-xs transition cursor-pointer flex flex-col gap-1 ${
+                        isSelected
+                          ? "bg-primary-container border-primary text-on-primary-container font-semibold"
+                          : "bg-surface-container-lowest border-outline-variant hover:bg-surface-container-low text-on-surface"
+                      }`}
+                    >
+                      <div className="flex justify-between items-start">
+                        <span className="truncate max-w-[150px] font-medium">{session.candidateName}</span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-error animate-pulse shrink-0 mt-1" />
+                      </div>
+                      <p className="text-[11px] text-on-surface-variant truncate">{session.role}</p>
+                      <div className="flex justify-between items-center text-[10px] text-on-surface-variant mt-1">
+                        <span>{session.personaName}</span>
+                        <span className="font-mono text-[9px]">{session.scheduledAt ? fmtDate(session.scheduledAt).slice(0, 10) : "Live"}</span>
+                      </div>
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          </CardShadow>
+
+          {/* Selected Live Session Details */}
+          <LiveSession live={live} />
+        </div>
       ) : (
         <CardShadow className="p-lg">
           <EmptyState

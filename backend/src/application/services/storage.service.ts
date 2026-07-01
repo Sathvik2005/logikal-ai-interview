@@ -1,10 +1,10 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import * as fs from "fs";
 import * as path from "path";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 @Injectable()
-export class StorageService {
+export class StorageService implements OnModuleInit {
   private readonly logger = new Logger(StorageService.name);
   private supabaseClient: SupabaseClient | null = null;
   private isLocal = true;
@@ -33,6 +33,43 @@ export class StorageService {
       this.logger.log(
         `Storage Service initialized in local mode. Directory: ${this.localStorageDir}`,
       );
+    }
+  }
+
+  async onModuleInit() {
+    const buckets = ["resumes", "recordings", "reports", "candidate-documents", "avatars"];
+    if (this.isLocal || !this.supabaseClient) {
+      for (const bucket of buckets) {
+        const dirPath = path.join(this.localStorageDir, bucket);
+        if (!fs.existsSync(dirPath)) {
+          fs.mkdirSync(dirPath, { recursive: true });
+        }
+      }
+      return;
+    }
+
+    try {
+      const { data: bucketList, error: listError } = await this.supabaseClient.storage.listBuckets();
+      if (listError) {
+        this.logger.error(`Failed to list Supabase storage buckets: ${listError.message}`);
+        return;
+      }
+
+      for (const bucket of buckets) {
+        const exists = bucketList.some((b) => b.id === bucket);
+        if (!exists) {
+          this.logger.log(`Creating missing storage bucket: ${bucket}`);
+          const isPublic = bucket === "avatars";
+          const { error: createError } = await this.supabaseClient.storage.createBucket(bucket, {
+            public: isPublic,
+          });
+          if (createError) {
+            this.logger.error(`Failed to create storage bucket ${bucket}: ${createError.message}`);
+          }
+        }
+      }
+    } catch (err: any) {
+      this.logger.error(`Error initializing storage buckets: ${err.message || err}`);
     }
   }
 

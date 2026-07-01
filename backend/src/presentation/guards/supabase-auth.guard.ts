@@ -40,7 +40,7 @@ export class SupabaseAuthGuard implements CanActivate {
         userId: decoded.sub,
         email: decoded.email,
         role: decoded.user_metadata?.role || "candidate",
-        orgId: decoded.user_metadata?.orgId || null,
+        orgId: decoded.user_metadata?.orgId || "00000000-0000-0000-0000-000000000000",
         claims: decoded,
       };
 

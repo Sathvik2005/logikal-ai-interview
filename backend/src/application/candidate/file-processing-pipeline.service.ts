@@ -150,32 +150,20 @@ export class FileProcessingPipelineService implements OnModuleInit {
 
     try {
       // 2. Download resume content from URL
-      this.logger.log(`Downloading resume from: ${candidate.resumeUrl}`);
-      const response = await fetch(candidate.resumeUrl);
-      if (!response.ok) {
-        throw new Error(`Failed to download resume from URL (status ${response.status}): ${response.statusText}`);
-      }
+      const fileKey = this.extractFileKey(candidate.resumeUrl, "resumes");
+      this.logger.log(`Downloading resume from storage: key=${fileKey}`);
+      const fileBuffer = await this.storage.downloadFile("resumes", fileKey);
 
-      const arrayBuffer = await response.arrayBuffer();
-      const fileBuffer = Buffer.from(arrayBuffer);
       let mimeType = "application/pdf";
-      const contentType = response.headers.get("content-type");
-      if (contentType) {
-        mimeType = contentType.split(";")[0].trim();
+      if (fileKey.toLowerCase().endsWith(".docx")) {
+        mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+      } else if (fileKey.toLowerCase().endsWith(".doc")) {
+        mimeType = "application/msword";
+      } else if (fileKey.toLowerCase().endsWith(".txt")) {
+        mimeType = "text/plain";
       }
 
-      let fileName = "resume.pdf";
-      const disposition = response.headers.get("content-disposition");
-      if (disposition && disposition.includes("filename=")) {
-        const match = disposition.match(/filename="?([^";]+)"?/);
-        if (match) fileName = match[1];
-      } else {
-        const urlParts = candidate.resumeUrl.split("/");
-        const lastPart = urlParts[urlParts.length - 1];
-        if (lastPart && lastPart.includes(".")) {
-          fileName = lastPart;
-        }
-      }
+      const fileName = fileKey.split("/").pop() || "resume.pdf";
 
       // 3. Process download inside the standard resume pipeline
       await this.processResume(
@@ -232,5 +220,15 @@ export class FileProcessingPipelineService implements OnModuleInit {
     await this.candidateRepo.save(candidate);
 
     await this.queue.enqueue("process-candidate-resume", { candidateId });
+  }
+
+  private extractFileKey(url: string, bucketName: string): string {
+    const marker = `/${bucketName}/`;
+    const idx = url.indexOf(marker);
+    if (idx === -1) {
+      return url.split("/").pop() || url;
+    }
+    const rawKey = url.slice(idx + marker.length);
+    return rawKey.split("?")[0];
   }
 }

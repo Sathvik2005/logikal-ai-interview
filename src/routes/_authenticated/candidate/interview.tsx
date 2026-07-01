@@ -80,13 +80,26 @@ function InterviewOrchestrator() {
     })();
   }, [resolveInterview, interviewId]);
 
-  // Cleanup all media streams on unmount
+  // Cleanup all media streams and voice synthesis on unmount
+  const webcamStreamRef = useRef<MediaStream | null>(null);
+  const screenStreamRef = useRef<MediaStream | null>(null);
+
+  useEffect(() => {
+    webcamStreamRef.current = webcamStream;
+  }, [webcamStream]);
+
+  useEffect(() => {
+    screenStreamRef.current = screenStream;
+  }, [screenStream]);
+
   useEffect(() => {
     return () => {
-      webcamStream?.getTracks().forEach((t) => t.stop());
-      screenStream?.getTracks().forEach((t) => t.stop());
+      webcamStreamRef.current?.getTracks().forEach((t) => t.stop());
+      screenStreamRef.current?.getTracks().forEach((t) => t.stop());
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (phase === "boot") {
@@ -153,6 +166,8 @@ function InterviewOrchestrator() {
         sessionId={sessionId}
         webcamStream={webcamStream}
         screenStream={screenStream}
+        setWebcamStream={setWebcamStream}
+        setScreenStream={setScreenStream}
         onCompleted={() => {
           webcamStream?.getTracks().forEach((t) => t.stop());
           screenStream?.getTracks().forEach((t) => t.stop());
@@ -620,12 +635,16 @@ function InterviewRoom({
   sessionId,
   webcamStream,
   screenStream,
+  setWebcamStream,
+  setScreenStream,
   onCompleted,
 }: {
   interview: NonNullable<InterviewMeta>;
   sessionId: string;
   webcamStream: MediaStream | null;
   screenStream: MediaStream | null;
+  setWebcamStream: (stream: MediaStream | null) => void;
+  setScreenStream: (stream: MediaStream | null) => void;
   onCompleted: () => void;
 }) {
   const camRef = useRef<HTMLVideoElement | null>(null);
@@ -636,6 +655,8 @@ function InterviewRoom({
   const [muted, setMuted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [isReconnecting, setIsReconnecting] = useState(false);
+  const isUserListeningRef = useRef(false);
   const recognitionRef = useRef<any>(null);
   const personaInitRef = useRef(false);
 
@@ -647,6 +668,23 @@ function InterviewRoom({
   const turnsQuery = useSessionTurns(sessionId);
 
   useProctor({ sessionId, webcamStream, screenStream, enabled: true });
+
+  // Cleanup speech synthesis and recognition on unmount of room
+  useEffect(() => {
+    return () => {
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+      isUserListeningRef.current = false;
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.onend = null;
+          recognitionRef.current.onerror = null;
+          recognitionRef.current.stop();
+        } catch (e) {}
+      }
+    };
+  }, []);
 
   // Attach webcam video
   useEffect(() => {
@@ -708,7 +746,7 @@ function InterviewRoom({
     };
   }, []);
 
-  // Devices Disconnect Monitoring
+  // Devices Disconnect Monitoring (Camera and Microphone)
   useEffect(() => {
     if (!webcamStream) return;
     const handlers: Array<{ track: MediaStreamTrack; fn: () => void }> = [];
@@ -725,32 +763,65 @@ function InterviewRoom({
     return () => handlers.forEach((h) => h.track.removeEventListener("ended", h.fn));
   }, [webcamStream]);
 
+  // Screen Share Disconnect Monitoring
+  useEffect(() => {
+    if (!screenStream) return;
+    const track = screenStream.getVideoTracks()[0];
+    if (!track) return;
+    const fn = () => {
+      setIsPaused(true);
+      toast.error("Screen sharing ended. Interview paused.");
+    };
+    track.addEventListener("ended", fn);
+    return () => track.removeEventListener("ended", fn);
+  }, [screenStream]);
+
   async function reconnectDevices() {
     try {
-      const s = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      if (camRef.current) {
-        camRef.current.srcObject = s;
-        await camRef.current.play().catch(() => undefined);
+      let currentCam = webcamStream;
+      const camTrack = webcamStream?.getVideoTracks()[0];
+      const micTrack = webcamStream?.getAudioTracks()[0];
+
+      if (!camTrack || camTrack.readyState === "ended" || !micTrack || micTrack.readyState === "ended") {
+        currentCam = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        setWebcamStream(currentCam);
+        if (camRef.current) {
+          camRef.current.srcObject = currentCam;
+          await camRef.current.play().catch(() => undefined);
+        }
       }
+
+      let currentScreen = screenStream;
+      const screenTrack = screenStream?.getVideoTracks()[0];
+      if (!screenTrack || screenTrack.readyState === "ended") {
+        currentScreen = await navigator.mediaDevices.getDisplayMedia({ video: true });
+        setScreenStream(currentScreen);
+      }
+
       toast.success("Devices reconnected successfully.");
       setIsPaused(false);
-    } catch {
-      toast.error("Could not reconnect devices. Please check permission.");
+    } catch (err: any) {
+      toast.error(`Reconnection failed: ${err.message || err}`);
     }
   }
 
-  function toggleSpeech() {
-    if (isListening) {
-      recognitionRef.current?.stop();
-      setIsListening(false);
-      return;
-    }
-
+  function startRecognition() {
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       toast.error("Speech recognition is not supported in this browser.");
+      isUserListeningRef.current = false;
+      setIsListening(false);
+      setIsReconnecting(false);
       return;
+    }
+
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.onend = null;
+        recognitionRef.current.onerror = null;
+        recognitionRef.current.stop();
+      } catch (e) {}
     }
 
     const rec = new SpeechRecognition();
@@ -766,17 +837,62 @@ function InterviewRoom({
       }
     };
 
-    rec.onerror = () => {
-      setIsListening(false);
+    rec.onerror = (event: any) => {
+      console.warn("Speech recognition error:", event.error);
+      if (event.error === "not-allowed") {
+        toast.error("Microphone permission denied. Speech recognition disabled.");
+        isUserListeningRef.current = false;
+        setIsListening(false);
+        setIsReconnecting(false);
+      } else if (event.error === "network") {
+        setIsReconnecting(true);
+      }
     };
 
     rec.onend = () => {
-      setIsListening(false);
+      if (isUserListeningRef.current) {
+        setIsReconnecting(true);
+        setTimeout(() => {
+          if (isUserListeningRef.current) {
+            try {
+              rec.start();
+              setIsReconnecting(false);
+            } catch (e) {
+              console.error("Failed to restart speech recognition:", e);
+            }
+          }
+        }, 400);
+      } else {
+        setIsListening(false);
+        setIsReconnecting(false);
+      }
     };
 
     recognitionRef.current = rec;
-    rec.start();
-    setIsListening(true);
+    try {
+      rec.start();
+      setIsListening(true);
+      setIsReconnecting(false);
+    } catch (err) {
+      console.error("Failed to start speech recognition:", err);
+      setIsReconnecting(true);
+    }
+  }
+
+  function toggleSpeech() {
+    if (isListening || isReconnecting) {
+      isUserListeningRef.current = false;
+      setIsListening(false);
+      setIsReconnecting(false);
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch (e) {}
+      }
+    } else {
+      isUserListeningRef.current = true;
+      startRecognition();
+    }
   }
 
   function toggleMute() {
@@ -933,11 +1049,13 @@ function InterviewRoom({
               onClick={toggleSpeech}
               disabled={awaiting || finalizing || isPaused}
               className={`absolute right-3 bottom-4 p-2 rounded-full transition ${
-                isListening
-                  ? "bg-error text-on-error animate-pulse"
-                  : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
+                isReconnecting
+                  ? "bg-amber-500 text-white animate-pulse"
+                  : isListening
+                    ? "bg-red-600 text-white animate-pulse"
+                    : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
               }`}
-              title={isListening ? "Listening - Click to stop" : "Speak verbally"}
+              title={isReconnecting ? "Reconnecting mic..." : isListening ? "Listening - Click to stop" : "Speak verbally"}
             >
               <Icon name={isListening ? "mic" : "mic_off"} className="text-lg" />
             </button>
@@ -946,9 +1064,11 @@ function InterviewRoom({
             <p className="text-label-sm text-on-surface-variant">
               {awaiting
                 ? "Aria is thinking…"
-                : isListening
-                  ? "Listening to your voice..."
-                  : "Press Send when ready."}
+                : isReconnecting
+                  ? "Reconnecting microphone..."
+                  : isListening
+                    ? "Listening to your voice..."
+                    : "Press Send when ready."}
             </p>
             <div className="flex gap-2">
               <button

@@ -104,6 +104,8 @@ describe("NotificationService", () => {
 
     beforeEach(async () => {
       process.env.RESEND_API_KEY = "re_someapikey";
+      process.env.EMAIL_FROM_NAME = "Lokality AI Recruitment";
+      process.env.EMAIL_FROM_ADDRESS = "recruitment@lokality.ai";
       mockSend = jest.fn().mockResolvedValue({});
 
       const module: TestingModule = await Test.createTestingModule({
@@ -168,13 +170,15 @@ describe("NotificationService", () => {
         scheduledAt: "10:00 AM",
       });
 
-      expect(loggerErrorSpy).toHaveBeenCalledWith("Resend email delivery failed: Network Timeout");
+      expect(loggerErrorSpy).toHaveBeenCalledWith(
+        "Resend email delivery failed with sender [Lokality AI Recruitment <recruitment@lokality.ai>]: Network Timeout"
+      );
 
       expect(prisma.notificationOutbox.update).toHaveBeenCalledWith({
         where: { id: "outbox-789" },
         data: {
           status: "failed",
-          error: "Network Timeout",
+          error: "Original: Network Timeout | Fallback: Network Timeout",
         },
       });
     });
