@@ -11,7 +11,6 @@ function validateEnvironment() {
     "SUPABASE_SERVICE_ROLE_KEY",
     "JWT_SECRET",
     "GEMINI_API_KEY",
-    "LOVABLE_API_KEY",
     "RESEND_API_KEY",
   ];
   const missing = required.filter((key) => {
