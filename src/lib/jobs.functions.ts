@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getRequest } from "@tanstack/react-start/server";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 export type JobStatus = "draft" | "open" | "paused" | "closed" | "archived";
 
@@ -64,37 +65,59 @@ function getAuthHeader(): Record<string, string> {
 export const listJobs = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async () => {
-    const res = await fetch(`${getBackendUrl()}/api/jobs`, {
-      headers: {
-        ...getAuthHeader(),
-      },
-    });
+    try {
+      const res = await fetch(`${getBackendUrl()}/api/jobs`, {
+        headers: {
+          ...getAuthHeader(),
+        },
+      });
 
-    if (!res.ok) {
-      throw new Error(`Failed to list jobs: ${res.statusText}`);
+      if (!res.ok) {
+        throw new Error(`Failed to list jobs: ${res.statusText}`);
+      }
+
+      const rows = (await res.json()) as Row[];
+      return rows.map((r) => mapRow(r, 0));
+    } catch (err) {
+      console.warn("NestJS backend offline. Listing jobs directly from Supabase:", err);
+      const { data: rows, error } = await supabaseAdmin
+        .from("job_descriptions")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (rows || []).map((r) => mapRow(r as any, 0));
     }
-
-    const rows = (await res.json()) as Row[];
-    return rows.map((r) => mapRow(r, 0)); // Candidate counts are aggregated in backend analytics
   });
 
 export const getJob = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data }) => {
-    const res = await fetch(`${getBackendUrl()}/api/jobs/${data.id}`, {
-      headers: {
-        ...getAuthHeader(),
-      },
-    });
+    try {
+      const res = await fetch(`${getBackendUrl()}/api/jobs/${data.id}`, {
+        headers: {
+          ...getAuthHeader(),
+        },
+      });
 
-    if (!res.ok) {
-      throw new Error(`Failed to fetch job: ${res.statusText}`);
+      if (!res.ok) {
+        throw new Error(`Failed to fetch job: ${res.statusText}`);
+      }
+
+      const row = (await res.json()) as Row | null;
+      if (!row) throw new Error("Job not found");
+      return mapRow(row);
+    } catch (err) {
+      console.warn("NestJS backend offline. Fetching job directly from Supabase:", err);
+      const { data: row, error } = await supabaseAdmin
+        .from("job_descriptions")
+        .select("*")
+        .eq("id", data.id)
+        .maybeSingle();
+      if (error) throw error;
+      if (!row) throw new Error("Job not found");
+      return mapRow(row as any);
     }
-
-    const row = (await res.json()) as Row | null;
-    if (!row) throw new Error("Job not found");
-    return mapRow(row);
   });
 
 const UpsertInput = z.object({
@@ -115,21 +138,48 @@ export const upsertJob = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => UpsertInput.parse(input))
   .handler(async ({ data }) => {
-    const res = await fetch(`${getBackendUrl()}/api/jobs`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeader(),
-      },
-      body: JSON.stringify(data),
-    });
+    try {
+      const res = await fetch(`${getBackendUrl()}/api/jobs`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+        body: JSON.stringify(data),
+      });
 
-    if (!res.ok) {
-      throw new Error(`Failed to upsert job: ${res.statusText}`);
+      if (!res.ok) {
+        throw new Error(`Failed to upsert job: ${res.statusText}`);
+      }
+
+      const row = (await res.json()) as Row;
+      return mapRow(row);
+    } catch (err) {
+      console.warn("NestJS backend offline. Upserting job directly in Supabase:", err);
+      const dbData = {
+        id: data.id || undefined,
+        title: data.title,
+        department: data.department,
+        location: data.location,
+        employment_type: data.employmentType,
+        seniority: data.seniority,
+        description: data.description,
+        requirements: data.requirements,
+        persona_id: data.personaId,
+        status: data.status,
+        competencies: data.competencies || {},
+        created_by: "00000000-0000-0000-0000-000000000000", // system default user
+        org_id: "00000000-0000-0000-0000-000000000000", // default org
+      };
+
+      const { data: row, error } = await supabaseAdmin
+        .from("job_descriptions")
+        .upsert(dbData)
+        .select()
+        .single();
+      if (error) throw error;
+      return mapRow(row as any);
     }
-
-    const row = (await res.json()) as Row;
-    return mapRow(row);
   });
 
 export const archiveJob = createServerFn({ method: "POST" })

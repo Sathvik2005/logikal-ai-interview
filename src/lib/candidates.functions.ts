@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getRequest } from "@tanstack/react-start/server";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 // ---------- shared UI shape ----------
 export type CandidateStatus =
@@ -133,18 +134,46 @@ export const listCandidates = createServerFn({ method: "POST" })
       url += `?${params.toString()}`;
     }
 
-    const res = await fetch(url, {
-      headers: {
-        ...getAuthHeader(),
-      },
-    });
+    try {
+      const res = await fetch(url, {
+        headers: {
+          ...getAuthHeader(),
+        },
+      });
 
-    if (!res.ok) {
-      throw new Error(`Failed to list candidates: ${res.statusText}`);
+      if (!res.ok) {
+        throw new Error(`Failed to list candidates: ${res.statusText}`);
+      }
+
+      const rows = (await res.json()) as DbRow[];
+      return rows.map(mapRow);
+    } catch (err) {
+      console.warn("NestJS backend offline. Falling back to direct Supabase query:", err);
+      let queryBuilder = supabaseAdmin.from("candidates").select("*");
+      if (data.search) {
+        queryBuilder = queryBuilder.or(`full_name.ilike.%${data.search}%,email.ilike.%${data.search}%,role_applied.ilike.%${data.search}%`);
+      }
+      if (data.status) {
+        let dbStatus = data.status;
+        if (data.status === "new") {
+          queryBuilder = queryBuilder.in("status", ["new", "applied", "resume_imported", "resume_parsed"]);
+        } else if (data.status === "screening") {
+          queryBuilder = queryBuilder.in("status", ["screening", "jd_matched", "shortlisted"]);
+        } else if (data.status === "interviewing") {
+          queryBuilder = queryBuilder.in("status", ["interviewing", "interview_assigned", "interview_scheduled", "invitation_sent", "interview_started", "interview_running"]);
+        } else if (data.status === "evaluated") {
+          queryBuilder = queryBuilder.in("status", ["evaluated", "evaluation_processing", "recruiter_review"]);
+        } else if (data.status === "hired") {
+          queryBuilder = queryBuilder.eq("status", "hiring_decision");
+        } else {
+          queryBuilder = queryBuilder.eq("status", dbStatus);
+        }
+      }
+      queryBuilder = queryBuilder.limit(data.limit).order("created_at", { ascending: false });
+      const { data: rows, error } = await queryBuilder;
+      if (error) throw error;
+      return (rows || []).map(mapRow);
     }
-
-    const rows = (await res.json()) as DbRow[];
-    return rows.map(mapRow);
   });
 
 // ---------- get one ----------
@@ -152,19 +181,31 @@ export const getCandidate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data }) => {
-    const res = await fetch(`${getBackendUrl()}/api/candidates/${data.id}`, {
-      headers: {
-        ...getAuthHeader(),
-      },
-    });
+    try {
+      const res = await fetch(`${getBackendUrl()}/api/candidates/${data.id}`, {
+        headers: {
+          ...getAuthHeader(),
+        },
+      });
 
-    if (!res.ok) {
-      throw new Error(`Failed to fetch candidate: ${res.statusText}`);
+      if (!res.ok) {
+        throw new Error(`Failed to fetch candidate: ${res.statusText}`);
+      }
+
+      const row = (await res.json()) as DbRow | null;
+      if (!row) return null;
+      return mapRow(row);
+    } catch (err) {
+      console.warn("NestJS backend offline. Fetching candidate directly from Supabase:", err);
+      const { data: row, error } = await supabaseAdmin
+        .from("candidates")
+        .select("*")
+        .eq("id", data.id)
+        .maybeSingle();
+      if (error) throw error;
+      if (!row) return null;
+      return mapRow(row as any);
     }
-
-    const row = (await res.json()) as DbRow | null;
-    if (!row) return null;
-    return mapRow(row);
   });
 
 // ---------- create ----------
@@ -189,30 +230,57 @@ export const createCandidate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => createInput.parse(data))
   .handler(async ({ data }) => {
-    const res = await fetch(`${getBackendUrl()}/api/candidates`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeader(),
-      },
-      body: JSON.stringify(data),
-    });
+    try {
+      const res = await fetch(`${getBackendUrl()}/api/candidates`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+        body: JSON.stringify(data),
+      });
 
-    if (!res.ok) {
-      throw new Error(`Failed to create candidate: ${res.statusText}`);
+      if (!res.ok) {
+        throw new Error(`Failed to create candidate: ${res.statusText}`);
+      }
+
+      const result = await res.json();
+
+      // Fetch the newly created candidate to map correct format
+      const getRes = await fetch(`${getBackendUrl()}/api/candidates/${result.id}`, {
+        headers: {
+          ...getAuthHeader(),
+        },
+      });
+
+      const row = (await getRes.json()) as DbRow;
+      return mapRow(row);
+    } catch (err) {
+      console.warn("NestJS backend offline. Creating candidate directly in Supabase:", err);
+      const insertData = {
+        full_name: data.name,
+        email: data.email,
+        phone: data.phone,
+        role_applied: data.role,
+        status: data.status === "new" ? "applied" : data.status,
+        experience_years: data.experienceYears,
+        skills: data.skills,
+        notes: data.notes,
+        job_id: data.jobId,
+        custom_role: data.customRole || {},
+        resume_analysis: data.resumeAnalysis || {},
+        org_id: "00000000-0000-0000-0000-000000000000", // default org
+      };
+
+      const { data: inserted, error } = await supabaseAdmin
+        .from("candidates")
+        .insert(insertData)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return mapRow(inserted as any);
     }
-
-    const result = await res.json();
-
-    // Fetch the newly created candidate to map correct format
-    const getRes = await fetch(`${getBackendUrl()}/api/candidates/${result.id}`, {
-      headers: {
-        ...getAuthHeader(),
-      },
-    });
-
-    const row = (await getRes.json()) as DbRow;
-    return mapRow(row);
   });
 
 // ---------- list sent notifications ----------
@@ -410,15 +478,45 @@ export const getCandidateResumeUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data }): Promise<{ url: string | null }> => {
-    const res = await fetch(`${getBackendUrl()}/api/candidates/${data.id}/resume-url`, {
-      headers: {
-        ...getAuthHeader(),
-      },
-    });
+    try {
+      const res = await fetch(`${getBackendUrl()}/api/candidates/${data.id}/resume-url`, {
+        headers: {
+          ...getAuthHeader(),
+        },
+      });
 
-    if (!res.ok) {
-      throw new Error(`Failed to fetch resume signed URL: ${res.statusText}`);
+      if (!res.ok) {
+        throw new Error(`Failed to fetch resume signed URL: ${res.statusText}`);
+      }
+
+      return (await res.json()) as { url: string | null };
+    } catch (err) {
+      console.warn("NestJS backend offline. Generating signed URL directly via Supabase storage:", err);
+      const { data: candidate, error: fetchErr } = await supabaseAdmin
+        .from("candidates")
+        .select("resume_url")
+        .eq("id", data.id)
+        .maybeSingle();
+
+      if (fetchErr || !candidate?.resume_url) {
+        return { url: null };
+      }
+
+      const resumeUrl = candidate.resume_url;
+      let fileKey = resumeUrl;
+      if (resumeUrl.includes("/resumes/")) {
+        fileKey = resumeUrl.split("/resumes/").pop()?.split("?")[0] || resumeUrl;
+      }
+
+      const { data: signed, error: signErr } = await supabaseAdmin.storage
+        .from("resumes")
+        .createSignedUrl(fileKey, 3600);
+
+      if (signErr) {
+        console.error("Direct signed URL generation failed:", signErr);
+        return { url: null };
+      }
+
+      return { url: signed.signedUrl };
     }
-
-    return (await res.json()) as { url: string | null };
   });
