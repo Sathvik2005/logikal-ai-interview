@@ -143,9 +143,9 @@ export function AddCandidateWizard({
     if (step === 1) return form.name.trim().length >= 2 && emailValid && phoneValid;
     if (step === 2) {
       if (form.alignmentType === "jd") {
-        return !!form.jobId && form.experienceYears > 0;
+        return !!form.jobId && form.experienceYears >= 0;
       } else {
-        return !!form.customRole?.roleTitle?.trim() && form.experienceYears > 0;
+        return !!form.customRole?.roleTitle?.trim() && form.experienceYears >= 0;
       }
     }
     if (step === 3) return form.skills.length >= 3 && notesValid;
