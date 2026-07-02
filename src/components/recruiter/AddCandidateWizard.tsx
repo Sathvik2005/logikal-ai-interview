@@ -238,7 +238,7 @@ export function AddCandidateWizard({
 
   return (
     <Dialog open={open} onOpenChange={(o) => (o ? onOpenChange(true) : close())}>
-      <DialogContent className="relative p-0 gap-0 bg-white border border-outline-variant shadow-2xl rounded-2xl overflow-hidden max-w-[960px] w-[96vw] max-h-[88vh] sm:max-w-[960px] flex flex-col [&>button]:hidden">
+      <DialogContent className="p-0 gap-0 bg-white border border-outline-variant shadow-2xl rounded-2xl overflow-hidden max-w-[960px] w-[96vw] max-h-[88vh] sm:max-w-[960px] flex flex-col [&>button]:hidden">
         {isProcessing && (
           <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center gap-3">
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
