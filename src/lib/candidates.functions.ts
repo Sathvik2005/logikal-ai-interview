@@ -229,7 +229,7 @@ export type CreateCandidateInput = z.infer<typeof createInput>;
 export const createCandidate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => createInput.parse(data))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     try {
       const res = await fetch(`${getBackendUrl()}/api/candidates`, {
         method: "POST",
@@ -257,6 +257,7 @@ export const createCandidate = createServerFn({ method: "POST" })
       return mapRow(row);
     } catch (err) {
       console.warn("NestJS backend offline. Creating candidate directly in Supabase:", err);
+      const creatorId = (context as any)?.userId || "00000000-0000-0000-0000-000000000000";
       const insertData = {
         full_name: data.name,
         email: data.email,
@@ -269,6 +270,7 @@ export const createCandidate = createServerFn({ method: "POST" })
         job_id: data.jobId,
         custom_role: data.customRole || {},
         resume_analysis: data.resumeAnalysis || {},
+        created_by: creatorId,
         org_id: "00000000-0000-0000-0000-000000000000", // default org
       };
 

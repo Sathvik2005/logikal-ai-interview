@@ -137,7 +137,7 @@ const UpsertInput = z.object({
 export const upsertJob = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => UpsertInput.parse(input))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     try {
       const res = await fetch(`${getBackendUrl()}/api/jobs`, {
         method: "POST",
@@ -156,6 +156,7 @@ export const upsertJob = createServerFn({ method: "POST" })
       return mapRow(row);
     } catch (err) {
       console.warn("NestJS backend offline. Upserting job directly in Supabase:", err);
+      const creatorId = (context as any)?.userId || "00000000-0000-0000-0000-000000000000";
       const dbData = {
         id: data.id || undefined,
         title: data.title,
@@ -168,7 +169,7 @@ export const upsertJob = createServerFn({ method: "POST" })
         persona_id: data.personaId,
         status: data.status,
         competencies: data.competencies || {},
-        created_by: "00000000-0000-0000-0000-000000000000", // system default user
+        created_by: creatorId,
         org_id: "00000000-0000-0000-0000-000000000000", // default org
       };
 
