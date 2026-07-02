@@ -148,7 +148,7 @@ export const listCandidates = createServerFn({ method: "POST" })
       const rows = (await res.json()) as DbRow[];
       return rows.map(mapRow);
     } catch (err) {
-      console.warn("NestJS backend offline. Falling back to direct Supabase query:", err);
+      console.warn("NestJS backend offline at port 3000. Fetching candidates directly from Supabase...");
       let queryBuilder = supabaseAdmin.from("candidates").select("*");
       if (data.search) {
         queryBuilder = queryBuilder.or(`full_name.ilike.%${data.search}%,email.ilike.%${data.search}%,role_applied.ilike.%${data.search}%`);
@@ -196,7 +196,7 @@ export const getCandidate = createServerFn({ method: "POST" })
       if (!row) return null;
       return mapRow(row);
     } catch (err) {
-      console.warn("NestJS backend offline. Fetching candidate directly from Supabase:", err);
+      console.warn("NestJS backend offline at port 3000. Fetching candidate directly from Supabase...");
       const { data: row, error } = await supabaseAdmin
         .from("candidates")
         .select("*")
@@ -256,7 +256,7 @@ export const createCandidate = createServerFn({ method: "POST" })
       const row = (await getRes.json()) as DbRow;
       return mapRow(row);
     } catch (err) {
-      console.warn("NestJS backend offline. Creating candidate directly in Supabase:", err);
+      console.warn("NestJS backend offline. Creating candidate directly in Supabase...");
       const creatorId = (context as any)?.userId || "00000000-0000-0000-0000-000000000000";
       const insertData = {
         full_name: data.name,
@@ -266,7 +266,7 @@ export const createCandidate = createServerFn({ method: "POST" })
         status: data.status === "new" ? "applied" : data.status,
         experience_years: data.experienceYears,
         skills: data.skills,
-        notes: data.notes,
+        resume_summary: data.notes,
         job_id: data.jobId,
         custom_role: data.customRole || {},
         resume_analysis: data.resumeAnalysis || {},
@@ -280,7 +280,10 @@ export const createCandidate = createServerFn({ method: "POST" })
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Direct Supabase candidate creation failed:", error);
+        throw error;
+      }
       return mapRow(inserted as any);
     }
   });

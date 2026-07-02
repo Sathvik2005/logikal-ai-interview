@@ -79,7 +79,7 @@ export const listJobs = createServerFn({ method: "POST" })
       const rows = (await res.json()) as Row[];
       return rows.map((r) => mapRow(r, 0));
     } catch (err) {
-      console.warn("NestJS backend offline. Listing jobs directly from Supabase:", err);
+      console.warn("NestJS backend offline at port 3000. Listing jobs directly from Supabase...");
       const { data: rows, error } = await supabaseAdmin
         .from("job_descriptions")
         .select("*")
@@ -108,7 +108,7 @@ export const getJob = createServerFn({ method: "POST" })
       if (!row) throw new Error("Job not found");
       return mapRow(row);
     } catch (err) {
-      console.warn("NestJS backend offline. Fetching job directly from Supabase:", err);
+      console.warn("NestJS backend offline at port 3000. Fetching job directly from Supabase...");
       const { data: row, error } = await supabaseAdmin
         .from("job_descriptions")
         .select("*")
@@ -155,7 +155,7 @@ export const upsertJob = createServerFn({ method: "POST" })
       const row = (await res.json()) as Row;
       return mapRow(row);
     } catch (err) {
-      console.warn("NestJS backend offline. Upserting job directly in Supabase:", err);
+      console.warn("NestJS backend offline at port 3000. Upserting job directly in Supabase...");
       const creatorId = (context as any)?.userId || "00000000-0000-0000-0000-000000000000";
       const dbData = {
         id: data.id || undefined,
