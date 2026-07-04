@@ -155,8 +155,22 @@ export const upsertJob = createServerFn({ method: "POST" })
       const row = (await res.json()) as Row;
       return mapRow(row);
     } catch (err) {
-      console.warn("NestJS backend offline at port 3000. Upserting job directly in Supabase...");
+      console.warn("NestJS backend offline at port 3000. Upserting job directly in Supabase:", (err as Error).message);
       const creatorId = (context as any)?.userId || "00000000-0000-0000-0000-000000000000";
+
+      // Resolve the user's actual org_id from their profile
+      let orgId: string | null = null;
+      try {
+        const { data: profile } = await supabaseAdmin
+          .from("profiles")
+          .select("org_id")
+          .eq("id", creatorId)
+          .maybeSingle();
+        orgId = profile?.org_id ?? null;
+      } catch (e) {
+        console.warn("Could not resolve org_id from profile, using null:", e);
+      }
+
       const dbData = {
         id: data.id || undefined,
         title: data.title,
@@ -170,7 +184,7 @@ export const upsertJob = createServerFn({ method: "POST" })
         status: data.status,
         competencies: data.competencies || {},
         created_by: creatorId,
-        org_id: "00000000-0000-0000-0000-000000000000", // default org
+        org_id: orgId,
       };
 
       const { data: row, error } = await supabaseAdmin

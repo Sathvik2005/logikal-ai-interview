@@ -256,14 +256,28 @@ export const createCandidate = createServerFn({ method: "POST" })
       const row = (await getRes.json()) as DbRow;
       return mapRow(row);
     } catch (err) {
-      console.warn("NestJS backend offline. Creating candidate directly in Supabase...");
+      console.warn("NestJS backend offline. Creating candidate directly in Supabase:", (err as Error).message);
       const creatorId = (context as any)?.userId || "00000000-0000-0000-0000-000000000000";
+
+      // Resolve the user's actual org_id from their profile
+      let orgId: string | null = null;
+      try {
+        const { data: profile } = await supabaseAdmin
+          .from("profiles")
+          .select("org_id")
+          .eq("id", creatorId)
+          .maybeSingle();
+        orgId = profile?.org_id ?? null;
+      } catch (e) {
+        console.warn("Could not resolve org_id from profile, using null:", e);
+      }
+
       const insertData = {
         full_name: data.name,
         email: data.email,
         phone: data.phone,
         role_applied: data.role,
-        status: data.status === "new" ? "applied" : data.status,
+        status: data.status || "new",
         experience_years: data.experienceYears,
         skills: data.skills,
         resume_summary: data.notes,
@@ -271,7 +285,7 @@ export const createCandidate = createServerFn({ method: "POST" })
         custom_role: data.customRole || {},
         resume_analysis: data.resumeAnalysis || {},
         created_by: creatorId,
-        org_id: "00000000-0000-0000-0000-000000000000", // default org
+        org_id: orgId,
       };
 
       const { data: inserted, error } = await supabaseAdmin
