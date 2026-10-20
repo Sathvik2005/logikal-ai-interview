@@ -10,6 +10,8 @@ import {
   UseInterceptors,
   UploadedFile,
   Req,
+  Inject,
+  ServiceUnavailableException,
   BadRequestException,
 } from "@nestjs/common";
 import { CANDIDATE_STATUSES, type CandidateStatus } from "../../domain/candidate/candidate.entity";
@@ -20,6 +22,14 @@ import { CandidateWorkflowService } from "../../application/candidate/candidate-
 import { FileProcessingPipelineService } from "../../application/candidate/file-processing-pipeline.service";
 import { PrismaService } from "../../infrastructure/database/prisma.service";
 import { StorageService } from "../../application/services/storage.service";
+import {
+  DocumentTextService,
+  MAX_DOCUMENT_BYTES,
+} from "../../application/services/document-text.service";
+import {
+  IAIOrchestrator,
+  IAIOrchestratorToken,
+} from "../../application/common/ai/ai-orchestrator.interface";
 
 @Controller("candidates")
 @UseGuards(SupabaseAuthGuard, RolesGuard)
@@ -29,6 +39,9 @@ export class CandidatesController {
     private readonly filePipeline: FileProcessingPipelineService,
     private readonly prisma: PrismaService,
     private readonly storage: StorageService,
+    private readonly documentText: DocumentTextService,
+    @Inject(IAIOrchestratorToken)
+    private readonly aiOrchestrator: IAIOrchestrator,
   ) {}
 
   @Get()
@@ -133,6 +146,23 @@ export class CandidatesController {
       await this.workflow.transition(id, body.status, body.reason);
     }
     return { message: "Candidate state transitioned successfully." };
+  }
+
+  /**
+   * Read an uploaded resume and return the extracted profile fields so the "Add candidate" form can be
+   * pre-filled. Nothing is stored or created here.
+   */
+  @Post("parse-resume")
+  @Roles("recruiter", "admin")
+  @UseInterceptors(FileInterceptor("file", { limits: { fileSize: MAX_DOCUMENT_BYTES } }))
+  async parseResume(@UploadedFile() file: Express.Multer.File) {
+    if (!this.aiOrchestrator.isAvailable()) {
+      throw new ServiceUnavailableException(
+        "Resume parsing is not available because AI is not configured.",
+      );
+    }
+    const doc = await this.documentText.extract(file);
+    return this.aiOrchestrator.parseResume(doc.text, doc.mimeType, file.buffer);
   }
 
   @Post(":id/upload-resume")

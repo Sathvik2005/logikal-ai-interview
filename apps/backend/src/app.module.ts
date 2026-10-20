@@ -19,6 +19,7 @@ import { IAIOrchestratorToken } from "./application/common/ai/ai-orchestrator.in
 
 // Application Services
 import { StorageService } from "./application/services/storage.service";
+import { DocumentTextService } from "./application/services/document-text.service";
 import { AppConfigService } from "./application/services/config.service";
 import { FeatureFlagsService } from "./application/services/feature-flags.service";
 import { PromptLibraryService } from "./application/services/prompt-library.service";
@@ -64,6 +65,7 @@ import { AdminController } from "./presentation/http/admin.controller";
     // Core Services
     PrismaService,
     StorageService,
+    DocumentTextService,
     AppConfigService,
     FeatureFlagsService,
     PromptLibraryService,

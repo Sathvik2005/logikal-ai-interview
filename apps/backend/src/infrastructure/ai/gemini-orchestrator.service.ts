@@ -4,6 +4,7 @@ import {
   IAIOrchestrator,
   ParsedResume,
   SuggestedJd,
+  ParsedJd,
   JdMatchResult,
   EvaluationResult,
   JDAssistResult,
@@ -29,6 +30,11 @@ export class GeminiOrchestratorService implements IAIOrchestrator {
         "GEMINI_API_KEY is missing or template key. AI Orchestrator running in Mock Fallback Mode.",
       );
     }
+  }
+
+  /** True when a real AI client is configured (otherwise parse methods return mock data or throw). */
+  isAvailable(): boolean {
+    return this.hasClient();
   }
 
   private hasClient(): boolean {
@@ -67,7 +73,9 @@ export class GeminiOrchestratorService implements IAIOrchestrator {
     try {
       return await Promise.race([apiCall, timeoutPromise]);
     } catch (err: any) {
-      this.logger.warn(`AI call to ${modelName} failed on attempt ${attempt}/${maxRetries}: ${err.message}`);
+      this.logger.warn(
+        `AI call to ${modelName} failed on attempt ${attempt}/${maxRetries}: ${err.message}`,
+      );
       if (attempt < maxRetries) {
         // Exponential backoff
         await new Promise((resolve) => setTimeout(resolve, Math.pow(2, attempt) * 1000));
@@ -78,7 +86,9 @@ export class GeminiOrchestratorService implements IAIOrchestrator {
       const proModel = this.config.getGeminiProModel();
       const flashModel = this.config.getGeminiFlashModel();
       if (modelName === proModel && flashModel !== proModel) {
-        this.logger.warn(`Falling back from Pro model (${proModel}) to Flash model (${flashModel}) due to continuous failures.`);
+        this.logger.warn(
+          `Falling back from Pro model (${proModel}) to Flash model (${flashModel}) due to continuous failures.`,
+        );
         return this.generateWithRetry(flashModel, prompt, generationConfig, 1);
       }
 
@@ -137,9 +147,25 @@ Return ONLY a valid JSON object matching the keys listed above. Do not wrap in m
         phone: phoneMatch ? phoneMatch[0] : "+1-555-0199",
         experienceYears,
         skills,
-        resumeSummary: "Experienced software engineer with a strong background in web applications, cloud migrations, and scalable backend design.",
-        technicalSkills: ["React", "TypeScript", "Node.js", "PostgreSQL", "AWS", "Docker", "GraphQL", "Next.js"],
-        softSkills: ["Team Leadership", "Communication", "Problem Solving", "Mentoring", "Agile Methodologies"],
+        resumeSummary:
+          "Experienced software engineer with a strong background in web applications, cloud migrations, and scalable backend design.",
+        technicalSkills: [
+          "React",
+          "TypeScript",
+          "Node.js",
+          "PostgreSQL",
+          "AWS",
+          "Docker",
+          "GraphQL",
+          "Next.js",
+        ],
+        softSkills: [
+          "Team Leadership",
+          "Communication",
+          "Problem Solving",
+          "Mentoring",
+          "Agile Methodologies",
+        ],
         currentRole: "Senior Software Engineer",
         previousCompanies: ["TechCorp Solutions", "InnoWeb Inc."],
         education: "B.S. in Computer Science, Georgia Institute of Technology",
@@ -149,8 +175,14 @@ Return ONLY a valid JSON object matching the keys listed above. Do not wrap in m
         domainExpertise: ["E-commerce", "SaaS", "DevOps"],
         languages: ["English (Native)", "Spanish (Conversational)"],
         suggestedSeniority: "Senior",
-        resumeKeywords: ["Frontend", "Single Page Apps", "State Management", "CI/CD Pipelines", "Performance Optimization"],
-        jdMatchSuggestions: jdContext 
+        resumeKeywords: [
+          "Frontend",
+          "Single Page Apps",
+          "State Management",
+          "CI/CD Pipelines",
+          "Performance Optimization",
+        ],
+        jdMatchSuggestions: jdContext
           ? "Strong candidate matching 88% of target role specifications. Excellent frontend foundation with React/TypeScript; minor gap in Kubernetes production deployment experience."
           : "Matches criteria for Senior engineering position with strong fullstack capabilities.",
       };
@@ -177,7 +209,7 @@ Return ONLY a valid JSON object matching the keys listed above. Do not wrap in m
       const response = await this.generateWithRetry(
         this.config.getGeminiFlashModel(),
         contentParts,
-        { responseMimeType: "application/json" }
+        { responseMimeType: "application/json" },
       );
       const content = response.response.text();
       const parsed = JSON.parse(content);
@@ -188,22 +220,79 @@ Return ONLY a valid JSON object matching the keys listed above. Do not wrap in m
         experienceYears: Number(parsed.experienceYears ?? 0),
         skills: Array.isArray(parsed.skills) ? parsed.skills.map(String) : [],
         resumeSummary: String(parsed.resumeSummary ?? parsed.professionalSummary ?? ""),
-        technicalSkills: Array.isArray(parsed.technicalSkills) ? parsed.technicalSkills.map(String) : [],
+        technicalSkills: Array.isArray(parsed.technicalSkills)
+          ? parsed.technicalSkills.map(String)
+          : [],
         softSkills: Array.isArray(parsed.softSkills) ? parsed.softSkills.map(String) : [],
         currentRole: parsed.currentRole ? String(parsed.currentRole) : "",
-        previousCompanies: Array.isArray(parsed.previousCompanies) ? parsed.previousCompanies.map(String) : [],
+        previousCompanies: Array.isArray(parsed.previousCompanies)
+          ? parsed.previousCompanies.map(String)
+          : [],
         education: parsed.education ? String(parsed.education) : "",
-        certifications: Array.isArray(parsed.certifications) ? parsed.certifications.map(String) : [],
+        certifications: Array.isArray(parsed.certifications)
+          ? parsed.certifications.map(String)
+          : [],
         projects: Array.isArray(parsed.projects) ? parsed.projects.map(String) : [],
-        toolsTechnologies: Array.isArray(parsed.toolsTechnologies) ? parsed.toolsTechnologies.map(String) : [],
-        domainExpertise: Array.isArray(parsed.domainExpertise) ? parsed.domainExpertise.map(String) : [],
+        toolsTechnologies: Array.isArray(parsed.toolsTechnologies)
+          ? parsed.toolsTechnologies.map(String)
+          : [],
+        domainExpertise: Array.isArray(parsed.domainExpertise)
+          ? parsed.domainExpertise.map(String)
+          : [],
         languages: Array.isArray(parsed.languages) ? parsed.languages.map(String) : [],
         suggestedSeniority: parsed.suggestedSeniority ? String(parsed.suggestedSeniority) : "Mid",
-        resumeKeywords: Array.isArray(parsed.resumeKeywords) ? parsed.resumeKeywords.map(String) : [],
+        resumeKeywords: Array.isArray(parsed.resumeKeywords)
+          ? parsed.resumeKeywords.map(String)
+          : [],
         jdMatchSuggestions: parsed.jdMatchSuggestions ? String(parsed.jdMatchSuggestions) : "",
       };
     } catch (err) {
       this.logger.error(`Error parsing resume with Gemini: ${err}`);
+      throw err;
+    }
+  }
+
+  async parseJd(jdText: string, mimeType?: string, fileBuffer?: Buffer): Promise<ParsedJd> {
+    if (!this.hasClient()) {
+      throw new Error(
+        "AI is not configured (GEMINI_API_KEY), so job descriptions cannot be parsed.",
+      );
+    }
+    const prompt = `You extract structured data from a job description document.
+Return STRICT JSON with exactly these string keys:
+"title" (job title), "department" (team/department, "" if unknown), "location" (location and work mode, "" if unknown),
+"employmentType" (one of: Full-time, Part-time, Contract, Internship; default Full-time),
+"experienceLevel" (one of: Junior, Mid-level, Senior, Lead; infer from years required),
+"description" (the role summary and responsibilities as clean paragraphs/bullets),
+"requirements" (must-have skills, experience and qualifications as a bulleted list, one per line starting with "- ").
+Use only information present in the document. Do not invent details.`;
+    const parts: any[] = [{ text: prompt }];
+    if (fileBuffer && mimeType === "application/pdf") {
+      parts.push({
+        inlineData: { data: fileBuffer.toString("base64"), mimeType: "application/pdf" },
+      });
+    } else {
+      parts.push({
+        text: `Job description text:
+${jdText}`,
+      });
+    }
+    try {
+      const response = await this.generateWithRetry(this.config.getGeminiFlashModel(), parts, {
+        responseMimeType: "application/json",
+      });
+      const p = JSON.parse(response.response.text());
+      return {
+        title: String(p.title ?? ""),
+        department: String(p.department ?? ""),
+        location: String(p.location ?? ""),
+        employmentType: String(p.employmentType ?? "Full-time"),
+        experienceLevel: String(p.experienceLevel ?? "Mid-level"),
+        description: String(p.description ?? ""),
+        requirements: String(p.requirements ?? ""),
+      };
+    } catch (err) {
+      this.logger.error(`Error parsing JD with Gemini: ${err}`);
       throw err;
     }
   }
@@ -222,11 +311,9 @@ Return ONLY a valid JSON object matching the keys listed above. Do not wrap in m
 Return STRICT JSON format with exactly two keys: "description" and "requirements".
 "description" should be a high-quality job summary paragraph.
 "requirements" should be a bulleted string listing core qualifications.`;
-      const response = await this.generateWithRetry(
-        this.config.getGeminiFlashModel(),
-        prompt,
-        { responseMimeType: "application/json" }
-      );
+      const response = await this.generateWithRetry(this.config.getGeminiFlashModel(), prompt, {
+        responseMimeType: "application/json",
+      });
       const parsed = JSON.parse(response.response.text());
       return {
         description: String(parsed.description ?? ""),
@@ -263,7 +350,7 @@ Return STRICT JSON format with exactly two keys: "description" and "requirements
       const response = await this.generateWithRetry(
         this.config.getGeminiFlashModel(),
         [{ text: systemPrompt }, { text: userPrompt }],
-        { responseMimeType: "application/json" }
+        { responseMimeType: "application/json" },
       );
       const parsed = JSON.parse(response.response.text());
       return {
@@ -323,10 +410,9 @@ Return STRICT JSON format with exactly two keys: "description" and "requirements
         });
       });
 
-      const response = await this.generateWithRetry(
-        this.config.getGeminiFlashModel(),
-        { contents } as any
-      );
+      const response = await this.generateWithRetry(this.config.getGeminiFlashModel(), {
+        contents,
+      } as any);
       return response.response.text().trim();
     } catch (err) {
       this.logger.error(`Error generating interview question: ${err}`);
@@ -370,7 +456,7 @@ Return STRICT JSON format with exactly two keys: "description" and "requirements
       const response = await this.generateWithRetry(
         this.config.getGeminiProModel(),
         [{ text: systemPrompt }, { text: userPrompt }],
-        { responseMimeType: "application/json" }
+        { responseMimeType: "application/json" },
       );
       const parsed = JSON.parse(response.response.text());
       return {
@@ -417,10 +503,10 @@ ${evaluation.concerns.map((c) => `- ${c}`).join("\n")}
 
     try {
       const userPrompt = `Candidate Details:\n${JSON.stringify(candidateInfo)}\n\nJD Info:\n${JSON.stringify(jdContext)}\n\nEvaluation Details:\n${JSON.stringify(evaluation)}`;
-      const response = await this.generateWithRetry(
-        this.config.getGeminiFlashModel(),
-        [{ text: systemPrompt }, { text: userPrompt }]
-      );
+      const response = await this.generateWithRetry(this.config.getGeminiFlashModel(), [
+        { text: systemPrompt },
+        { text: userPrompt },
+      ]);
       return response.response.text();
     } catch (err) {
       this.logger.error(`Error generating report markdown: ${err}`);
@@ -495,7 +581,7 @@ Return ONLY the generated system prompt text. Do not wrap in markdown code block
 
       const response = await this.generateWithRetry(
         this.config.getGeminiFlashModel(),
-        systemPrompt
+        systemPrompt,
       );
       return response.response.text().trim();
     } catch (err) {
@@ -521,54 +607,52 @@ Return ONLY the generated system prompt text. Do not wrap in markdown code block
           `Collaborate with product managers and other stakeholders to translate requirements into technical specs`,
           `Write clean, maintainable, and well-tested code`,
           `Mentor junior developers and participate in design reviews`,
-          `Optimize application performance and scalability`
+          `Optimize application performance and scalability`,
         ],
         requiredSkills: [`React`, `TypeScript`, `Node.js`, `SQL`],
         preferredSkills: [`AWS`, `Docker`, `CI/CD`, `TailwindCSS`],
         technicalSkills: [`JavaScript`, `HTML/CSS`, `REST APIs`, `Git`],
-        softSkills: [`Problem Solving`, `Team Collaboration`, `Effective Communication`, `Adaptability`],
+        softSkills: [
+          `Problem Solving`,
+          `Team Collaboration`,
+          `Effective Communication`,
+          `Adaptability`,
+        ],
         minimumQualifications: [
           `Bachelor's degree in Computer Science, engineering, or equivalent experience`,
           `At least 3 years of professional experience in software development`,
-          `Solid understanding of frontend and backend development practices`
+          `Solid understanding of frontend and backend development practices`,
         ],
         preferredQualifications: [
           `Experience building high-traffic, secure SaaS applications`,
-          `Familiarity with cloud-native infrastructure (AWS/GCP/Azure)`
+          `Familiarity with cloud-native infrastructure (AWS/GCP/Azure)`,
         ],
         experienceRequirements: `3+ years of professional software engineering experience working in an agile environment.`,
         interviewFocusAreas: [
           `Coding & System Design (hands-on design tradeoffs)`,
           `Component-driven architecture and state management`,
           `Database integration and API design`,
-          `Behavioral alignment and collaboration skills`
+          `Behavioral alignment and collaboration skills`,
         ],
         evaluationCriteria: [
           `Technical Depth: Mastery of core languages and design patterns`,
           `Problem Solving: Ability to breakdown complex tasks logically`,
           `Communication: Clarity of explaining design decisions`,
-          `Cultural Fit: Team spirit, curiosity, and adaptability`
+          `Cultural Fit: Team spirit, curiosity, and adaptability`,
         ],
         suggestedCompetencies: [
           `Frontend Engineering`,
           `Backend APIs`,
           `Cloud Infrastructure`,
-          `Testing & Quality Assurance`
+          `Testing & Quality Assurance`,
         ],
-        suggestedKeywords: [
-          `React`,
-          `TypeScript`,
-          `Fullstack`,
-          `Agile`,
-          `CI/CD`,
-          `SaaS`
-        ],
+        suggestedKeywords: [`React`, `TypeScript`, `Fullstack`, `Agile`, `CI/CD`, `SaaS`],
         suggestedQuestionCategories: [
           `Frontend Architecture`,
           `Database Design`,
           `System Scaling`,
-          `Behavioral / Collaboration`
-        ]
+          `Behavioral / Collaboration`,
+        ],
       };
     }
 
@@ -601,30 +685,50 @@ Generate a JSON object containing exactly the following keys:
 
 Ensure the output is valid JSON matching this schema. Do not wrap in markdown tags or include any additional text outside the JSON.`;
 
-      const response = await this.generateWithRetry(
-        this.config.getGeminiFlashModel(),
-        promptText,
-        { responseMimeType: "application/json" }
-      );
+      const response = await this.generateWithRetry(this.config.getGeminiFlashModel(), promptText, {
+        responseMimeType: "application/json",
+      });
       const text = response.response.text().trim();
       const parsed = JSON.parse(text);
 
       return {
         description: String(parsed.description ?? ""),
         requirements: String(parsed.requirements ?? ""),
-        keyResponsibilities: Array.isArray(parsed.keyResponsibilities) ? parsed.keyResponsibilities.map(String) : [],
-        requiredSkills: Array.isArray(parsed.requiredSkills) ? parsed.requiredSkills.map(String) : [],
-        preferredSkills: Array.isArray(parsed.preferredSkills) ? parsed.preferredSkills.map(String) : [],
-        technicalSkills: Array.isArray(parsed.technicalSkills) ? parsed.technicalSkills.map(String) : [],
+        keyResponsibilities: Array.isArray(parsed.keyResponsibilities)
+          ? parsed.keyResponsibilities.map(String)
+          : [],
+        requiredSkills: Array.isArray(parsed.requiredSkills)
+          ? parsed.requiredSkills.map(String)
+          : [],
+        preferredSkills: Array.isArray(parsed.preferredSkills)
+          ? parsed.preferredSkills.map(String)
+          : [],
+        technicalSkills: Array.isArray(parsed.technicalSkills)
+          ? parsed.technicalSkills.map(String)
+          : [],
         softSkills: Array.isArray(parsed.softSkills) ? parsed.softSkills.map(String) : [],
-        minimumQualifications: Array.isArray(parsed.minimumQualifications) ? parsed.minimumQualifications.map(String) : [],
-        preferredQualifications: Array.isArray(parsed.preferredQualifications) ? parsed.preferredQualifications.map(String) : [],
+        minimumQualifications: Array.isArray(parsed.minimumQualifications)
+          ? parsed.minimumQualifications.map(String)
+          : [],
+        preferredQualifications: Array.isArray(parsed.preferredQualifications)
+          ? parsed.preferredQualifications.map(String)
+          : [],
         experienceRequirements: String(parsed.experienceRequirements ?? ""),
-        interviewFocusAreas: Array.isArray(parsed.interviewFocusAreas) ? parsed.interviewFocusAreas.map(String) : [],
-        evaluationCriteria: Array.isArray(parsed.evaluationCriteria) ? parsed.evaluationCriteria.map(String) : [],
-        suggestedCompetencies: Array.isArray(parsed.suggestedCompetencies) ? parsed.suggestedCompetencies.map(String) : [],
-        suggestedKeywords: Array.isArray(parsed.suggestedKeywords) ? parsed.suggestedKeywords.map(String) : [],
-        suggestedQuestionCategories: Array.isArray(parsed.suggestedQuestionCategories) ? parsed.suggestedQuestionCategories.map(String) : [],
+        interviewFocusAreas: Array.isArray(parsed.interviewFocusAreas)
+          ? parsed.interviewFocusAreas.map(String)
+          : [],
+        evaluationCriteria: Array.isArray(parsed.evaluationCriteria)
+          ? parsed.evaluationCriteria.map(String)
+          : [],
+        suggestedCompetencies: Array.isArray(parsed.suggestedCompetencies)
+          ? parsed.suggestedCompetencies.map(String)
+          : [],
+        suggestedKeywords: Array.isArray(parsed.suggestedKeywords)
+          ? parsed.suggestedKeywords.map(String)
+          : [],
+        suggestedQuestionCategories: Array.isArray(parsed.suggestedQuestionCategories)
+          ? parsed.suggestedQuestionCategories.map(String)
+          : [],
       };
     } catch (err) {
       this.logger.error(`Error generating JD assist details: ${err}`);

@@ -20,6 +20,16 @@ export interface ParsedResume {
   jdMatchSuggestions?: string;
 }
 
+export interface ParsedJd {
+  title: string;
+  department: string;
+  location: string;
+  employmentType: string;
+  experienceLevel: string;
+  description: string;
+  requirements: string;
+}
+
 export interface SuggestedJd {
   description: string;
   requirements: string;
@@ -44,6 +54,8 @@ export interface EvaluationResult {
 }
 
 export interface IAIOrchestrator {
+  /** Whether a real AI backend is configured; used to refuse prefill parsing instead of returning mock data. */
+  isAvailable(): boolean;
   parseResume(
     resumeText: string,
     mimeType?: string,
@@ -51,6 +63,8 @@ export interface IAIOrchestrator {
     jdContext?: string,
   ): Promise<ParsedResume>;
   suggestJd(title: string, department?: string): Promise<SuggestedJd>;
+  /** Extract structured fields from an uploaded job description (text or PDF buffer). */
+  parseJd(jdText: string, mimeType?: string, fileBuffer?: Buffer): Promise<ParsedJd>;
   matchJdCandidate(jdRequirements: string, candidateProfile: any): Promise<JdMatchResult>;
   generateInterviewQuestion(
     personaPrompt: string,

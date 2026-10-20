@@ -6,6 +6,8 @@ import { PrismaService } from "../../infrastructure/database/prisma.service";
 import { SupabaseAuthGuard } from "../guards/supabase-auth.guard";
 import { RolesGuard } from "../guards/roles.guard";
 import { StorageService } from "../../application/services/storage.service";
+import { DocumentTextService } from "../../application/services/document-text.service";
+import { IAIOrchestratorToken } from "../../application/common/ai/ai-orchestrator.interface";
 
 describe("CandidatesController", () => {
   let controller: CandidatesController;
@@ -28,6 +30,15 @@ describe("CandidatesController", () => {
       const i = url.indexOf(`/${bucket}/`);
       return i === -1 ? url : url.slice(i + bucket.length + 2).split("?")[0];
     }),
+  };
+
+  const mockDocumentText = {
+    extract: jest.fn(),
+  };
+
+  const mockAi = {
+    isAvailable: jest.fn().mockReturnValue(true),
+    parseResume: jest.fn(),
   };
 
   const mockPrisma = {
@@ -66,6 +77,8 @@ describe("CandidatesController", () => {
           provide: PrismaService,
           useValue: mockPrisma,
         },
+        { provide: DocumentTextService, useValue: mockDocumentText },
+        { provide: IAIOrchestratorToken, useValue: mockAi },
         {
           provide: StorageService,
           useValue: mockStorage,
@@ -147,9 +160,12 @@ describe("CandidatesController", () => {
         undefined,
         undefined,
         undefined,
-        undefined
+        undefined,
       );
-      expect(result).toEqual({ id: "new-id", message: "Candidate profile registered successfully." });
+      expect(result).toEqual({
+        id: "new-id",
+        message: "Candidate profile registered successfully.",
+      });
     });
   });
 
@@ -157,10 +173,38 @@ describe("CandidatesController", () => {
     it("should transition candidate workflow status", async () => {
       workflow.transition.mockResolvedValue(undefined);
 
-      const result = await controller.updateStatus("c1", { status: "shortlisted", reason: "Good resume" });
+      const result = await controller.updateStatus("c1", {
+        status: "shortlisted",
+        reason: "Good resume",
+      });
 
       expect(workflow.transition).toHaveBeenCalledWith("c1", "shortlisted", "Good resume");
       expect(result).toEqual({ message: "Candidate state transitioned successfully." });
+    });
+  });
+
+  describe("parseResume", () => {
+    const file = {
+      buffer: Buffer.from("x"),
+      originalname: "cv.pdf",
+      mimetype: "application/pdf",
+    } as any;
+
+    it("extracts the document and returns parsed profile fields without creating anything", async () => {
+      mockAi.isAvailable.mockReturnValue(true);
+      mockDocumentText.extract.mockResolvedValue({ text: "", mimeType: "application/pdf" });
+      mockAi.parseResume.mockResolvedValue({ name: "Ada", email: "ada@x.com" });
+
+      const result = await controller.parseResume(file);
+
+      expect(mockAi.parseResume).toHaveBeenCalledWith("", "application/pdf", file.buffer);
+      expect(result).toEqual({ name: "Ada", email: "ada@x.com" });
+    });
+
+    it("refuses with 503 when AI is not configured (never returns mock data)", async () => {
+      mockAi.isAvailable.mockReturnValue(false);
+      await expect(controller.parseResume(file)).rejects.toThrow(/AI is not configured/);
+      expect(mockAi.parseResume).not.toHaveBeenCalled();
     });
   });
 
@@ -168,7 +212,11 @@ describe("CandidatesController", () => {
     it("should process uploaded file in resume pipeline", async () => {
       filePipeline.processResume.mockResolvedValue(undefined);
       const req = { user: { orgId: "org-123" } };
-      const file: any = { originalname: "resume.pdf", buffer: Buffer.from(""), mimetype: "application/pdf" };
+      const file: any = {
+        originalname: "resume.pdf",
+        buffer: Buffer.from(""),
+        mimetype: "application/pdf",
+      };
 
       const result = await controller.uploadResume(req, "c1", file);
 
@@ -177,7 +225,7 @@ describe("CandidatesController", () => {
         "c1",
         "resume.pdf",
         file.buffer,
-        "application/pdf"
+        "application/pdf",
       );
       expect(result).toEqual({ message: "Resume file uploaded and parsed by pipeline." });
     });
@@ -199,7 +247,11 @@ describe("CandidatesController", () => {
 
   describe("getResumeUrl", () => {
     it("should return signed URL if recruiter/admin checks it", async () => {
-      const candidate = { id: "c1", resume_url: "http://localhost:3000/api/storage/resumes/c1/1700_resume.pdf", user_id: "user-123" };
+      const candidate = {
+        id: "c1",
+        resume_url: "http://localhost:3000/api/storage/resumes/c1/1700_resume.pdf",
+        user_id: "user-123",
+      };
       mockPrisma.candidate.findUnique.mockResolvedValue(candidate);
       mockStorage.getFileSignedUrl.mockResolvedValue("http://localhost:3000/signed/c1-resume.pdf");
 

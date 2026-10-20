@@ -1,4 +1,21 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Req, Inject } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  Req,
+  Inject,
+  ServiceUnavailableException,
+} from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
+import {
+  DocumentTextService,
+  MAX_DOCUMENT_BYTES,
+} from "../../application/services/document-text.service";
 import { SupabaseAuthGuard } from "../guards/supabase-auth.guard";
 import { Roles, RolesGuard } from "../guards/roles.guard";
 import { PrismaService } from "../../infrastructure/database/prisma.service";
@@ -14,6 +31,7 @@ export class JobsController {
     private readonly prisma: PrismaService,
     @Inject(IAIOrchestratorToken)
     private readonly aiOrchestrator: IAIOrchestrator,
+    private readonly documentText: DocumentTextService,
   ) {}
 
   @Get()
@@ -23,6 +41,20 @@ export class JobsController {
       where: { org_id: orgId, deleted_at: null },
       orderBy: { created_at: "desc" },
     });
+  }
+
+  /** Read an uploaded JD (PDF/DOCX/TXT) and return fields to pre-fill the job form. Nothing is saved. */
+  @Post("parse-jd")
+  @Roles("recruiter", "admin")
+  @UseInterceptors(FileInterceptor("file", { limits: { fileSize: MAX_DOCUMENT_BYTES } }))
+  async parseJd(@UploadedFile() file: Express.Multer.File) {
+    if (!this.aiOrchestrator.isAvailable()) {
+      throw new ServiceUnavailableException(
+        "JD parsing is not available because AI is not configured.",
+      );
+    }
+    const doc = await this.documentText.extract(file);
+    return this.aiOrchestrator.parseJd(doc.text, doc.mimeType, file.buffer);
   }
 
   @Get(":id")

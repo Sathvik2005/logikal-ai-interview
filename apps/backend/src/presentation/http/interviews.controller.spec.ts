@@ -26,6 +26,11 @@ describe("InterviewsController", () => {
     },
     candidate: {
       findUnique: jest.fn(),
+      findMany: jest.fn(),
+    },
+    persona: {
+      findUnique: jest.fn(),
+      findFirst: jest.fn(),
     },
     interviewSession: {
       findFirst: jest.fn(),
@@ -55,6 +60,7 @@ describe("InterviewsController", () => {
 
   const mockWorkflow = {
     transition: jest.fn(),
+    advanceTo: jest.fn(),
   };
 
   const mockQueue = {
@@ -139,9 +145,14 @@ describe("InterviewsController", () => {
 
       mockPrisma.interviewTemplate.create.mockResolvedValue({ id: "temp-9" });
       mockPrisma.interview.create.mockResolvedValue({ id: "iv-5", org_id: "org-1" });
-      mockPrisma.candidate.findUnique.mockResolvedValue({ id: "cand-1", full_name: "Alice", email: "alice@example.com", role_applied: "Dev" });
+      mockPrisma.candidate.findUnique.mockResolvedValue({
+        id: "cand-1",
+        full_name: "Alice",
+        email: "alice@example.com",
+        role_applied: "Dev",
+      });
       mockPrisma.personaVersion.findFirst.mockResolvedValue({ id: "mock-persona-version-id" });
-      
+
       const result = await controller.schedule(req, body);
 
       expect(mockPrisma.interviewTemplate.create).toHaveBeenCalledWith({
@@ -161,9 +172,25 @@ describe("InterviewsController", () => {
         }),
       });
 
-      expect(workflow.transition).toHaveBeenNthCalledWith(1, "cand-1", "interview_assigned", expect.any(String), { interviewId: "iv-5" });
-      expect(workflow.transition).toHaveBeenNthCalledWith(2, "cand-1", "interview_scheduled", expect.any(String));
-      expect(workflow.transition).toHaveBeenNthCalledWith(3, "cand-1", "invitation_sent", expect.any(String));
+      expect(workflow.transition).toHaveBeenNthCalledWith(
+        1,
+        "cand-1",
+        "interview_assigned",
+        expect.any(String),
+        { interviewId: "iv-5" },
+      );
+      expect(workflow.transition).toHaveBeenNthCalledWith(
+        2,
+        "cand-1",
+        "interview_scheduled",
+        expect.any(String),
+      );
+      expect(workflow.transition).toHaveBeenNthCalledWith(
+        3,
+        "cand-1",
+        "invitation_sent",
+        expect.any(String),
+      );
 
       expect(queue.enqueue).toHaveBeenCalledWith("send-notification", {
         orgId: "org-1",
@@ -213,7 +240,10 @@ describe("InterviewsController", () => {
   describe("appendTurn", () => {
     it("should delegate turn appending to engine", async () => {
       engine.appendTurn.mockResolvedValue({ id: "t-1" });
-      const result = await controller.appendTurn("sess-1", { speaker: "candidate", text: "Answer" });
+      const result = await controller.appendTurn("sess-1", {
+        speaker: "candidate",
+        text: "Answer",
+      });
       expect(engine.appendTurn).toHaveBeenCalledWith("sess-1", "candidate", "Answer", undefined);
       expect(result).toEqual({ id: "t-1" });
     });
@@ -269,6 +299,146 @@ describe("InterviewsController", () => {
         },
       });
       expect(result).toEqual(evaluationData);
+    });
+  });
+
+  describe("bulkSchedule", () => {
+    const req = { user: { userId: "u1", orgId: "org-1", claims: {} } };
+    const cand = (id: string, over: any = {}) => ({
+      id,
+      full_name: `Cand ${id}`,
+      email: `${id}@x.com`,
+      role_applied: "Engineer",
+      job_id: null,
+      org_id: null,
+      ...over,
+    });
+    const body = (ids: string[], over: any = {}) => ({
+      candidateIds: ids,
+      startAt: "2026-10-20T09:00:00Z",
+      personaId: "p1",
+      ...over,
+    });
+
+    beforeEach(() => {
+      mockPrisma.candidate.findMany.mockResolvedValue([cand("a"), cand("b"), cand("c")]);
+      mockPrisma.interview.findMany.mockResolvedValue([]);
+      mockPrisma.persona.findUnique.mockResolvedValue({ id: "p1" });
+      mockPrisma.personaVersion.findFirst.mockResolvedValue({ id: "pv1" });
+      mockPrisma.interviewTemplate.create.mockResolvedValue({ id: "t1" });
+      mockPrisma.interview.create.mockImplementation(async ({ data }: any) => ({
+        id: `int-${data.candidate_id}`,
+      }));
+      mockWorkflow.advanceTo.mockResolvedValue(undefined);
+      mockPrisma.interview.update.mockResolvedValue({});
+      mockQueue.enqueue.mockResolvedValue(undefined);
+    });
+
+    it("plans sequential slots without creating anything on dryRun", async () => {
+      const res: any = await controller.bulkSchedule(req, body(["a", "b", "c"], { dryRun: true }));
+
+      expect(res.dryRun).toBe(true);
+      expect(res.schedulable).toBe(3);
+      expect(res.created).toBe(0);
+      expect(res.results.map((r: any) => r.scheduledAt)).toEqual([
+        "2026-10-20T09:00:00.000Z",
+        "2026-10-20T10:00:00.000Z",
+        "2026-10-20T11:00:00.000Z",
+      ]);
+      expect(mockPrisma.interview.create).not.toHaveBeenCalled();
+      expect(mockQueue.enqueue).not.toHaveBeenCalled();
+    });
+
+    it("creates one interview per candidate, advances the workflow and queues one email each", async () => {
+      const res: any = await controller.bulkSchedule(req, body(["a", "b", "c"]));
+
+      expect(res.created).toBe(3);
+      expect(res.failed).toBe(0);
+      expect(mockPrisma.interviewTemplate.create).toHaveBeenCalledTimes(1); // shared template
+      expect(mockPrisma.interview.create).toHaveBeenCalledTimes(3);
+      expect(mockWorkflow.advanceTo).toHaveBeenCalledWith(
+        "a",
+        "interview_scheduled",
+        expect.any(String),
+      );
+      expect(mockWorkflow.advanceTo).toHaveBeenCalledWith(
+        "a",
+        "invitation_sent",
+        expect.any(String),
+      );
+      expect(mockQueue.enqueue).toHaveBeenCalledTimes(3);
+      expect(mockQueue.enqueue).toHaveBeenCalledWith(
+        "send-notification",
+        expect.objectContaining({
+          kind: "interview_invitation",
+          recipientEmail: "a@x.com",
+          payload: expect.objectContaining({
+            interviewId: "int-a",
+            scheduledAt: "2026-10-20T09:00:00.000Z",
+          }),
+        }),
+      );
+    });
+
+    it("skips candidates that already have an active interview and unknown ids, and reports why", async () => {
+      mockPrisma.interview.findMany.mockResolvedValue([{ candidate_id: "b" }]);
+      const res: any = await controller.bulkSchedule(req, body(["a", "b", "zzz"]));
+
+      expect(res.created).toBe(1);
+      expect(res.failed).toBe(2);
+      expect(res.results.find((r: any) => r.candidateId === "b").error).toMatch(/active interview/);
+      expect(res.results.find((r: any) => r.candidateId === "zzz").error).toMatch(/not found/);
+    });
+
+    it("isolates a failure: other candidates still get scheduled and the failed interview is cancelled", async () => {
+      mockWorkflow.advanceTo.mockImplementation(async (id: string) => {
+        if (id === "b") throw new Error("Invalid candidate workflow transition");
+      });
+      const res: any = await controller.bulkSchedule(req, body(["a", "b", "c"]));
+
+      expect(res.created).toBe(2);
+      expect(res.results.find((r: any) => r.candidateId === "b")).toMatchObject({
+        ok: false,
+        error: expect.stringMatching(/Invalid candidate workflow/),
+      });
+      expect(mockPrisma.interview.update).toHaveBeenCalledWith({
+        where: { id: "int-b" },
+        data: { status: "cancelled" },
+      });
+      expect(mockQueue.enqueue).toHaveBeenCalledTimes(2);
+    });
+
+    it("rejects candidates from another organization", async () => {
+      mockPrisma.candidate.findMany.mockResolvedValue([cand("a", { org_id: "other-org" })]);
+      const r = {
+        user: { userId: "u1", orgId: "org-1", claims: { user_metadata: { orgId: "org-1" } } },
+      };
+      const res: any = await controller.bulkSchedule(r, body(["a"], { dryRun: true }));
+      expect(res.results[0].error).toMatch(/another organization/);
+    });
+
+    it("validates the request", async () => {
+      await expect(controller.bulkSchedule(req, body([]))).rejects.toThrow(
+        /at least one candidate/,
+      );
+      await expect(
+        controller.bulkSchedule(req, body(Array.from({ length: 101 }, (_, i) => `c${i}`))),
+      ).rejects.toThrow(/at most 100/);
+      await expect(controller.bulkSchedule(req, body(["a"], { startAt: "nope" }))).rejects.toThrow(
+        /start time/,
+      );
+      await expect(
+        controller.bulkSchedule(req, body(["a"], { durationMinutes: 5 })),
+      ).rejects.toThrow(/durationMinutes/);
+    });
+
+    it("handles 20 candidates in one call across working days", async () => {
+      const many = Array.from({ length: 20 }, (_, i) => cand(`c${i}`));
+      mockPrisma.candidate.findMany.mockResolvedValue(many);
+      const res: any = await controller.bulkSchedule(req, body(many.map((c) => c.id)));
+      expect(res.created).toBe(20);
+      const days = new Set(res.results.map((r: any) => r.scheduledAt.slice(0, 10)));
+      expect(days.size).toBe(3);
     });
   });
 });

@@ -89,7 +89,9 @@ export class NotificationService implements OnModuleInit {
 
       const isSandboxPossible = fromAddress !== "onboarding@resend.dev";
       if (isSandboxPossible) {
-        this.logger.warn(`Attempting sandbox mode fallback email dispatch via onboarding@resend.dev...`);
+        this.logger.warn(
+          `Attempting sandbox mode fallback email dispatch via onboarding@resend.dev...`,
+        );
         try {
           fromHeader = `${fromName} <onboarding@resend.dev>`;
           await this.resend.emails.send({
@@ -101,17 +103,25 @@ export class NotificationService implements OnModuleInit {
 
           await this.prisma.notificationOutbox.update({
             where: { id: outboxRecord.id },
-            data: { status: "sent", sent_at: new Date(), error: `Fallback used. Original error: ${originalMsg}` },
+            data: {
+              status: "sent",
+              sent_at: new Date(),
+              error: `Fallback used. Original error: ${originalMsg}`,
+            },
           });
           this.logger.log(`Email successfully dispatched via Resend fallback to ${recipientEmail}`);
           return;
         } catch (fallbackErr: any) {
-          const fallbackMsg = fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr);
+          const fallbackMsg =
+            fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr);
           this.logger.error(`Resend fallback email delivery failed: ${fallbackMsg}`);
-          
+
           await this.prisma.notificationOutbox.update({
             where: { id: outboxRecord.id },
-            data: { status: "failed", error: `Original: ${originalMsg} | Fallback: ${fallbackMsg}` },
+            data: {
+              status: "failed",
+              error: `Original: ${originalMsg} | Fallback: ${fallbackMsg}`,
+            },
           });
         }
       } else {
@@ -128,7 +138,9 @@ export class NotificationService implements OnModuleInit {
       case "candidate_welcome":
         return `Welcome to Lokality: Application Received`;
       case "interview_invitation":
-        return `Action Required: Schedule your Lokality AI Interview for ${payload.role || "Job Position"}`;
+        return payload.scheduledAt
+          ? `Your Lokality AI Interview for ${payload.role || "Job Position"} is scheduled`
+          : `Action Required: Schedule your Lokality AI Interview for ${payload.role || "Job Position"}`;
       case "interview_reminder":
         return `Reminder: Your Lokality AI Interview is scheduled soon`;
       case "interview_report_ready":
@@ -148,6 +160,7 @@ export class NotificationService implements OnModuleInit {
       case "interview_invitation":
         return `<h3>Dear ${payload.candidateName || "Candidate"},</h3>
                 <p>You have been invited to participate in an AI-assisted interview screening for the <strong>${payload.role || "Job Position"}</strong> position.</p>
+                ${payload.scheduledAt ? `<p><strong>When:</strong> ${new Date(payload.scheduledAt).toUTCString()}${payload.durationMinutes ? ` (about ${payload.durationMinutes} minutes)` : ""}</p>` : ""}
                 <p>Please enter the candidate portal using the link below to verify your device credentials and complete the interview session:</p>
                 <p><a href="${process.env.APP_URL || "http://localhost:5173"}/candidate/prepare?id=${payload.interviewId}" style="display:inline-block;padding:10px 20px;background:#4f46e5;color:#fff;text-decoration:none;border-radius:4px;">Enter Interview Room</a></p>
                 <p>Best regards,<br/>Talent Team</p>`;
