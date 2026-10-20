@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { CardShadow, Icon, EmptyState, SkeletonCard } from "@/components/recruiter/RecruiterShell";
 import { fmtDate, scoreColor } from "@/components/recruiter/mock-data";
 import { useAuth } from "@/hooks/use-auth";
+import { GettingStarted } from "@/components/recruiter/GettingStarted";
 import {
   getRecruiterDashboard,
   type RecruiterDashboardDTO,
@@ -66,6 +67,8 @@ function DashboardPage() {
           Here is the latest intelligence on your recruitment pipeline.
         </p>
       </div>
+
+      <GettingStarted />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md mb-xl">
         {stats.map((s) => (

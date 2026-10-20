@@ -118,7 +118,7 @@ function Analytics() {
     <>
       <div className="mb-lg flex flex-wrap items-start justify-between gap-md">
         <div>
-          <h2 className="text-headline-lg">Recruiter Analytics</h2>
+          <h2 className="text-headline-lg">Analytics</h2>
           <p className="text-body-lg text-on-surface-variant">
             Operational and quality metrics across your hiring funnel.
           </p>

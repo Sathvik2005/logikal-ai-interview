@@ -19,7 +19,7 @@ function PersonasList() {
   return (
     <>
       <PageHeader
-        title="AI Persona Builder"
+        title="AI interviewers"
         subtitle="Design AI interviewers tuned for your roles, tone, and difficulty."
         actions={
           <>

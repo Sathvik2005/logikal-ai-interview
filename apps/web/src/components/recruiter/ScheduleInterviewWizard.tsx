@@ -56,8 +56,8 @@ const DEFAULT_STATE: WizardState = {
 
 const STEPS = [
   { id: 1, title: "Candidate", icon: "person_search" },
-  { id: 2, title: "Job Description", icon: "description" },
-  { id: 3, title: "AI Persona", icon: "smart_toy" },
+  { id: 2, title: "Job role", icon: "description" },
+  { id: 3, title: "AI interviewer", icon: "smart_toy" },
   { id: 4, title: "Schedule", icon: "event" },
   { id: 5, title: "Review", icon: "check_circle" },
 ] as const;
@@ -801,7 +801,7 @@ function StepPersona({
 
       {previewing && (
         <Dialog open onOpenChange={() => setPreviewing(null)}>
-          <DialogContent className="max-w-lg bg-white">
+          <DialogContent className="max-w-[32rem] bg-white">
             <h3 className="text-lg font-semibold text-on-surface">{previewing.name}</h3>
             <p className="text-sm text-on-surface-variant">Sample opening question</p>
             <div className="p-4 bg-surface-container-low border border-outline-variant rounded-lg text-sm text-on-surface mt-2">
@@ -894,7 +894,7 @@ function StepReview({ state, onJump }: { state: WizardState; onJump: (step: numb
       ],
     },
     {
-      title: "Job Description",
+      title: "Job role",
       step: 2,
       rows: [
         ["Role", state.jd?.role ?? "—"],
@@ -903,7 +903,7 @@ function StepReview({ state, onJump }: { state: WizardState; onJump: (step: numb
       ],
     },
     {
-      title: "AI Persona",
+      title: "AI interviewer",
       step: 3,
       rows: [
         ["Name", state.persona?.name ?? "—"],

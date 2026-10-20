@@ -7,18 +7,19 @@ import { UserMenu } from "@/components/shared/UserMenu";
 import { GlobalSearch } from "@/components/shared/GlobalSearch";
 import { useOrgName } from "@/hooks/use-org";
 
-type NavItem = { to: string; icon: string; label: string };
+type NavItem = { to: string; icon: string; label: string; group?: string };
 
+// Grouped by the order a recruiter actually works: hire -> interview -> set up -> insights.
 const NAV: NavItem[] = [
-  { to: "/recruiter", icon: "dashboard", label: "Dashboard" },
-  { to: "/recruiter/candidates", icon: "groups", label: "Candidates" },
-  { to: "/recruiter/personas", icon: "psychology", label: "Persona Builder" },
-  { to: "/recruiter/jobs", icon: "description", label: "JD Builder" },
-  { to: "/recruiter/questions", icon: "quiz", label: "Question Bank" },
-  { to: "/recruiter/scheduling", icon: "calendar_today", label: "Scheduling" },
-  { to: "/recruiter/monitor", icon: "video_chat", label: "Interview Monitor" },
-  { to: "/recruiter/reports", icon: "analytics", label: "AI Reports" },
-  { to: "/recruiter/analytics", icon: "monitoring", label: "Analytics" },
+  { to: "/recruiter", icon: "dashboard", label: "Home" },
+  { to: "/recruiter/jobs", icon: "work", label: "Job roles", group: "Hire" },
+  { to: "/recruiter/candidates", icon: "groups", label: "Candidates", group: "Hire" },
+  { to: "/recruiter/scheduling", icon: "calendar_today", label: "Schedule", group: "Interview" },
+  { to: "/recruiter/monitor", icon: "video_chat", label: "Live monitor", group: "Interview" },
+  { to: "/recruiter/reports", icon: "analytics", label: "Results & reports", group: "Interview" },
+  { to: "/recruiter/personas", icon: "psychology", label: "AI interviewers", group: "Set up" },
+  { to: "/recruiter/questions", icon: "quiz", label: "Question bank", group: "Set up" },
+  { to: "/recruiter/analytics", icon: "monitoring", label: "Analytics", group: "Insights" },
 ];
 
 export function Icon({
@@ -172,20 +173,26 @@ export function RecruiterShell() {
           New Interview
         </Link>
         <nav className="flex-1 space-y-1 overflow-y-auto">
-          {NAV.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              aria-current={isActive(item.to) ? "page" : undefined}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
-                isActive(item.to)
-                  ? "bg-primary-container text-on-primary-container font-semibold"
-                  : "text-on-surface-variant hover:bg-surface-container-high"
-              }`}
-            >
-              <Icon name={item.icon} filled={isActive(item.to)} />
-              <span className="text-body-md">{item.label}</span>
-            </Link>
+          {NAV.map((item, idx) => (
+            <div key={item.to}>
+              {item.group && NAV[idx - 1]?.group !== item.group && (
+                <p className="px-4 pt-3 pb-1 text-label-caps uppercase text-on-surface-variant/70">
+                  {item.group}
+                </p>
+              )}
+              <Link
+                to={item.to}
+                aria-current={isActive(item.to) ? "page" : undefined}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
+                  isActive(item.to)
+                    ? "bg-primary-container text-on-primary-container font-semibold"
+                    : "text-on-surface-variant hover:bg-surface-container-high"
+                }`}
+              >
+                <Icon name={item.icon} filled={isActive(item.to)} />
+                <span className="text-body-md">{item.label}</span>
+              </Link>
+            </div>
           ))}
         </nav>
         <div className="mt-auto pt-4 border-t border-outline-variant space-y-1">

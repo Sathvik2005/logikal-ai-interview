@@ -399,7 +399,7 @@ export function QuestionBankWizard({
           )}
 
           {step === 3 && (
-            <div className="max-w-xl mx-auto text-center py-6">
+            <div className="max-w-[36rem] mx-auto text-center py-6">
               <div className="w-16 h-16 mx-auto rounded-full bg-primary-container text-on-primary-container flex items-center justify-center mb-4">
                 <Icon name="check_circle" />
               </div>

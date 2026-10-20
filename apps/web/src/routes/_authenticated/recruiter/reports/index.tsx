@@ -354,7 +354,7 @@ function ReportsCenter() {
       <div className="flex flex-wrap items-start justify-between gap-md border-b border-outline-variant/60 pb-md">
         <div>
           <h2 className="text-display-lg text-on-background font-bold tracking-tight">
-            Recruiter Intelligence Center
+            Results &amp; reports
           </h2>
           <p className="text-body-lg text-on-surface-variant mt-1">
             Real-time proctoring telemetry, multi-candidate comparisons, and explainable AI
@@ -396,7 +396,7 @@ function ReportsCenter() {
       </div>
 
       {/* Summary Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9 gap-md mb-lg">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-md mb-lg">
         {[
           {
             label: "Total Reviews",
@@ -455,7 +455,7 @@ function ReportsCenter() {
             icon="visibility"
             title="No candidate interviews are live at the moment"
             hint="Observer console will populate automatically when a scheduled session begins."
-            className="py-12 text-white/60 [&_span]:text-white/60 [&_h3]:text-white [&_p]:text-white/60"
+            className="py-12 text-white/80 [&_span]:text-white/80 [&_h3]:text-white [&_p]:text-white/80"
           />
         ) : (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-lg">

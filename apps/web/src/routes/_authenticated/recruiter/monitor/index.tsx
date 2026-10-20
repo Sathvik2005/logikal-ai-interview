@@ -129,12 +129,14 @@ function ActiveMonitor() {
                 LIVE
               </span>
             )}
-            Active Interview Monitor
+            Live monitor
           </h2>
           <p className="text-body-lg text-on-surface-variant">
             {live
               ? `${live.candidateName} • ${live.role} • ${live.personaName}`
-              : "No live interviews right now."}
+              : liveQ.isLoading
+                ? "Checking for live interviews…"
+                : "No live interviews right now."}
           </p>
         </div>
         {live && (
@@ -598,7 +600,7 @@ function LiveSession({ live }: { live: LiveInterviewDTO }) {
           onClick={() => setConfirmEnd(false)}
         >
           <div
-            className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-soft max-w-md w-full p-lg"
+            className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-soft max-w-[28rem] w-full p-lg"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-headline-sm mb-2">End this interview session?</h3>

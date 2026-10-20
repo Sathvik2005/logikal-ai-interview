@@ -100,7 +100,7 @@ function CandidatesPage() {
     <>
       <div className="mb-lg grid grid-cols-[minmax(0,1fr)_auto] items-center gap-md sm:flex sm:flex-wrap sm:justify-between">
         <div className="min-w-0">
-          <h2 className="text-headline-lg text-on-background mb-1">Candidate Management</h2>
+          <h2 className="text-headline-lg text-on-background mb-1">Candidates</h2>
           <p className="text-body-lg text-on-surface-variant">
             Search, filter, and triage your full pipeline.
           </p>
@@ -151,7 +151,16 @@ function CandidatesPage() {
 
       <CardShadow className="overflow-hidden">
         <div className="w-full overflow-x-auto">
-          <table className="w-full text-body-md min-w-[1200px]">
+          <table
+            className={[
+              "w-full text-body-md min-w-[820px]",
+              // progressively hide the widest, least critical columns on narrower screens
+              "max-2xl:[&_td:nth-child(4)]:hidden max-2xl:[&_th:nth-child(4)]:hidden",
+              "max-2xl:[&_td:nth-child(6)]:hidden max-2xl:[&_th:nth-child(6)]:hidden",
+              "max-2xl:[&_td:nth-child(5)]:hidden max-2xl:[&_th:nth-child(5)]:hidden",
+              "max-2xl:[&_td:nth-child(7)]:hidden max-2xl:[&_th:nth-child(7)]:hidden",
+            ].join(" ")}
+          >
             <thead className="bg-surface-container-low text-label-caps uppercase text-on-surface-variant">
               <tr>
                 <th className="text-left p-lg min-w-[200px]">Candidate</th>
@@ -506,7 +515,7 @@ function CandidatesPage() {
           if (!open) setEditingSummary(null);
         }}
       >
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-[32rem]">
           <DialogHeader>
             <DialogTitle>Edit Professional Summary</DialogTitle>
             <DialogDescription>

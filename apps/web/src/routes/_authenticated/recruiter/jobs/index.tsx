@@ -30,7 +30,7 @@ function JobsList() {
   return (
     <>
       <PageHeader
-        title="Job Description Builder"
+        title="Job roles"
         subtitle="Author and publish JD specs your AI personas will interview against."
         actions={
           <Link

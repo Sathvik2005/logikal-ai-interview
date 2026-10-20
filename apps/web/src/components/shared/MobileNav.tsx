@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
-export type MobileNavItem = { to: string; icon: string; label: string };
+export type MobileNavItem = { to: string; icon: string; label: string; group?: string };
 
 export function MobileNav({
   items,
@@ -36,22 +36,28 @@ export function MobileNav({
           {subtitle && <p className="text-body-md text-on-surface-variant mt-1">{subtitle}</p>}
         </div>
         <nav className="flex-1 space-y-1 overflow-y-auto">
-          {items.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              onClick={() => setOpen(false)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
-                isActive(item.to)
-                  ? "bg-primary-container text-on-primary-container font-semibold"
-                  : "text-on-surface-variant hover:bg-surface-container-high"
-              }`}
-            >
-              <span className="material-symbols-outlined" aria-hidden>
-                {item.icon}
-              </span>
-              <span className="text-body-md">{item.label}</span>
-            </Link>
+          {items.map((item, idx) => (
+            <div key={item.to}>
+              {item.group && items[idx - 1]?.group !== item.group && (
+                <p className="px-4 pt-3 pb-1 text-label-caps uppercase text-on-surface-variant/70">
+                  {item.group}
+                </p>
+              )}
+              <Link
+                to={item.to}
+                onClick={() => setOpen(false)}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
+                  isActive(item.to)
+                    ? "bg-primary-container text-on-primary-container font-semibold"
+                    : "text-on-surface-variant hover:bg-surface-container-high"
+                }`}
+              >
+                <span className="material-symbols-outlined" aria-hidden>
+                  {item.icon}
+                </span>
+                <span className="text-body-md">{item.label}</span>
+              </Link>
+            </div>
           ))}
         </nav>
       </SheetContent>

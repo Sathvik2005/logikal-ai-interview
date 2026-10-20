@@ -35,7 +35,7 @@ function QuestionBank() {
     <>
       <div className="mb-lg grid grid-cols-[minmax(0,1fr)_auto] items-center gap-md sm:flex sm:flex-wrap sm:justify-between">
         <div className="min-w-0">
-          <h2 className="text-headline-lg">Question Bank Builder</h2>
+          <h2 className="text-headline-lg">Question bank</h2>
           <p className="text-body-lg text-on-surface-variant">
             Curate competency-tagged questions your personas draw from.
           </p>

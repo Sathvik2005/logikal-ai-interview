@@ -132,11 +132,19 @@ function SchedulingHub() {
     }
   };
 
+  const isOverdue = (i: { status: string; scheduledAt: string }) =>
+    i.status === "scheduled" && new Date(i.scheduledAt).getTime() < Date.now() - 60 * 60 * 1000;
+
   const upcoming = useMemo(
     () =>
       interviews
         .filter((i) => i.status === "scheduled" || i.status === "live")
-        .sort((a, b) => a.scheduledAt.localeCompare(b.scheduledAt)),
+        .sort((a, b) => {
+          // upcoming first (soonest first), overdue ones after
+          const ao = isOverdue(a) ? 1 : 0;
+          const bo = isOverdue(b) ? 1 : 0;
+          return ao - bo || a.scheduledAt.localeCompare(b.scheduledAt);
+        }),
     [interviews],
   );
   const past = interviews.filter((i) => i.status === "completed");
@@ -174,7 +182,7 @@ function SchedulingHub() {
     <>
       <div className="mb-lg grid grid-cols-[minmax(0,1fr)_auto] items-center gap-md sm:flex sm:flex-wrap sm:justify-between">
         <div className="min-w-0">
-          <h2 className="text-headline-lg">Interview Scheduling Hub</h2>
+          <h2 className="text-headline-lg">Schedule interviews</h2>
           <p className="text-body-lg text-on-surface-variant">
             Drag to reschedule. Click an empty slot to create.
           </p>
@@ -278,7 +286,7 @@ function SchedulingHub() {
         {/* Right rail */}
         <div className="space-y-lg">
           <CardShadow className="p-lg space-y-md h-fit">
-            <h3 className="text-headline-sm">Upcoming</h3>
+            <h3 className="text-headline-sm">Upcoming &amp; missed</h3>
             {upcoming.length === 0 && (
               <EmptyState
                 icon="event"
@@ -293,8 +301,16 @@ function SchedulingHub() {
                 <div key={i.id} className="p-md border border-outline-variant rounded-lg">
                   <p className="font-semibold">{i.candidateName}</p>
                   <p className="text-body-md text-on-surface-variant">{i.persona}</p>
-                  <p className="text-label-caps uppercase text-on-surface-variant mt-1">
+                  <p className="text-label-caps uppercase text-on-surface-variant mt-1 flex items-center gap-2">
                     {fmtDate(i.scheduledAt)}
+                    {isOverdue(i) && (
+                      <span
+                        className="rounded-full bg-error-container px-2 py-0.5 text-on-error-container normal-case"
+                        title="This interview's start time has passed and it was never held. Reschedule or cancel it."
+                      >
+                        Missed
+                      </span>
+                    )}
                   </p>
                   <div className="grid grid-cols-2 gap-2 mt-2">
                     <button

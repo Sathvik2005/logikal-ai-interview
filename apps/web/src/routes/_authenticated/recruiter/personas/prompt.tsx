@@ -131,7 +131,7 @@ function PromptEditor() {
           className="text-primary text-body-md hover:underline inline-flex items-center gap-1"
         >
           <Icon name="arrow_back" />
-          Back to personas
+          Back to AI interviewers
         </Link>
       </div>
       <PageHeader

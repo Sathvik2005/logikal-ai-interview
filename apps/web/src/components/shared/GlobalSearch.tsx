@@ -31,7 +31,7 @@ export function GlobalSearch({
   return (
     <form
       role="search"
-      className="relative w-full max-w-md hidden md:block"
+      className="relative w-full max-w-[28rem] hidden md:block"
       onSubmit={(e) => {
         e.preventDefault();
         const q = value.trim();
