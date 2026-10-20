@@ -1,0 +1,12 @@
+{
+  // Cloudflare Workers deployment for the TanStack Start web app.
+  // Build first (npm run build:web), then: npx wrangler deploy  (from apps/web)
+  "name": "lokality-web",
+  "main": "dist/server/server.js",
+  "compatibility_date": "2025-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": { "directory": "dist/client" }
+  // Set secrets with: npx wrangler secret put <NAME>
+  // Needed: BACKEND_URL, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, SUPABASE_SERVICE_ROLE_KEY,
+  //         VITE_SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY must be present at BUILD time.
+}

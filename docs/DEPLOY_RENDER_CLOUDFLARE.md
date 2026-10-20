@@ -1,0 +1,52 @@
+# Deploying: backend on Render, frontend on Cloudflare
+
+The web app is built for **Cloudflare Workers** (the TanStack Start/Lovable build config fixes that target;
+`NITRO_PRESET=vercel` is ignored, so Vercel is not supported without changing the build setup).
+
+## 0. Before you start
+- Use a **separate Supabase project for production**. Do not enable `app.seed_demo` there.
+- Apply migrations to it: `npx supabase db push --db-url "<PROD DIRECT_URL>"` (a fresh project has no history, so all migrations run).
+- Create the first admin user from Supabase Authentication, then add a row in `user_roles` (role `admin`).
+- Push the repo to GitHub (`git push origin main`) and confirm CI is green.
+
+## 1. Backend on Render
+1. Render Dashboard > **New > Blueprint** > pick this repo. It reads `render.yaml` (service `lokality-backend`).
+2. Fill the prompted secrets:
+
+| Variable | Value |
+|---|---|
+| `DATABASE_URL` / `DIRECT_URL` | Supabase pooler / direct Postgres URLs |
+| `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` | Supabase > Settings > API |
+| `SUPABASE_JWKS_URL` | `https://<project>.supabase.co/auth/v1/.well-known/jwks.json` |
+| `JWT_SECRET` | Supabase JWT secret, at least 32 chars |
+| `GEMINI_API_KEY` | Google AI Studio |
+| `RESEND_API_KEY` | real `re_...` key (mock values abort startup in production) |
+| `FRONTEND_URL` | exact web origin, e.g. `https://lokality-web.<account>.workers.dev` (no trailing slash) |
+
+3. Deploy. Health check is `/api/docs`. Note the URL, e.g. `https://lokality-backend.onrender.com`.
+   Free/starter instances sleep or restart, and the in-memory queue and local file storage are not durable:
+   use a paid always-on instance and Supabase Storage for resumes before real use.
+
+## 2. Frontend on Cloudflare
+From `apps/web` (needs a Cloudflare account; `npx wrangler login` once):
+
+```bash
+# build-time public vars
+export VITE_SUPABASE_URL=https://<project>.supabase.co
+export VITE_SUPABASE_PUBLISHABLE_KEY=<anon key>
+npm run build            # in apps/web
+npx wrangler deploy      # uses apps/web/wrangler.jsonc
+
+# server-side secrets (runtime)
+npx wrangler secret put BACKEND_URL                 # the Render URL, no trailing slash
+npx wrangler secret put SUPABASE_URL
+npx wrangler secret put SUPABASE_PUBLISHABLE_KEY
+npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+```
+Or connect the repo in Cloudflare Workers Builds with root `apps/web`, build command `npm run build`,
+deploy command `npx wrangler deploy`, and add the same variables in the dashboard.
+
+## 3. Wire and verify
+1. Set Render's `FRONTEND_URL` to the final web URL and redeploy the backend (CORS).
+2. In Supabase > Authentication > URL configuration, add the web URL as Site URL and redirect URL.
+3. Open the web URL, log in, and run `BACKEND_URL=<render url> SMOKE_EMAIL=... SMOKE_PASSWORD=... node scripts/smoke-e2e.mjs`.

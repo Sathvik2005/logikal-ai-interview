@@ -1,0 +1,37 @@
+# Render Blueprint: backend API (NestJS). Create via Render Dashboard > New > Blueprint.
+# Secrets marked sync:false are prompted for in the dashboard; they are never stored in git.
+services:
+  - type: web
+    name: lokality-backend
+    runtime: node
+    plan: starter
+    region: singapore          # same region as the Supabase pooler (ap-southeast-1)
+    buildCommand: npm ci && npm run prisma:generate && npm run build:backend
+    startCommand: node apps/backend/dist/main.js
+    healthCheckPath: /api/docs
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL        # Supabase pooler URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_JWKS_URL   # https://<project>.supabase.co/auth/v1/.well-known/jwks.json
+        sync: false
+      - key: JWT_SECRET          # >= 32 chars
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: RESEND_API_KEY      # real re_... key; mock values are rejected in production
+        sync: false
+      - key: FRONTEND_URL        # exact origin of the deployed web app (CORS)
+        sync: false
