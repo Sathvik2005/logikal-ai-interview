@@ -210,6 +210,24 @@ To quickly login locally and inspect specific dashboards, use:
 
 ---
 
+## Verified status (2026-10-20)
+
+Tested against the Supabase project used by `apps/backend/.env` (id starting `evsp`):
+
+| Account | Exists | Documented password works |
+|---|---|---|
+| `superadmin@lokality.ai` | yes | **no** |
+| `orgadmin@acme.com` | yes | **no** |
+| `recruitersatya@logikality.demo` | yes | **no** |
+| `aisha.k@example.com` | **no** | n/a |
+| `m.chen@example.com` | **no** | n/a |
+
+To make the documented logins work on a dev/QA project, fill in and run `supabase/manual/reset_demo_passwords.sql`
+in the SQL editor and create the two candidate accounts from the dashboard. Never do this on production.
+End-to-end smoke test: `SMOKE_EMAIL=... SMOKE_PASSWORD=... node scripts/smoke-e2e.mjs` (see `scripts/smoke.env.example`).
+
+---
+
 ## Quick Demo Accounts
 
 | Role                    | Email                            | Password          | Purpose                                                              |
