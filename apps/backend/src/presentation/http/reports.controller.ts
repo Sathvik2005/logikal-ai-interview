@@ -1,9 +1,11 @@
 import { Controller, Get, Param, Query, UseGuards, Req } from "@nestjs/common";
 import { SupabaseAuthGuard } from "../guards/supabase-auth.guard";
+import { Roles, RolesGuard } from "../guards/roles.guard";
 import { PrismaService } from "../../infrastructure/database/prisma.service";
 
+@Roles("recruiter", "admin")
 @Controller("reports")
-@UseGuards(SupabaseAuthGuard)
+@UseGuards(SupabaseAuthGuard, RolesGuard)
 export class ReportsController {
   constructor(private readonly prisma: PrismaService) {}
 

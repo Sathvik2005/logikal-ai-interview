@@ -1,8 +1,8 @@
 # Lokality AI Recruitment Intelligence Platform — Architecture Guide
 
-> **Version:** 1.0.0  
-> **Last Updated:** June 22, 2026  
-> **Status:** Development
+> **Version:** 1.1.0  
+> **Last Updated:** October 20, 2026  
+> **Status:** Staging-ready (see [STATUS.md](STATUS.md) for what is verified and what is left)
 
 ---
 
@@ -385,19 +385,41 @@ organizations ──┬── profiles
 
 ### Guard Implementation
 
-- **SupabaseAuthGuard**: Validates JWT Bearer tokens. In production, verifies signature with `JWT_SECRET`. In development, falls back to `jwt.decode()` (no signature verification).
+- **SupabaseAuthGuard**: Verifies the Bearer token (ES256/RS256 against the project JWKS, or HS256 with `JWT_SECRET`;
+  decode-only fallback exists for local development, never in production), then builds `request.user`.
+  **Role and organization come from the database** (`user_roles`, `profiles`, cached for 60 s), never from the
+  token's `user_metadata`, because users can edit their own metadata. Shared logic lives in `guards/token-verifier.ts`.
 - **RolesGuard**: Checks `request.user.role` against allowed roles per endpoint.
+- Users without an organization share an explicit default organization (`DEFAULT_ORG_ID`); cross-organization checks
+  use `request.user.orgFromProfile`, which is set only for users who really belong to one.
 
 ---
 
 ## AI Engine Integration
 
-### Gemini 2.5 Integration
+### Gemini Integration
 
-The `GeminiOrchestratorService` provides 5 core AI capabilities:
+The `GeminiOrchestratorService` provides the AI capabilities. Model names are configured with `GEMINI_FLASH_MODEL` /
+`GEMINI_PRO_MODEL` and default to the `-latest` aliases, because pinned names get retired (gemini-2.0-flash and 2.5
+already were, which silently broke every AI feature):
 
-| Method | Model | Purpose |
+| Method | Model setting | Purpose |
 |---|---|---|
+| `parseResume()` / `parseJd()` | Flash (fast) | Pre-fill the Add Candidate / New Job forms from an uploaded file |
+| `suggestJd()` | Flash | Generate a job description from title/department |
+| `matchJdCandidate()` | Flash | Score candidate-JD compatibility |
+| `generateInterviewQuestion()` | Flash | Next live question (curated, then adaptive). Wrapped in a 10 s budget with a fallback question |
+| `evaluateInterview()` | Pro | Grade the transcript (runs in the background queue after the interview) |
+| `generateReportMarkdown()` | Flash | Create the structured assessment report |
+
+### When the AI is slow or down
+
+- Live questions have a time budget (`LIVE_QUESTION_TIMEOUT_MS`, default 10 s). On timeout or error the candidate gets
+  the next curated question or a standard follow-up, and an `ai_question_fallback` event is recorded.
+- Without `GEMINI_API_KEY` the orchestrator falls back to mock data for development, but the resume/JD **parse**
+  endpoints refuse to run (they would otherwise pre-fill forms with invented people).
+
+---|---|---|
 | `parseResume()` | Gemini 2.5 Flash | Extract structured data from resume text |
 | `suggestJd()` | Gemini 2.5 Flash | Generate job description from title/department |
 | `matchJdCandidate()` | Gemini 2.5 Flash | Score candidate-JD compatibility |
@@ -415,7 +437,11 @@ When `GEMINI_API_KEY` is not configured, the orchestrator gracefully falls back 
 
 ### WebSocket Gateway
 
-The `InterviewGateway` (Socket.IO) handles real-time interview interactions:
+The `InterviewGateway` (Socket.IO) is **authenticated**: a connection must present a valid access token
+(`auth: { token }`), and each message is checked against its session (a candidate may only act on their own
+interview session; recruiters/admins can observe sessions in their organization). The web app does not use this
+channel today (it uses the HTTP API). If you start using it with several backend instances, add
+`@socket.io/redis-adapter` so rooms span instances.
 
 | Event (Client → Server) | Handler | Description |
 |---|---|---|
@@ -483,3 +509,18 @@ scheduled → in_progress → evaluation_pending → completed
     ↓
   scheduled (retry)
 ```
+
+---
+
+## Operational Design
+
+| Concern | Design |
+|---|---|
+| Background work | Postgres-backed durable queue (`job_queue`): at-least-once delivery, `FOR UPDATE SKIP LOCKED` claiming (multi-instance safe), exponential backoff, dead-letter status, stale-job recovery. In-memory queue only for local dev (`QUEUE_DRIVER`). |
+| Safe retries | Emails carry a dedupe key (kind + recipient + event id) with a unique index, so a retried job cannot send twice; a failed send fails the job so the queue retries it. |
+| File storage | Supabase Storage (private buckets); the backend refuses local-disk storage in production. |
+| Human in the loop | The AI only recommends. `POST /candidates/:id/decision` is the only path to hire/reject; reasons are mandatory for reject, hold and AI overrides; every decision is stored (`candidate_decisions`) with who/when/AI recommendation. The candidate is told the outcome only by a human-triggered email that never includes AI data. |
+| Data retention | `RetentionService` enforces the workspace "retention months" setting: proctoring snapshots and identity photos older than the period are deleted (storage first, then rows); transcripts, scores and reports are kept. A transaction-scoped advisory lock keeps multiple instances from overlapping. |
+| Recorded data | The platform stores the transcript, integrity events and periodic webcam/screen snapshots. It does **not** record audio/video. |
+| Error monitoring | A global exception filter logs 5xx errors as structured JSON and stores them in `error_events` (shown on the admin dashboard); callers get a request id. `GET /api/health` is a public database-checking probe. |
+| Scheduling | `POST /interviews/bulk-schedule` plans slots inside working hours (weekends skipped), supports a dry-run preview, skips candidates with an active interview, isolates per-candidate failures and queues one invitation email each. |

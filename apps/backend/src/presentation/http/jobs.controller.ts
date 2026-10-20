@@ -24,6 +24,7 @@ import {
   IAIOrchestratorToken,
 } from "../../application/common/ai/ai-orchestrator.interface";
 
+@Roles("recruiter", "admin")
 @Controller("jobs")
 @UseGuards(SupabaseAuthGuard, RolesGuard)
 export class JobsController {

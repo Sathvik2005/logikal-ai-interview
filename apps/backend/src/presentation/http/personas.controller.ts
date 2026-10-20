@@ -2,8 +2,12 @@ import { Controller, Get, Post, Param, Body, Req, UseGuards, Inject } from "@nes
 import { SupabaseAuthGuard } from "../guards/supabase-auth.guard";
 import { Roles, RolesGuard } from "../guards/roles.guard";
 import { PrismaService } from "../../infrastructure/database/prisma.service";
-import { IAIOrchestrator, IAIOrchestratorToken } from "../../application/common/ai/ai-orchestrator.interface";
+import {
+  IAIOrchestrator,
+  IAIOrchestratorToken,
+} from "../../application/common/ai/ai-orchestrator.interface";
 
+@Roles("recruiter", "admin")
 @Controller("personas")
 @UseGuards(SupabaseAuthGuard, RolesGuard)
 export class PersonasController {

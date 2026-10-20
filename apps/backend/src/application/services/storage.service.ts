@@ -143,6 +143,23 @@ export class StorageService implements OnModuleInit {
     return Buffer.from(arrayBuffer);
   }
 
+  /** Delete objects (best effort per batch). Missing objects are not an error. */
+  async deleteFiles(bucket: string, fileKeys: string[]): Promise<void> {
+    if (fileKeys.length === 0) return;
+    if (this.isLocal || !this.supabaseClient) {
+      for (const key of fileKeys) {
+        const filePath = path.join(this.localStorageDir, bucket, key);
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      }
+      return;
+    }
+    const { error } = await this.supabaseClient.storage.from(bucket).remove(fileKeys);
+    if (error) {
+      this.logger.error(`Supabase delete error (${bucket}): ${error.message}`);
+      throw error;
+    }
+  }
+
   /**
    * Recover the object key from a stored URL (Supabase public/signed URL or local URL).
    * Falls back to treating the value as the key itself.

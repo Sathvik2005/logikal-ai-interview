@@ -58,7 +58,10 @@ function PreparePage() {
             <li>Keep your face visible to the camera at all times.</li>
             <li>Do not leave the interview tab or switch windows.</li>
             <li>Avoid background noise and interruptions.</li>
-            <li>The session will be recorded for evaluation purposes.</li>
+            <li>
+              Your answers, periodic webcam and screen snapshots, and integrity events are saved for
+              evaluation.
+            </li>
           </ul>
         </Card>
 

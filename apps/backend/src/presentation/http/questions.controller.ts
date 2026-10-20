@@ -3,6 +3,7 @@ import { SupabaseAuthGuard } from "../guards/supabase-auth.guard";
 import { Roles, RolesGuard } from "../guards/roles.guard";
 import { PrismaService } from "../../infrastructure/database/prisma.service";
 
+@Roles("recruiter", "admin")
 @Controller("questions")
 @UseGuards(SupabaseAuthGuard, RolesGuard)
 export class QuestionsController {

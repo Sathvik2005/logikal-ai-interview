@@ -10,31 +10,105 @@ import {
 import { Server, Socket } from "socket.io";
 import { Logger } from "@nestjs/common";
 import { InterviewEngineService } from "../../application/interview/interview-engine.service";
+import { PrismaService } from "../../infrastructure/database/prisma.service";
+import { buildRequestUser, verifyAccessToken } from "../guards/token-verifier";
 
-@WebSocketGateway({ cors: { origin: "*" }, namespace: "interview" })
+type WsUser = Awaited<ReturnType<typeof buildRequestUser>>;
+
+/**
+ * Realtime channel for live interviews.
+ * Every connection must present a valid access token (`auth: { token }` in the socket.io handshake), and every
+ * message is checked against the session it targets: a candidate may only act on their own interview session;
+ * recruiters/admins may observe sessions in their organization. The web app does not depend on this channel
+ * today (it uses the HTTP API), so it is locked down rather than left open.
+ *
+ * Scaling note: rooms live in this process. If you run several backend instances and start using this channel,
+ * add `@socket.io/redis-adapter` (ioredis is already a dependency) so rooms span instances.
+ */
+@WebSocketGateway({
+  namespace: "interview",
+  cors: {
+    // Evaluated per request (env is loaded after decorators run). Without FRONTEND_URL any origin is allowed,
+    // but the token requirement above still applies.
+    origin: (origin: string | undefined, cb: (err: Error | null, allow?: boolean) => void) =>
+      cb(null, !process.env.FRONTEND_URL || !origin || origin === process.env.FRONTEND_URL),
+  },
+})
 export class InterviewGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private readonly logger = new Logger(InterviewGateway.name);
 
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly interviewEngine: InterviewEngineService) {}
+  constructor(
+    private readonly interviewEngine: InterviewEngineService,
+    private readonly prisma: PrismaService,
+  ) {}
 
-  handleConnection(client: Socket) {
-    this.logger.log(`Realtime client connected: ${client.id}`);
+  async handleConnection(client: Socket) {
+    const raw =
+      (client.handshake.auth as { token?: string } | undefined)?.token ??
+      client.handshake.headers?.authorization?.replace(/^Bearer\s+/i, "");
+    // Messages can arrive while verification is still running, so handlers await this promise.
+    client.data.auth = (async () => {
+      if (!raw) throw new Error("missing token");
+      return buildRequestUser(this.prisma, await verifyAccessToken(raw));
+    })();
+    try {
+      await client.data.auth;
+      this.logger.log(`Realtime client connected: ${client.id}`);
+    } catch {
+      this.logger.warn(`Rejected unauthenticated realtime client: ${client.id}`);
+      client.emit("unauthorized", { message: "A valid access token is required." });
+      client.disconnect(true);
+    }
   }
 
   handleDisconnect(client: Socket) {
     this.logger.log(`Realtime client disconnected: ${client.id}`);
   }
 
+  /** The authenticated user for this socket, or null (and the socket is dropped) if it never authenticated. */
+  private async userOf(client: Socket): Promise<WsUser | null> {
+    try {
+      return (await client.data.auth) as WsUser;
+    } catch {
+      client.disconnect(true);
+      return null;
+    }
+  }
+
+  /**
+   * candidate: only their own interview session. recruiter/admin: sessions in their organization (read/observe).
+   */
+  private async canAccessSession(user: WsUser, sessionId: string, asCandidate: boolean) {
+    const session = await this.prisma.interviewSession.findUnique({
+      where: { id: sessionId },
+      include: { interview: { include: { candidate: { select: { user_id: true } } } } },
+    });
+    if (!session) return false;
+    const iv = session.interview;
+    const isOwnCandidate = iv.candidate?.user_id === user.userId;
+    if (asCandidate) return isOwnCandidate; // candidate-originated events: never allow impersonation
+    if (user.role === "admin" || user.role === "recruiter") {
+      return !user.orgFromProfile || !iv.org_id || iv.org_id === user.orgFromProfile;
+    }
+    return isOwnCandidate;
+  }
+
   @SubscribeMessage("join-session")
-  handleJoinSession(
+  async handleJoinSession(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { sessionId: string; role: "candidate" | "recruiter" },
+    @MessageBody() data: { sessionId: string; role?: "candidate" | "recruiter" },
   ) {
+    const user = await this.userOf(client);
+    if (!user) return;
+    if (!data?.sessionId || !(await this.canAccessSession(user, data.sessionId, false))) {
+      client.emit("joined", { status: "forbidden" });
+      return;
+    }
     client.join(data.sessionId);
-    this.logger.log(`Client [${client.id}] joined room: ${data.sessionId} as ${data.role}`);
+    this.logger.log(`Client [${client.id}] (${user.role}) joined room: ${data.sessionId}`);
     client.emit("joined", { status: "success", room: data.sessionId });
   }
 
@@ -43,7 +117,9 @@ export class InterviewGateway implements OnGatewayConnection, OnGatewayDisconnec
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { sessionId: string; text: string },
   ) {
-    this.logger.log(`Speech input for session [${data.sessionId}]: ${data.text}`);
+    const user = await this.userOf(client);
+    if (!user || !(await this.canAccessSession(user, data?.sessionId, true))) return;
+    this.logger.log(`Speech input for session [${data.sessionId}]`);
 
     // 1. Log candidate speech turn in database
     const turn = await this.interviewEngine.appendTurn(data.sessionId, "candidate", data.text);
@@ -79,6 +155,8 @@ export class InterviewGateway implements OnGatewayConnection, OnGatewayDisconnec
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { sessionId: string; type: string; payload?: any },
   ) {
+    const user = await this.userOf(client);
+    if (!user || !(await this.canAccessSession(user, data?.sessionId, true))) return;
     this.logger.log(`Realtime proctoring signal [${data.type}] in session [${data.sessionId}]`);
 
     // 1. Record event logs
@@ -93,10 +171,12 @@ export class InterviewGateway implements OnGatewayConnection, OnGatewayDisconnec
   }
 
   @SubscribeMessage("waveform-data")
-  handleWaveformData(
+  async handleWaveformData(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { sessionId: string; values: number[] },
   ) {
+    const user = await this.userOf(client);
+    if (!user || !(await this.canAccessSession(user, data?.sessionId, true))) return;
     client.to(data.sessionId).emit("live-waveform", { values: data.values });
   }
 }

@@ -9,6 +9,8 @@ import { EventEmitterBusService } from "./infrastructure/event-bus/event-emitter
 import { InMemoryQueueService } from "./infrastructure/queue/in-memory-queue.service";
 import { PgQueueService } from "./infrastructure/queue/pg-queue.service";
 import { HealthController } from "./presentation/http/health.controller";
+import { APP_FILTER } from "@nestjs/core";
+import { ErrorCaptureFilter } from "./presentation/filters/error-capture.filter";
 import { GeminiOrchestratorService } from "./infrastructure/ai/gemini-orchestrator.service";
 
 // Repository Tokens
@@ -21,6 +23,7 @@ import { IAIOrchestratorToken } from "./application/common/ai/ai-orchestrator.in
 // Application Services
 import { StorageService } from "./application/services/storage.service";
 import { DocumentTextService } from "./application/services/document-text.service";
+import { RetentionService } from "./application/services/retention.service";
 import { HiringDecisionService } from "./application/candidate/hiring-decision.service";
 import { AppConfigService } from "./application/services/config.service";
 import { FeatureFlagsService } from "./application/services/feature-flags.service";
@@ -69,6 +72,7 @@ import { AdminController } from "./presentation/http/admin.controller";
     PrismaService,
     StorageService,
     DocumentTextService,
+    RetentionService,
     HiringDecisionService,
     AppConfigService,
     FeatureFlagsService,
@@ -88,6 +92,7 @@ import { AdminController } from "./presentation/http/admin.controller";
       provide: IEventBusToken,
       useClass: EventEmitterBusService,
     },
+    { provide: APP_FILTER, useClass: ErrorCaptureFilter },
     InMemoryQueueService,
     PgQueueService,
     {

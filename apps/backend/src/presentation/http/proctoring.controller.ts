@@ -1,13 +1,15 @@
 import { Controller, Get, Post, Param, Body, UseGuards, Req, Inject } from "@nestjs/common";
 import { SupabaseAuthGuard } from "../guards/supabase-auth.guard";
 import { Roles, RolesGuard } from "../guards/roles.guard";
+import { InterviewAccessGuard } from "../guards/interview-access.guard";
 import { PrismaService } from "../../infrastructure/database/prisma.service";
 import { StorageService } from "../../application/services/storage.service";
 import { IQueueService, IQueueServiceToken } from "../../application/common/queue/queue.service";
 import { CandidateWorkflowService } from "../../application/candidate/candidate-workflow.service";
 
+@Roles("recruiter", "admin")
 @Controller("proctoring")
-@UseGuards(SupabaseAuthGuard)
+@UseGuards(SupabaseAuthGuard, RolesGuard)
 export class ProctoringController {
   constructor(
     private readonly prisma: PrismaService,
@@ -17,6 +19,8 @@ export class ProctoringController {
     private readonly queue: IQueueService,
   ) {}
 
+  @Roles("candidate", "recruiter", "admin")
+  @UseGuards(InterviewAccessGuard)
   @Post("identity")
   async verifyIdentity(@Req() req: any, @Body() body: any) {
     const userId = req.user.userId;
@@ -71,6 +75,8 @@ export class ProctoringController {
     return { ok: true, verificationId: verification.id };
   }
 
+  @Roles("candidate", "recruiter", "admin")
+  @UseGuards(InterviewAccessGuard)
   @Post("snapshot")
   async uploadSnapshot(@Req() req: any, @Body() body: any) {
     const userId = req.user.userId;

@@ -14,11 +14,13 @@ import {
 import { planSlots } from "../../application/interview/slot-planner";
 import { SupabaseAuthGuard } from "../guards/supabase-auth.guard";
 import { Roles, RolesGuard } from "../guards/roles.guard";
+import { InterviewAccessGuard } from "../guards/interview-access.guard";
 import { InterviewEngineService } from "../../application/interview/interview-engine.service";
 import { PrismaService } from "../../infrastructure/database/prisma.service";
 import { CandidateWorkflowService } from "../../application/candidate/candidate-workflow.service";
 import { IQueueService, IQueueServiceToken } from "../../application/common/queue/queue.service";
 
+@Roles("recruiter", "admin")
 @Controller("interviews")
 @UseGuards(SupabaseAuthGuard, RolesGuard)
 export class InterviewsController {
@@ -163,7 +165,7 @@ export class InterviewsController {
   @Roles("recruiter", "admin")
   async bulkSchedule(@Req() req: any, @Body() body: BulkScheduleBody) {
     const orgId = req.user.orgId || "00000000-0000-0000-0000-000000000000";
-    const claimedOrg: string | undefined = req.user.claims?.user_metadata?.orgId;
+    const claimedOrg: string | undefined = req.user.orgFromProfile;
     const opts = this.parseBulkBody(body);
 
     const candidates = await this.prisma.candidate.findMany({
@@ -350,17 +352,23 @@ export class InterviewsController {
     };
   }
 
+  @Roles("candidate", "recruiter", "admin")
+  @UseGuards(InterviewAccessGuard)
   @Post("session/start")
   async start(@Body() body: { interviewId: string; deviceInfo?: any }) {
     return this.engine.startSession(body.interviewId, body.deviceInfo);
   }
 
+  @Roles("candidate", "recruiter", "admin")
+  @UseGuards(InterviewAccessGuard)
   @Post("session/end")
   async end(@Body() body: { sessionId: string }) {
     await this.engine.endSession(body.sessionId);
     return { status: "success" };
   }
 
+  @Roles("candidate", "recruiter", "admin")
+  @UseGuards(InterviewAccessGuard)
   @Get("session/:sessionId/turns")
   async getTurns(@Param("sessionId") sessionId: string) {
     return this.prisma.interviewTurn.findMany({
@@ -369,6 +377,8 @@ export class InterviewsController {
     });
   }
 
+  @Roles("candidate", "recruiter", "admin")
+  @UseGuards(InterviewAccessGuard)
   @Post("session/:sessionId/turn")
   async appendTurn(
     @Param("sessionId") sessionId: string,
@@ -377,11 +387,15 @@ export class InterviewsController {
     return this.engine.appendTurn(sessionId, body.speaker, body.text, body.audioPath);
   }
 
+  @Roles("candidate", "recruiter", "admin")
+  @UseGuards(InterviewAccessGuard)
   @Post("session/:sessionId/next-question")
   async getNextQuestion(@Param("sessionId") sessionId: string) {
     return this.engine.getNextQuestion(sessionId);
   }
 
+  @Roles("candidate", "recruiter", "admin")
+  @UseGuards(InterviewAccessGuard)
   @Post("session/:sessionId/event")
   async logEvent(
     @Param("sessionId") sessionId: string,

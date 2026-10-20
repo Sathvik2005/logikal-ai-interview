@@ -36,6 +36,7 @@ import {
   IAIOrchestratorToken,
 } from "../../application/common/ai/ai-orchestrator.interface";
 
+@Roles("recruiter", "admin")
 @Controller("candidates")
 @UseGuards(SupabaseAuthGuard, RolesGuard)
 export class CandidatesController {
@@ -74,7 +75,7 @@ export class CandidatesController {
   @Get("awaiting-decision")
   @Roles("recruiter", "admin")
   async awaitingDecision(@Req() req: any) {
-    const claimedOrg: string | undefined = req.user.claims?.user_metadata?.orgId;
+    const claimedOrg: string | undefined = req.user.orgFromProfile;
     return this.decisions.awaiting(claimedOrg);
   }
 
@@ -245,6 +246,7 @@ export class CandidatesController {
     });
   }
 
+  @Roles("candidate", "recruiter", "admin")
   @Get(":id/resume-url")
   async getResumeUrl(@Req() req: any, @Param("id") id: string) {
     const candidate = await this.prisma.candidate.findUnique({
@@ -266,6 +268,7 @@ export class CandidatesController {
     return { url };
   }
 
+  @Roles("candidate", "recruiter", "admin")
   @Get("self/interview")
   async getSelfInterview(@Req() req: any, @Query("interviewId") interviewId?: string) {
     const userId = req.user.userId;
@@ -318,6 +321,7 @@ export class CandidatesController {
     };
   }
 
+  @Roles("candidate", "recruiter", "admin")
   @Get("self/upcoming")
   async getSelfUpcoming(@Req() req: any) {
     const userId = req.user.userId;

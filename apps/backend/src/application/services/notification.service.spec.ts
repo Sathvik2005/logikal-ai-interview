@@ -13,6 +13,7 @@ describe("NotificationService", () => {
     notificationOutbox: {
       create: jest.fn(),
       update: jest.fn(),
+      findUnique: jest.fn(),
     },
   };
 
@@ -57,7 +58,7 @@ describe("NotificationService", () => {
 
       expect(inMemoryQueue.registerProcessor).toHaveBeenCalledWith(
         "send-notification",
-        expect.any(Function)
+        expect.any(Function),
       );
     });
   });
@@ -85,7 +86,7 @@ describe("NotificationService", () => {
       });
 
       expect(loggerLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining("[Email Output Mock LOG] To: test@example.com")
+        expect.stringContaining("[Email Output Mock LOG] To: test@example.com"),
       );
 
       expect(prisma.notificationOutbox.update).toHaveBeenCalledWith({
@@ -163,15 +164,19 @@ describe("NotificationService", () => {
       prisma.notificationOutbox.update.mockResolvedValue({});
       mockSend.mockRejectedValue(new Error("Network Timeout"));
 
-      const loggerErrorSpy = jest.spyOn((serviceWithResend as any).logger, "error").mockImplementation(() => {});
+      const loggerErrorSpy = jest
+        .spyOn((serviceWithResend as any).logger, "error")
+        .mockImplementation(() => {});
 
-      await serviceWithResend.sendEmail("org-2", "interview_reminder", "bob@example.com", {
-        candidateName: "Bob",
-        scheduledAt: "10:00 AM",
-      });
+      await expect(
+        serviceWithResend.sendEmail("org-2", "interview_reminder", "bob@example.com", {
+          candidateName: "Bob",
+          scheduledAt: "10:00 AM",
+        }),
+      ).rejects.toThrow(/Email delivery failed: Network Timeout/);
 
       expect(loggerErrorSpy).toHaveBeenCalledWith(
-        "Resend email delivery failed with sender [Lokality AI Recruitment <recruitment@lokality.ai>]: Network Timeout"
+        "Resend email delivery failed with sender [Lokality AI Recruitment <recruitment@lokality.ai>]: Network Timeout",
       );
 
       expect(prisma.notificationOutbox.update).toHaveBeenCalledWith({
@@ -181,6 +186,82 @@ describe("NotificationService", () => {
           error: "Original: Network Timeout | Fallback: Network Timeout",
         },
       });
+    });
+  });
+
+  describe("idempotent sending (at-least-once queue delivery)", () => {
+    const payload = { candidateName: "Jane", interviewId: "int-1", role: "Dev" };
+    const duplicateError = Object.assign(new Error("Unique constraint failed"), { code: "P2002" });
+
+    beforeEach(() => {
+      prisma.notificationOutbox.create.mockReset();
+      prisma.notificationOutbox.update.mockReset().mockResolvedValue({});
+      prisma.notificationOutbox.findUnique.mockReset();
+    });
+
+    it("derives a stable key per event and recipient, and none when there is no event id", () => {
+      const a = NotificationService.dedupeKey("interview_invitation", "Jane@X.com", payload);
+      const b = NotificationService.dedupeKey("interview_invitation", "jane@x.com ", payload);
+      const other = NotificationService.dedupeKey("interview_invitation", "jane@x.com", {
+        interviewId: "int-2",
+      });
+      expect(a).toBe(b); // case/whitespace-insensitive
+      expect(a).not.toBe(other);
+      expect(
+        NotificationService.dedupeKey("candidate_welcome", "jane@x.com", { candidateName: "Jane" }),
+      ).toBeNull();
+      // reminders for different times are different events
+      expect(
+        NotificationService.dedupeKey("interview_reminder", "j@x.com", {
+          interviewId: "i",
+          scheduledAt: "9",
+        }),
+      ).not.toBe(
+        NotificationService.dedupeKey("interview_reminder", "j@x.com", {
+          interviewId: "i",
+          scheduledAt: "10",
+        }),
+      );
+    });
+
+    it("stores the dedupe key with the outbox row", async () => {
+      prisma.notificationOutbox.create.mockResolvedValue({ id: "o1", status: "pending" });
+      await service.sendEmail("org-1", "interview_invitation", "jane@x.com", payload);
+      expect(prisma.notificationOutbox.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          dedupe_key: NotificationService.dedupeKey("interview_invitation", "jane@x.com", payload),
+        }),
+      });
+    });
+
+    it("suppresses a retry when the same event was already sent", async () => {
+      prisma.notificationOutbox.create.mockRejectedValue(duplicateError);
+      prisma.notificationOutbox.findUnique.mockResolvedValue({ id: "o1", status: "sent" });
+      const warn = jest.spyOn((service as any).logger, "warn").mockImplementation(() => {});
+
+      await service.sendEmail("org-1", "interview_invitation", "jane@x.com", payload);
+
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining("Duplicate interview_invitation"));
+      expect(prisma.notificationOutbox.update).not.toHaveBeenCalled(); // nothing re-sent, nothing re-marked
+    });
+
+    it("retries on the same row when the earlier attempt had failed", async () => {
+      prisma.notificationOutbox.create.mockRejectedValue(duplicateError);
+      prisma.notificationOutbox.findUnique.mockResolvedValue({ id: "o1", status: "failed" });
+
+      await service.sendEmail("org-1", "interview_invitation", "jane@x.com", payload);
+
+      expect(prisma.notificationOutbox.update).toHaveBeenCalledWith({
+        where: { id: "o1" },
+        data: expect.objectContaining({ status: "sent" }),
+      });
+    });
+
+    it("rethrows unrelated database errors", async () => {
+      prisma.notificationOutbox.create.mockRejectedValue(new Error("db down"));
+      await expect(
+        service.sendEmail("org-1", "interview_invitation", "jane@x.com", payload),
+      ).rejects.toThrow("db down");
     });
   });
 });

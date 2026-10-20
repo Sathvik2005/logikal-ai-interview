@@ -261,7 +261,7 @@ function ActiveMonitor() {
               Recorded interviews
             </h3>
             <p className="text-body-md text-on-surface-variant">
-              Every completed interview is recorded. Click any tile to replay the session.
+              Completed interviews are saved with their transcript, integrity events and snapshots. Click any tile to review the session.
             </p>
           </div>
           <span className="text-label-caps uppercase text-on-surface-variant">

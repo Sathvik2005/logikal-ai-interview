@@ -121,6 +121,7 @@ export class HiringDecisionService {
       kind: "candidate_outcome",
       recipientEmail: candidate.email,
       payload: {
+        decisionId: decision.id,
         candidateName: candidate.full_name,
         role: candidate.role_applied,
         outcome: decision.decision === "hire" ? "hire" : "reject",

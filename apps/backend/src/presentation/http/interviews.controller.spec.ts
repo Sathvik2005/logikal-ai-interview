@@ -411,7 +411,7 @@ describe("InterviewsController", () => {
     it("rejects candidates from another organization", async () => {
       mockPrisma.candidate.findMany.mockResolvedValue([cand("a", { org_id: "other-org" })]);
       const r = {
-        user: { userId: "u1", orgId: "org-1", claims: { user_metadata: { orgId: "org-1" } } },
+        user: { userId: "u1", orgId: "org-1", orgFromProfile: "org-1", claims: {} },
       };
       const res: any = await controller.bulkSchedule(r, body(["a"], { dryRun: true }));
       expect(res.results[0].error).toMatch(/another organization/);

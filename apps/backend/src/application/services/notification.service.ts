@@ -1,6 +1,7 @@
 import { Injectable, Inject, Logger, OnModuleInit } from "@nestjs/common";
 import { Resend } from "resend";
 import { IQueueService, IQueueServiceToken } from "../common/queue/queue.service";
+import { createHash } from "node:crypto";
 import { InMemoryQueueService } from "../../infrastructure/queue/in-memory-queue.service";
 import { PrismaService } from "../../infrastructure/database/prisma.service";
 
@@ -33,6 +34,19 @@ export class NotificationService implements OnModuleInit {
     }
   }
 
+  /**
+   * Stable key for "this email about this event to this person". Queue delivery is at-least-once, so a retried
+   * job must not send twice. Kinds without a natural event id get no key (never suppressed).
+   */
+  static dedupeKey(kind: string, recipientEmail: string, payload: any): string | null {
+    const eventId = payload?.decisionId ?? payload?.interviewId ?? payload?.candidateId;
+    if (!eventId) return null;
+    const when = kind === "interview_reminder" ? (payload?.scheduledAt ?? "") : "";
+    return createHash("sha256")
+      .update([kind, recipientEmail.trim().toLowerCase(), eventId, when].join("|"))
+      .digest("hex");
+  }
+
   async sendEmail(
     orgId: string,
     kind: string,
@@ -44,16 +58,32 @@ export class NotificationService implements OnModuleInit {
     const subject = this.getEmailSubject(kind, payload);
     const html = this.getEmailHtml(kind, payload);
 
-    // Save notification to database outbox
-    const outboxRecord = await this.prisma.notificationOutbox.create({
-      data: {
-        org_id: orgId || "00000000-0000-0000-0000-000000000000",
-        kind,
-        recipient_email: recipientEmail,
-        payload,
-        status: "pending",
-      },
-    });
+    // Save notification to the outbox (or pick up the existing row if this is a retry of the same event)
+    const dedupeKey = NotificationService.dedupeKey(kind, recipientEmail, payload);
+    let outboxRecord: { id: string; status: string };
+    try {
+      outboxRecord = await this.prisma.notificationOutbox.create({
+        data: {
+          org_id: orgId || "00000000-0000-0000-0000-000000000000",
+          kind,
+          recipient_email: recipientEmail,
+          payload,
+          status: "pending",
+          dedupe_key: dedupeKey,
+        },
+      });
+    } catch (err: any) {
+      if (err?.code !== "P2002" || !dedupeKey) throw err;
+      const existing = await this.prisma.notificationOutbox.findUnique({
+        where: { dedupe_key: dedupeKey },
+      });
+      if (!existing) throw err;
+      if (existing.status === "sent") {
+        this.logger.warn(`Duplicate ${kind} to ${recipientEmail} suppressed (already sent).`);
+        return;
+      }
+      outboxRecord = existing; // earlier attempt failed or never finished: retry on the same row
+    }
 
     if (!this.resend) {
       this.logger.log(
@@ -123,12 +153,14 @@ export class NotificationService implements OnModuleInit {
               error: `Original: ${originalMsg} | Fallback: ${fallbackMsg}`,
             },
           });
+          throw new Error(`Email delivery failed: ${fallbackMsg}`);
         }
       } else {
         await this.prisma.notificationOutbox.update({
           where: { id: outboxRecord.id },
           data: { status: "failed", error: originalMsg },
         });
+        throw new Error(`Email delivery failed: ${originalMsg}`);
       }
     }
   }

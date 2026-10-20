@@ -169,6 +169,7 @@ describe("HiringDecisionService.decide", () => {
         kind: "candidate_outcome",
         recipientEmail: "cand@x.com",
         payload: {
+          decisionId: "d1",
           candidateName: "Jane Doe",
           role: "Backend Engineer",
           outcome: "reject",
@@ -193,7 +194,13 @@ describe("HiringDecisionService.decide", () => {
       await service.notifyOutcome("c1", person);
       const payload = queue.enqueue.mock.calls[0][1].payload;
       expect(JSON.stringify(payload)).not.toMatch(/internal|AI score|weak system design/i);
-      expect(Object.keys(payload).sort()).toEqual(["candidateName", "message", "outcome", "role"]);
+      expect(Object.keys(payload).sort()).toEqual([
+        "candidateName",
+        "decisionId",
+        "message",
+        "outcome",
+        "role",
+      ]);
     });
 
     it("refuses a second send for the same decision", async () => {

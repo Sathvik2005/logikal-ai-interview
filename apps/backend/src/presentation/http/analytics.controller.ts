@@ -1,9 +1,11 @@
 import { Controller, Get, UseGuards, Req } from "@nestjs/common";
 import { SupabaseAuthGuard } from "../guards/supabase-auth.guard";
+import { Roles, RolesGuard } from "../guards/roles.guard";
 import { PrismaService } from "../../infrastructure/database/prisma.service";
 
+@Roles("recruiter", "admin")
 @Controller("analytics")
-@UseGuards(SupabaseAuthGuard)
+@UseGuards(SupabaseAuthGuard, RolesGuard)
 export class AnalyticsController {
   constructor(private readonly prisma: PrismaService) {}
 
@@ -129,11 +131,11 @@ export class AnalyticsController {
 
     const pipelineCount = cands.length;
     const evaluatedCount = cands.filter(
-      (c) => c.status === "evaluated" || c.status === "offer" || c.status === "hired"
+      (c) => c.status === "evaluated" || c.status === "offer" || c.status === "hired",
     ).length;
     const interviewsThisWeek = ivs.length;
     const liveOrScheduledCount = ivs.filter(
-      (i) => i.status === "scheduled" || i.status === "in_progress"
+      (i) => i.status === "scheduled" || i.status === "in_progress",
     ).length;
 
     const today = new Date();
@@ -142,12 +144,7 @@ export class AnalyticsController {
     tomorrow.setDate(tomorrow.getDate() + 1);
 
     const todaysInterviews = ivs
-      .filter(
-        (i) =>
-          i.scheduled_at &&
-          i.scheduled_at >= today &&
-          i.scheduled_at < tomorrow
-      )
+      .filter((i) => i.scheduled_at && i.scheduled_at >= today && i.scheduled_at < tomorrow)
       .map((i) => ({
         id: i.id,
         candidateName: i.candidate?.full_name ?? "Candidate",
@@ -162,7 +159,13 @@ export class AnalyticsController {
       role: c.role_applied ?? "—",
       score: c.ai_score === null ? 0 : Number(c.ai_score),
       status: c.status,
-      avatar: c.full_name.trim().split(/\s+/).slice(0, 2).map((p) => p[0]?.toUpperCase() ?? "").join("") || "?",
+      avatar:
+        c.full_name
+          .trim()
+          .split(/\s+/)
+          .slice(0, 2)
+          .map((p) => p[0]?.toUpperCase() ?? "")
+          .join("") || "?",
     }));
 
     return {
