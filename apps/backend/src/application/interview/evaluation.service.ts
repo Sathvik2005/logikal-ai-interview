@@ -3,7 +3,6 @@ import { PrismaService } from "../../infrastructure/database/prisma.service";
 import { IAIOrchestrator, IAIOrchestratorToken } from "../common/ai/ai-orchestrator.interface";
 import { CandidateWorkflowService } from "../candidate/candidate-workflow.service";
 import { IQueueService, IQueueServiceToken } from "../common/queue/queue.service";
-import { InMemoryQueueService } from "../../infrastructure/queue/in-memory-queue.service";
 import { IEventBus, IEventBusToken } from "../common/event-bus/event-bus.interface";
 import { EvaluationCompletedEvent } from "../../domain/interview/events/interview-events";
 
@@ -23,14 +22,21 @@ export class EvaluationService implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    if (this.queue instanceof InMemoryQueueService) {
-      this.queue.registerProcessor("finalize-evaluation", async (payload: any) => {
-        await this.finalizeEvaluation(payload.interviewId, payload.sessionId);
-      });
-    }
+    this.queue.registerProcessor("finalize-evaluation", async (payload: any) => {
+      await this.finalizeEvaluation(payload.interviewId, payload.sessionId);
+    });
   }
 
   async finalizeEvaluation(interviewId: string, sessionId: string): Promise<void> {
+    // Queue handlers are at-least-once: a retry of a finished evaluation must not grade or notify twice.
+    const already = await this.prisma.interview.findUnique({
+      where: { id: interviewId },
+      select: { evaluation_status: true, reports: { select: { id: true } } },
+    });
+    if (already?.evaluation_status === "done" && already.reports) {
+      this.logger.log(`Evaluation for interview ${interviewId} already completed; skipping retry.`);
+      return;
+    }
     this.logger.log(`Starting background AI evaluation grading for interview: ${interviewId}`);
 
     await this.prisma.interview.update({
@@ -112,16 +118,22 @@ Notes: ${cr.notes || ""}`,
       );
 
       // 7. Write scorecard to database
-      const report = await this.prisma.interviewReport.create({
-        data: {
+      const reportData = {
+        executive_summary: reportMarkdown,
+        scores: evaluation.competencyScores as any,
+        strengths: evaluation.strengths as any,
+        weaknesses: evaluation.concerns as any,
+        integrity_score: evaluation.integrityScore,
+        recommendation: evaluation.recommendation,
+      };
+      // Upsert: `interview_id` is unique, so a retry after a partial failure must update, not duplicate.
+      const report = await this.prisma.interviewReport.upsert({
+        where: { interview_id: interviewId },
+        update: reportData,
+        create: {
           org_id: interview.org_id || "00000000-0000-0000-0000-000000000000",
           interview_id: interviewId,
-          executive_summary: reportMarkdown,
-          scores: evaluation.competencyScores as any,
-          strengths: evaluation.strengths as any,
-          weaknesses: evaluation.concerns as any,
-          integrity_score: evaluation.integrityScore,
-          recommendation: evaluation.recommendation,
+          ...reportData,
         },
       });
 

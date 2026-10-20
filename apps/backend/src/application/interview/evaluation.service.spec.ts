@@ -29,6 +29,7 @@ describe("EvaluationService", () => {
     },
     interviewReport: {
       create: jest.fn(),
+      upsert: jest.fn(),
     },
   };
 
@@ -149,7 +150,7 @@ describe("EvaluationService", () => {
       aiOrchestrator.generateReportMarkdown.mockResolvedValue("# Report markdown content");
 
       const mockReport = { id: "rep-999", org_id: "org-123" };
-      prisma.interviewReport.create.mockResolvedValue(mockReport);
+      prisma.interviewReport.upsert.mockResolvedValue(mockReport);
 
       workflow.transition.mockResolvedValue(undefined);
       eventBus.publish.mockImplementation(() => {});
@@ -194,8 +195,10 @@ describe("EvaluationService", () => {
       );
 
       // 5. Stores report in DB
-      expect(prisma.interviewReport.create).toHaveBeenCalledWith({
-        data: {
+      expect(prisma.interviewReport.upsert).toHaveBeenCalledWith({
+        where: { interview_id: "int-123" },
+        update: expect.objectContaining({ executive_summary: "# Report markdown content" }),
+        create: {
           org_id: "org-123",
           interview_id: "int-123",
           executive_summary: "# Report markdown content",
@@ -225,7 +228,22 @@ describe("EvaluationService", () => {
       );
     });
 
+    it("skips a retried job when the evaluation already completed (no second grade, report or event)", async () => {
+      prisma.interview.findUnique.mockResolvedValue({
+        evaluation_status: "done",
+        reports: { id: "rep-1" },
+      });
+      await service.finalizeEvaluation("int-123", "sess-789");
+      expect(prisma.interview.update).not.toHaveBeenCalled();
+      expect(prisma.interviewReport.upsert).not.toHaveBeenCalled();
+      expect(workflow.transition).not.toHaveBeenCalled();
+    });
+
     it("should set evaluation status to failed and rethrow on error", async () => {
+      prisma.interview.findUnique.mockResolvedValue({
+        evaluation_status: "pending",
+        reports: null,
+      });
       prisma.interview.update.mockResolvedValue({});
       prisma.interviewTurn.findMany.mockRejectedValue(new Error("Database error"));
 

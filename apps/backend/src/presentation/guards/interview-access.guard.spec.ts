@@ -65,7 +65,14 @@ describe("InterviewAccessGuard", () => {
     ).resolves.toBe(false);
   });
 
-  it("does not restrict staff without an organization, and lets staff reach a handler's own not-found", async () => {
+  it("refuses a recruiter that has no organization", async () => {
+    const recruiter = { userId: "r", role: "recruiter" };
+    await expect(
+      guard.canActivate(ctx({ user: recruiter, params: { sessionId: "s1" }, body: {} })),
+    ).resolves.toBe(false);
+  });
+
+  it("does not restrict an admin without an organization, and lets staff reach a handler's own not-found", async () => {
     const staff = { userId: "r", role: "admin" };
     await expect(
       guard.canActivate(ctx({ user: staff, params: { sessionId: "s1" }, body: {} })),

@@ -1,4 +1,10 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
+import {
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { PrismaService } from "../../infrastructure/database/prisma.service";
 import { buildRequestUser, verifyAccessToken } from "./token-verifier";
 
@@ -24,7 +30,17 @@ export class SupabaseAuthGuard implements CanActivate {
     try {
       const claims = await verifyAccessToken(token);
       // Trusted values only: role/org come from the database, not from user-editable token metadata.
-      request.user = await buildRequestUser(this.prisma, claims);
+      const user = await buildRequestUser(this.prisma, claims);
+      // A recruiter must belong to an organization; without one every query would fall into the shared
+      // default organization. (Admins may be global, e.g. the platform super admin.) Dev/test keep the fallback.
+      if (
+        process.env.NODE_ENV === "production" &&
+        user.role === "recruiter" &&
+        !user.orgFromProfile
+      ) {
+        throw new ForbiddenException("Your account is not assigned to an organization.");
+      }
+      request.user = user;
       return true;
     } catch (err) {
       throw new UnauthorizedException(

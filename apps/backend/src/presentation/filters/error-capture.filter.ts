@@ -16,11 +16,14 @@ const MAX_EVENTS_PER_MINUTE = 30;
  *  - are logged as one structured JSON line (easy to ship to any log platform),
  *  - are stored in `error_events` (the admin dashboard's "Errors (24h)" reads this table),
  *  - get a request id returned to the caller so support can find the exact failure.
+ *  - are posted to `ERROR_ALERT_WEBHOOK_URL` when set (Slack/Teams/Discord-style `{ text }` JSON), at most once
+ *    per `ERROR_ALERT_COOLDOWN_SEC` (default 300) per distinct error message, so an outage pages once, not 1000 times.
  * Capturing never throws and is rate-limited so an outage can't flood the database.
  */
 @Catch()
 export class ErrorCaptureFilter implements ExceptionFilter {
   private readonly logger = new Logger("ErrorCapture");
+  private readonly lastAlertAt = new Map<string, number>();
   private windowStart = Date.now();
   private inWindow = 0;
 
@@ -57,6 +60,7 @@ export class ErrorCaptureFilter implements ExceptionFilter {
       err.stack,
     );
     this.persist(req, err, status, requestId);
+    this.alert(req, err, status, requestId);
 
     res.status(status).json({
       statusCode: status,
@@ -89,5 +93,30 @@ export class ErrorCaptureFilter implements ExceptionFilter {
       .catch((e: unknown) =>
         this.logger.warn(`Could not store error event: ${e instanceof Error ? e.message : e}`),
       );
+  }
+
+  private alert(req: any, err: Error, status: number, requestId: string) {
+    const url = process.env.ERROR_ALERT_WEBHOOK_URL;
+    if (!url) return;
+    const cooldownMs = Number(process.env.ERROR_ALERT_COOLDOWN_SEC ?? 300) * 1000;
+    const key = err.message.slice(0, 200);
+    const now = Date.now();
+    if (now - (this.lastAlertAt.get(key) ?? 0) < cooldownMs) return;
+    this.lastAlertAt.set(key, now);
+    if (this.lastAlertAt.size > 200) this.lastAlertAt.delete(this.lastAlertAt.keys().next().value!);
+
+    const text =
+      `:rotating_light: ${process.env.NODE_ENV ?? "dev"} backend error ${status} ` +
+      `${req?.method ?? ""} ${req?.originalUrl ?? req?.url ?? ""}
+${err.message.slice(0, 500)}
+requestId: ${requestId}`;
+    void fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ text, content: text }),
+      signal: AbortSignal.timeout(5000),
+    }).catch((e: unknown) =>
+      this.logger.warn(`Error alert webhook failed: ${e instanceof Error ? e.message : e}`),
+    );
   }
 }

@@ -42,7 +42,9 @@ export class InterviewAccessGuard implements CanActivate {
 
     if (!interview) return user.role !== "candidate"; // let staff reach the handler's own "not found"
     if (user.role === "admin" || user.role === "recruiter") {
-      return !user.orgFromProfile || !interview.org_id || interview.org_id === user.orgFromProfile;
+      // A recruiter is always tied to an organization; only an organization-less admin (platform admin) is global.
+      if (!user.orgFromProfile) return user.role === "admin";
+      return !interview.org_id || interview.org_id === user.orgFromProfile;
     }
     return interview.candidate?.user_id === user.userId;
   }

@@ -66,7 +66,9 @@ export class VectorMatchingService implements OnModuleInit {
       let jdRequirements = `${jd.title}\nRequirements: ${jd.requirements || ""}\nDescription: ${jd.description || ""}`;
       if (jd.competencies) {
         try {
-          const comp = (typeof jd.competencies === "string" ? JSON.parse(jd.competencies) : jd.competencies) as any;
+          const comp = (
+            typeof jd.competencies === "string" ? JSON.parse(jd.competencies) : jd.competencies
+          ) as any;
           if (comp) {
             if (Array.isArray(comp.requiredSkills) && comp.requiredSkills.length > 0) {
               jdRequirements += `\nRequired Skills: ${comp.requiredSkills.join(", ")}`;
@@ -77,7 +79,10 @@ export class VectorMatchingService implements OnModuleInit {
             if (Array.isArray(comp.softSkills) && comp.softSkills.length > 0) {
               jdRequirements += `\nSoft Skills: ${comp.softSkills.join(", ")}`;
             }
-            if (Array.isArray(comp.minimumQualifications) && comp.minimumQualifications.length > 0) {
+            if (
+              Array.isArray(comp.minimumQualifications) &&
+              comp.minimumQualifications.length > 0
+            ) {
               jdRequirements += `\nMinimum Qualifications: ${comp.minimumQualifications.join(", ")}`;
             }
           }
@@ -96,16 +101,22 @@ export class VectorMatchingService implements OnModuleInit {
       const result = await this.aiOrchestrator.matchJdCandidate(jdRequirements, candidateProfile);
 
       // Save match record
-      await this.prisma.jdCandidateMatch.create({
-        data: {
+      // Upsert on (job, candidate): a retried job refreshes the match instead of failing on the unique key.
+      const matchData = {
+        match_score: result.matchScore,
+        missing_skills: result.missingSkills || [],
+        strengths: result.strengths || [],
+        focus_areas: result.focusAreas || [],
+        shortlisted: result.matchScore >= 80,
+      };
+      await this.prisma.jdCandidateMatch.upsert({
+        where: { job_id_candidate_id: { job_id: jd.id, candidate_id: candidateId } },
+        update: matchData,
+        create: {
           org_id: candidate.orgId || "00000000-0000-0000-0000-000000000000",
           job_id: jd.id,
           candidate_id: candidateId,
-          match_score: result.matchScore,
-          missing_skills: result.missingSkills || [],
-          strengths: result.strengths || [],
-          focus_areas: result.focusAreas || [],
-          shortlisted: result.matchScore >= 80,
+          ...matchData,
         },
       });
 

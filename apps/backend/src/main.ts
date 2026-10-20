@@ -1,3 +1,4 @@
+import { RedisIoAdapter } from "./presentation/ws/redis-io.adapter";
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { ValidationPipe, Logger } from "@nestjs/common";
@@ -54,6 +55,12 @@ async function bootstrap() {
   validateEnvironment();
   const logger = new Logger("Bootstrap");
   const app = await NestFactory.create(AppModule);
+
+  // Fan live-interview WebSocket events out through Redis when configured (needed for >1 backend instance).
+  const ioAdapter = new RedisIoAdapter(app);
+  if (ioAdapter.connectToRedis(process.env.REDIS_URL)) app.useWebSocketAdapter(ioAdapter);
+  else if (process.env.NODE_ENV === "production")
+    logger.warn("REDIS_URL is not set: run a single backend instance, or live events will split.");
 
   // Global prefixes and versioning
   app.setGlobalPrefix("api");

@@ -53,10 +53,10 @@ recruiter sends the outcome email (once). Repeatable with `scripts/demo-intervie
 5. **Bulk scheduling at volume.** Verified live for one candidate and by unit tests for 20; run it once with a real batch.
 
 ### Should be done before scale
-6. **Tenant isolation.** The backend uses a privileged DB role, so isolation relies on code filters; the auth guard falls back to a default org id when a token has none.
-7. **Live-interview channel is single-instance** (in-memory event bus / WebSocket). Add a Redis adapter before running more than one backend instance.
-8. **Queue handlers are at-least-once.** Resume parsing, matching, evaluation and notifications need an idempotency audit (a retried send-notification can email twice).
-9. **Observability.** Add error tracking and alerting (the health endpoint is in place).
+6. **Tenant isolation (hardened, not RLS).** Per-interview ownership guard added; in production a recruiter with no organization is refused instead of falling into the shared default org. Still code-level filters on a privileged DB role: add database RLS for defence in depth.
+7. **Live-interview channel (Redis adapter added).** Set `REDIS_URL` to run more than one backend instance; without it, keep a single instance. The domain event bus is still in-process (nothing consumes it across instances today).
+8. **Queue handlers (audited).** Notifications are de-duplicated, evaluation and JD matching are now safe to retry. Resume parsing and state transitions in retried jobs are not yet audited.
+9. **Observability (partial).** Errors are logged, stored in `error_events` and sent to `ERROR_ALERT_WEBHOOK_URL` when set. Still no external tracker (Sentry) or uptime monitor.
 10. **Always-on hosting.** Use a paid, always-on Render instance (free tier sleeps).
 11. **Demo accounts.** Test data now in the Supabase project: candidate test account, one test interview with decisions. The documented admin/recruiter demo passwords were reset on the live project earlier.
 
