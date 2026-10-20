@@ -73,6 +73,6 @@ ALTER TABLE public.interviews
   ADD COLUMN IF NOT EXISTS template_id uuid REFERENCES public.interview_templates(id) ON DELETE SET NULL;
 
 -- 5. Seed the default organization record to prevent foreign key issues
-INSERT INTO public.organizations (id, name, created_at, updated_at)
-VALUES ('00000000-0000-0000-0000-000000000000', 'Default System Organization', now(), now())
+INSERT INTO public.organizations (id, name, created_at)
+VALUES ('00000000-0000-0000-0000-000000000000', 'Default System Organization', now())
 ON CONFLICT (id) DO NOTHING;

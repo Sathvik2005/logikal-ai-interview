@@ -56,9 +56,9 @@ BEGIN
       full_name = EXCLUDED.full_name,
       email = EXCLUDED.email;
 
-    INSERT INTO public.user_roles (user_id, role)
-    VALUES (v_admin_id, 'admin')
-    ON CONFLICT (user_id, role) DO NOTHING;
+    IF NOT EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = v_admin_id AND role = 'admin') THEN
+      INSERT INTO public.user_roles (user_id, role) VALUES (v_admin_id, 'admin');
+    END IF;
   END IF;
 
   -- Candidate profile + role
@@ -71,9 +71,9 @@ BEGIN
       full_name = EXCLUDED.full_name,
       email = EXCLUDED.email;
 
-    INSERT INTO public.user_roles (user_id, role)
-    VALUES (v_candidate_id, 'candidate')
-    ON CONFLICT (user_id, role) DO NOTHING;
+    IF NOT EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = v_candidate_id AND role = 'candidate') THEN
+      INSERT INTO public.user_roles (user_id, role) VALUES (v_candidate_id, 'candidate');
+    END IF;
   END IF;
 
   -- Ensure recruiter also has org_id set in user_roles
