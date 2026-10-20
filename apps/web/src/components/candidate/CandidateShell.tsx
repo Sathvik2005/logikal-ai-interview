@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import type { ReactNode } from "react";
 import { MobileNav } from "@/components/shared/MobileNav";
+import { UserMenu } from "@/components/shared/UserMenu";
 
 type NavItem = { to: string; icon: string; label: string };
 
@@ -54,6 +55,12 @@ export function CandidateShell() {
 
   return (
     <div className="bg-background text-on-background min-h-screen flex">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-on-primary"
+      >
+        Skip to content
+      </a>
       <aside className="hidden md:flex flex-col h-screen sticky left-0 top-0 w-64 bg-surface border-r border-outline-variant p-md">
         <div className="mb-lg">
           <Link
@@ -107,14 +114,7 @@ export function CandidateShell() {
           </div>
           <div className="flex-1" />
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-low">
-              <div className="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center text-label-caps font-semibold">
-                {(user?.email ?? "C").charAt(0).toUpperCase()}
-              </div>
-              <span className="text-body-md text-on-surface hidden sm:block">
-                {user?.email ?? "candidate"}
-              </span>
-            </div>
+            <UserMenu />
             <button
               type="button"
               onClick={signOut}
@@ -126,7 +126,11 @@ export function CandidateShell() {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-lg lg:p-xl max-w-[1920px] mx-auto w-full">
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="flex-1 overflow-y-auto p-4 md:p-lg lg:p-xl max-w-[1920px] mx-auto w-full"
+        >
           <Outlet />
         </main>
       </div>

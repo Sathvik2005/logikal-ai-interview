@@ -34,6 +34,9 @@ export const Route = createFileRoute("/_authenticated/recruiter/candidates/")({
   loader: ({ context }) => {
     context.queryClient.ensureQueryData(candidatesListOptions());
   },
+  validateSearch: (search: Record<string, unknown>): { q?: string } => ({
+    q: typeof search.q === "string" && search.q.trim() ? search.q.trim() : undefined,
+  }),
   component: CandidatesPage,
 });
 
@@ -48,7 +51,8 @@ const STATUS_VALUES: CandidateStatus[] = [
 ];
 
 function CandidatesPage() {
-  const [q, setQ] = useState("");
+  const { q: initialQ } = Route.useSearch();
+  const [q, setQ] = useState(initialQ ?? "");
   const [status, setStatus] = useState<CandidateStatus | "all">("all");
   const [wizardOpen, setWizardOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);

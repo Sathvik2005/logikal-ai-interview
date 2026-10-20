@@ -3,6 +3,9 @@ import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import type { ReactNode } from "react";
 import { MobileNav } from "@/components/shared/MobileNav";
+import { UserMenu } from "@/components/shared/UserMenu";
+import { GlobalSearch } from "@/components/shared/GlobalSearch";
+import { useOrgName } from "@/hooks/use-org";
 
 type NavItem = { to: string; icon: string; label: string };
 
@@ -127,6 +130,7 @@ export function LoadingRow({ label = "Loading…" }: { label?: string }) {
 
 export function RecruiterShell() {
   const { user } = useAuth();
+  const orgName = useOrgName(user?.id);
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
@@ -140,6 +144,12 @@ export function RecruiterShell() {
 
   return (
     <div className="bg-background text-on-background min-h-screen flex">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-on-primary"
+      >
+        Skip to content
+      </a>
       <aside className="hidden md:flex flex-col h-screen sticky left-0 top-0 w-64 bg-surface border-r border-outline-variant p-md">
         <div className="mb-lg">
           <Link
@@ -148,7 +158,12 @@ export function RecruiterShell() {
           >
             Logikality AI
           </Link>
-          <p className="text-body-md text-on-surface-variant mt-1">Enterprise Plan</p>
+          <p
+            className="text-body-md text-on-surface-variant mt-1 truncate"
+            title={orgName ?? undefined}
+          >
+            {orgName ?? "Recruiter workspace"}
+          </p>
         </div>
         <Link
           to="/recruiter/scheduling"
@@ -161,6 +176,7 @@ export function RecruiterShell() {
             <Link
               key={item.to}
               to={item.to}
+              aria-current={isActive(item.to) ? "page" : undefined}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                 isActive(item.to)
                   ? "bg-primary-container text-on-primary-container font-semibold"
@@ -191,24 +207,14 @@ export function RecruiterShell() {
               items={NAV}
               rootPath="/recruiter"
               brand="Logikality AI"
-              subtitle="Enterprise Plan"
+              subtitle={orgName ?? "Recruiter workspace"}
             />
             <Link to="/recruiter" className="text-headline-sm font-black text-on-surface">
               Logikality AI
             </Link>
           </div>
           <div className="flex-1 flex justify-start px-4 md:px-8">
-            <div className="relative w-full max-w-md hidden md:block">
-              <Icon
-                name="search"
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-outline"
-              />
-              <input
-                className="w-full pl-10 pr-4 py-2 bg-surface-container-lowest border border-outline-variant rounded-full focus:ring-2 focus:ring-primary-container outline-none text-body-md"
-                placeholder="Search candidates, reports..."
-                type="search"
-              />
-            </div>
+            <GlobalSearch />
           </div>
           <div className="flex items-center gap-2">
             <Link
@@ -225,18 +231,16 @@ export function RecruiterShell() {
             >
               <Icon name="history" />
             </Link>
-            <div className="ml-2 flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-low">
-              <div className="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center text-label-caps font-semibold">
-                {(user?.email ?? "S").charAt(0).toUpperCase()}
-              </div>
-              <span className="text-body-md text-on-surface hidden sm:block">
-                {user?.email ?? "recruiter"}
-              </span>
-            </div>
+
+            <UserMenu />
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-lg lg:p-xl max-w-[1920px] mx-auto w-full">
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="flex-1 overflow-y-auto p-4 md:p-lg lg:p-xl max-w-[1920px] mx-auto w-full"
+        >
           <Outlet />
         </main>
       </div>
