@@ -141,6 +141,10 @@ export class NotificationService implements OnModuleInit {
         return payload.scheduledAt
           ? `Your Lokality AI Interview for ${payload.role || "Job Position"} is scheduled`
           : `Action Required: Schedule your Lokality AI Interview for ${payload.role || "Job Position"}`;
+      case "candidate_outcome":
+        return payload.outcome === "hire"
+          ? `Good news about your application for ${payload.role || "the position"}`
+          : `An update on your application for ${payload.role || "the position"}`;
       case "interview_reminder":
         return `Reminder: Your Lokality AI Interview is scheduled soon`;
       case "interview_report_ready":
@@ -164,6 +168,21 @@ export class NotificationService implements OnModuleInit {
                 <p>Please enter the candidate portal using the link below to verify your device credentials and complete the interview session:</p>
                 <p><a href="${process.env.APP_URL || "http://localhost:5173"}/candidate/prepare?id=${payload.interviewId}" style="display:inline-block;padding:10px 20px;background:#4f46e5;color:#fff;text-decoration:none;border-radius:4px;">Enter Interview Room</a></p>
                 <p>Best regards,<br/>Talent Team</p>`;
+      case "candidate_outcome": {
+        const esc = (s: unknown) =>
+          String(s ?? "").replace(
+            /[&<>"]/g,
+            (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c] as string,
+          );
+        const intro =
+          payload.outcome === "hire"
+            ? `<p>Thank you for taking the time to interview for the <strong>${esc(payload.role || "open")}</strong> position. We are pleased to let you know that we would like to move forward with you.</p>`
+            : `<p>Thank you for taking the time to interview for the <strong>${esc(payload.role || "open")}</strong> position. After careful consideration we have decided not to move forward with your application at this time.</p>`;
+        return `<h3>Dear ${esc(payload.candidateName || "Candidate")},</h3>
+                ${intro}
+                ${payload.message ? `<p>${esc(payload.message)}</p>` : ""}
+                <p>Best regards,<br/>The Talent Acquisition Team</p>`;
+      }
       case "interview_reminder":
         return `<h3>Dear ${payload.candidateName || "Candidate"},</h3>
                 <p>This is a reminder that your scheduled Lokality AI Interview session will commence at <strong>${payload.scheduledAt}</strong>.</p>

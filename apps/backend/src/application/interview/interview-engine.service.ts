@@ -183,7 +183,7 @@ Department: ${cr.department || "N/A"}
 Experience Level: ${cr.experienceLevel || "N/A"}
 Employment Type: ${cr.employmentType || "N/A"}
 Location: ${cr.location || "N/A"}
-Skills: ${Array.isArray(cr.skills) ? cr.skills.join(", ") : (cr.skills || "")}
+Skills: ${Array.isArray(cr.skills) ? cr.skills.join(", ") : cr.skills || ""}
 Responsibilities: ${cr.responsibilities || ""}
 Notes: ${cr.notes || ""}`;
       }
@@ -216,12 +216,17 @@ Notes: ${cr.notes || ""}`;
     this.logger.log(
       `Generating next question. Curated turns: ${personaTurns.length}/${curatedQuestions.length}`,
     );
-    const questionText = await this.aiOrchestrator.generateInterviewQuestion(
-      personaPrompt,
-      history,
-      jdContext,
-      candidateContext,
-      nextCuratedQuestion,
+    const questionText = await this.generateQuestionWithinBudget(
+      sessionId,
+      () =>
+        this.aiOrchestrator.generateInterviewQuestion(
+          personaPrompt,
+          history,
+          jdContext,
+          candidateContext,
+          nextCuratedQuestion,
+        ),
+      this.fallbackQuestion(personaTurns.length, candidate?.full_name, nextCuratedQuestion),
     );
 
     // Save generated question turn
@@ -231,6 +236,62 @@ Notes: ${cr.notes || ""}`;
       speaker: "persona",
       text: questionText,
     };
+  }
+
+  /**
+   * A live candidate must never stare at a spinner while the AI provider is slow or down. Give the AI a
+   * fixed time budget; if it errors or runs over, ask a sensible fallback question instead and record an
+   * `ai_question_fallback` event so the recruiter can see it happened.
+   */
+  private async generateQuestionWithinBudget(
+    sessionId: string,
+    generate: () => Promise<string>,
+    fallback: string,
+  ): Promise<string> {
+    const budgetMs = Number(process.env.LIVE_QUESTION_TIMEOUT_MS ?? 10_000);
+    const started = Date.now();
+    let timer: NodeJS.Timeout | undefined;
+    try {
+      const pending = generate();
+      pending.catch(() => undefined); // if we time out first, don't leave an unhandled rejection behind
+      const text = await Promise.race([
+        pending,
+        new Promise<never>((_, reject) => {
+          timer = setTimeout(
+            () => reject(new Error(`AI question timed out after ${budgetMs}ms`)),
+            budgetMs,
+          );
+        }),
+      ]);
+      if (!text?.trim()) throw new Error("AI returned an empty question");
+      return text;
+    } catch (err) {
+      const reason = err instanceof Error ? err.message : String(err);
+      this.logger.warn(`Using fallback question for session ${sessionId}: ${reason}`);
+      await this.recordEvent(sessionId, "ai_question_fallback", {
+        reason,
+        elapsedMs: Date.now() - started,
+      }).catch(() => undefined);
+      return fallback;
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  }
+
+  /** Curated question if one is queued, otherwise a generic probing follow-up (cycled so it doesn't repeat). */
+  private fallbackQuestion(askedSoFar: number, candidateName?: string, curated?: string): string {
+    if (curated) return curated;
+    if (askedSoFar === 0) {
+      const name = candidateName ? ` ${candidateName.split(" ")[0]}` : "";
+      return `Hi${name}, thanks for joining. To start, could you give me a short overview of your background and the work you are most proud of?`;
+    }
+    const followUps = [
+      "Thanks. Could you walk me through a concrete example from your own experience, including the trade-offs you considered?",
+      "What would you do differently if the scale or the requirements changed significantly?",
+      "How would you test and monitor that in production, and which failure modes worry you most?",
+      "Tell me about a time something like this went wrong and how you handled it.",
+    ];
+    return followUps[(askedSoFar - 1) % followUps.length];
   }
 
   async endSession(sessionId: string): Promise<void> {
@@ -257,7 +318,9 @@ Notes: ${cr.notes || ""}`;
       });
 
       // Update candidate workflow
-      await this.candidateWorkflow.transition(
+      // advanceTo walks interview_started -> interview_running -> evaluation_processing, so a candidate
+      // who answered without the intermediate state being set can still be closed out.
+      await this.candidateWorkflow.advanceTo(
         interview.candidateId,
         "evaluation_processing",
         "Interview room closed. Enqueuing AI evaluation pipeline.",

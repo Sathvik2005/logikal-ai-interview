@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import {
   getCandidateDecisionState,
   submitCandidateDecision,
+  notifyCandidateOutcome,
   type DecisionRecord,
 } from "@/lib/candidates.functions";
 
@@ -47,6 +48,8 @@ export function DecisionPanel({
   const qc = useQueryClient();
   const stateFn = useServerFn(getCandidateDecisionState);
   const submitFn = useServerFn(submitCandidateDecision);
+  const notifyFn = useServerFn(notifyCandidateOutcome);
+  const [outcomeMsg, setOutcomeMsg] = useState("");
   const q = useQuery({
     queryKey: ["decision-state", candidateId],
     queryFn: () => stateFn({ data: { id: candidateId } }),
@@ -65,6 +68,17 @@ export function DecisionPanel({
     },
     onError: (err) =>
       toast.error(err instanceof Error ? err.message : "Could not record the decision"),
+  });
+
+  const notifyMutation = useMutation({
+    mutationFn: () =>
+      notifyFn({ data: { id: candidateId, message: outcomeMsg.trim() || undefined } }),
+    onSuccess: () => {
+      toast.success("Outcome email sent to the candidate.");
+      setOutcomeMsg("");
+      qc.invalidateQueries();
+    },
+    onError: (err) => toast.error(err instanceof Error ? err.message : "Could not send the email"),
   });
 
   if (q.isLoading)
@@ -193,6 +207,47 @@ export function DecisionPanel({
           </div>
         </div>
       )}
+
+      {(() => {
+        const finalDecision = history.find((h) => h.decision !== "hold");
+        if (awaiting || !finalDecision) return null;
+        if (finalDecision.outcome_notified_at) {
+          return (
+            <p className="mt-md rounded-lg bg-[#dcfce7] px-3 py-2 text-body-md text-[#166534]">
+              Candidate told the outcome by {finalDecision.outcome_notified_by ?? "a recruiter"} on{" "}
+              {when(finalDecision.outcome_notified_at)}.
+            </p>
+          );
+        }
+        return (
+          <div className="mt-md space-y-sm rounded-lg border border-outline-variant p-md">
+            <p className="text-body-md font-semibold text-on-background">
+              Tell the candidate (
+              {finalDecision.decision === "hire" ? "moving forward" : "not moving forward"})
+            </p>
+            <p className="text-body-md text-on-surface-variant">
+              Nothing is sent automatically. The email contains only the outcome and your message,
+              never the AI score or your internal notes.
+            </p>
+            <textarea
+              rows={2}
+              value={outcomeMsg}
+              onChange={(e) => setOutcomeMsg(e.target.value)}
+              maxLength={1000}
+              placeholder="Optional personal message to include"
+              className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2"
+            />
+            <button
+              type="button"
+              disabled={notifyMutation.isPending}
+              onClick={() => notifyMutation.mutate()}
+              className="rounded-lg bg-primary px-4 py-2 text-body-md font-semibold text-on-primary hover:brightness-110 disabled:opacity-50"
+            >
+              {notifyMutation.isPending ? "Sending…" : "Send outcome email"}
+            </button>
+          </div>
+        );
+      })()}
 
       {history.length > 0 && (
         <ul className="mt-md divide-y divide-outline-variant rounded-lg border border-outline-variant">

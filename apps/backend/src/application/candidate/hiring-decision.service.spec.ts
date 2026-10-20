@@ -20,6 +20,7 @@ describe("isOverride", () => {
 describe("HiringDecisionService.decide", () => {
   let prisma: any;
   let workflow: any;
+  let queue: any;
   let service: HiringDecisionService;
 
   const reviewCandidate = {
@@ -42,10 +43,13 @@ describe("HiringDecisionService.decide", () => {
       candidateDecision: {
         create: jest.fn(async ({ data }: any) => ({ id: "d1", ...data })),
         findMany: jest.fn(),
+        findFirst: jest.fn(),
+        update: jest.fn(async ({ data }: any) => ({ id: "d1", ...data })),
       },
     };
     workflow = { transition: jest.fn(), logTimeline: jest.fn() };
-    service = new HiringDecisionService(prisma, workflow);
+    queue = { enqueue: jest.fn() };
+    service = new HiringDecisionService(prisma, workflow, queue);
     withReport("hire");
   });
 
@@ -134,5 +138,78 @@ describe("HiringDecisionService.decide", () => {
     await expect(service.decide("c1", "hire", undefined, actor)).rejects.toThrow(
       /overriding the AI/,
     );
+  });
+
+  describe("notifyOutcome", () => {
+    const decision = (over: any = {}) => ({
+      id: "d1",
+      org_id: "org-1",
+      decision: "reject",
+      note: "internal: weak system design, AI score 59",
+      outcome_notified_at: null,
+      ...over,
+    });
+    const person = { userId: "u1", email: "recruiter@x.com", orgId: "org-1" };
+
+    beforeEach(() => {
+      prisma.candidate.findUnique.mockResolvedValue({
+        id: "c1",
+        email: "cand@x.com",
+        full_name: "Jane Doe",
+        role_applied: "Backend Engineer",
+      });
+      prisma.candidateDecision.findFirst.mockResolvedValue(decision());
+    });
+
+    it("queues one outcome email, marks it as sent and logs it on the timeline", async () => {
+      const rec = await service.notifyOutcome("c1", person, "We wish you the best.");
+
+      expect(queue.enqueue).toHaveBeenCalledWith("send-notification", {
+        orgId: "org-1",
+        kind: "candidate_outcome",
+        recipientEmail: "cand@x.com",
+        payload: {
+          candidateName: "Jane Doe",
+          role: "Backend Engineer",
+          outcome: "reject",
+          message: "We wish you the best.",
+        },
+      });
+      expect(prisma.candidateDecision.update).toHaveBeenCalledWith({
+        where: { id: "d1" },
+        data: { outcome_notified_at: expect.any(Date), outcome_notified_by: "recruiter@x.com" },
+      });
+      expect(workflow.logTimeline).toHaveBeenCalledWith(
+        "c1",
+        "outcome_email_sent",
+        expect.any(String),
+        expect.any(String),
+        expect.any(Object),
+      );
+      expect(rec.outcome_notified_by).toBe("recruiter@x.com");
+    });
+
+    it("never puts the internal note or any AI data in the email payload", async () => {
+      await service.notifyOutcome("c1", person);
+      const payload = queue.enqueue.mock.calls[0][1].payload;
+      expect(JSON.stringify(payload)).not.toMatch(/internal|AI score|weak system design/i);
+      expect(Object.keys(payload).sort()).toEqual(["candidateName", "message", "outcome", "role"]);
+    });
+
+    it("refuses a second send for the same decision", async () => {
+      prisma.candidateDecision.findFirst.mockResolvedValue(
+        decision({ outcome_notified_at: new Date() }),
+      );
+      await expect(service.notifyOutcome("c1", person)).rejects.toBeInstanceOf(ConflictException);
+      expect(queue.enqueue).not.toHaveBeenCalled();
+    });
+
+    it("refuses when there is no hire/reject decision (e.g. only a hold)", async () => {
+      prisma.candidateDecision.findFirst.mockResolvedValue(null);
+      await expect(service.notifyOutcome("c1", person)).rejects.toThrow(
+        /no hire or reject decision/,
+      );
+      expect(queue.enqueue).not.toHaveBeenCalled();
+    });
   });
 });

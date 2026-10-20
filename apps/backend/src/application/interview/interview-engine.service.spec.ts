@@ -57,6 +57,7 @@ describe("InterviewEngineService", () => {
 
   const mockCandidateWorkflow = {
     transition: jest.fn(),
+    advanceTo: jest.fn(),
     logTimeline: jest.fn(),
   };
 
@@ -128,7 +129,7 @@ describe("InterviewEngineService", () => {
       expect(interviewRepo.findById).toHaveBeenCalledWith("int-123");
       expect(interview.status).toBe("in_progress");
       expect(interviewRepo.save).toHaveBeenCalledWith(interview);
-      
+
       expect(prisma.interviewSession.create).toHaveBeenCalledWith({
         data: {
           interview_id: "int-123",
@@ -141,7 +142,7 @@ describe("InterviewEngineService", () => {
         "cand-456",
         "interview_started",
         expect.any(String),
-        { sessionId: "sess-999" }
+        { sessionId: "sess-999" },
       );
 
       expect(result).toEqual({
@@ -163,15 +164,27 @@ describe("InterviewEngineService", () => {
       const mockSession = { id: "sess-999", interview_id: "int-123" };
       prisma.interviewSession.findUnique.mockResolvedValue(mockSession);
 
-      const mockTurn = { id: "turn-1", session_id: "sess-999", speaker: "candidate", text: "My answer" };
+      const mockTurn = {
+        id: "turn-1",
+        session_id: "sess-999",
+        speaker: "candidate",
+        text: "My answer",
+      };
       prisma.interviewTurn.create.mockResolvedValue(mockTurn);
 
       const mockInterview = { id: "int-123", candidate_id: "cand-456" };
       prisma.interview.findUnique.mockResolvedValue(mockInterview);
 
-      const result = await service.appendTurn("sess-999", "candidate", "My answer", "s3://audio.mp3");
+      const result = await service.appendTurn(
+        "sess-999",
+        "candidate",
+        "My answer",
+        "s3://audio.mp3",
+      );
 
-      expect(prisma.interviewSession.findUnique).toHaveBeenCalledWith({ where: { id: "sess-999" } });
+      expect(prisma.interviewSession.findUnique).toHaveBeenCalledWith({
+        where: { id: "sess-999" },
+      });
       expect(prisma.interviewTurn.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           session_id: "sess-999",
@@ -186,7 +199,7 @@ describe("InterviewEngineService", () => {
         "cand-456",
         "turn_candidate",
         "CANDIDATE Turn",
-        "My answer"
+        "My answer",
       );
 
       expect(result).toEqual(mockTurn);
@@ -218,7 +231,7 @@ describe("InterviewEngineService", () => {
         "integrity_violation",
         "Integrity Signal: tab_switch",
         expect.any(String),
-        { count: 1 }
+        { count: 1 },
       );
     });
   });
@@ -237,22 +250,41 @@ describe("InterviewEngineService", () => {
       };
       prisma.interviewSession.findUnique.mockResolvedValue(mockSession);
 
-      prisma.persona.findUnique.mockResolvedValue({ id: "p-1", name: "Sophia", prompt: "Interviewer system prompt" });
+      prisma.persona.findUnique.mockResolvedValue({
+        id: "p-1",
+        name: "Sophia",
+        prompt: "Interviewer system prompt",
+      });
       prisma.jobDescription.findResolvedValue = jest.fn();
-      prisma.jobDescription.findUnique.mockResolvedValue({ id: "job-1", title: "Node Dev", requirements: "Node.js" });
-      prisma.candidate.findUnique.mockResolvedValue({ id: "cand-456", full_name: "John", resume_summary: "Dev", skills: ["JS"] });
-      
+      prisma.jobDescription.findUnique.mockResolvedValue({
+        id: "job-1",
+        title: "Node Dev",
+        requirements: "Node.js",
+      });
+      prisma.candidate.findUnique.mockResolvedValue({
+        id: "cand-456",
+        full_name: "John",
+        resume_summary: "Dev",
+        skills: ["JS"],
+      });
+
       prisma.interviewTurn.findMany.mockResolvedValue([
-        { id: "t1", speaker: "candidate", text: "Hello", started_at: new Date() }
+        { id: "t1", speaker: "candidate", text: "Hello", started_at: new Date() },
       ]);
       prisma.interviewQuestion.findMany.mockResolvedValue([
-        { id: "q1", question: { prompt: "Curated Question 1" } }
+        { id: "q1", question: { prompt: "Curated Question 1" } },
       ]);
 
       aiOrchestrator.generateInterviewQuestion.mockResolvedValue("Generated Question text?");
-      
+
       // Spy appendTurn
-      const appendTurnSpy = jest.spyOn(service, "appendTurn").mockResolvedValue({ id: "turn-gen", speaker: "persona", text: "Generated Question text?" });
+      const appendTurnSpy = jest
+        .spyOn(service, "appendTurn")
+        .mockResolvedValue({
+          id: "turn-gen",
+          speaker: "persona",
+          text: "Generated Question text?",
+        });
 
       const result = await service.getNextQuestion("sess-999");
 
@@ -261,7 +293,7 @@ describe("InterviewEngineService", () => {
         [{ speaker: "candidate", text: "Hello" }],
         "Job Title: Node Dev\nRequirements: Node.js",
         "Candidate Name: John\nResume Summary: Dev\nSkills: JS",
-        "Curated Question 1"
+        "Curated Question 1",
       );
 
       expect(appendTurnSpy).toHaveBeenCalledWith("sess-999", "persona", "Generated Question text?");
@@ -270,6 +302,86 @@ describe("InterviewEngineService", () => {
         speaker: "persona",
         text: "Generated Question text?",
       });
+    });
+  });
+
+  describe("getNextQuestion time budget", () => {
+    const setup = (curated: Array<{ id: string; question: { prompt: string } }> = []) => {
+      prisma.interviewSession.findUnique.mockResolvedValue({
+        id: "sess-999",
+        interview_id: "int-123",
+        interview: { id: "int-123", candidate_id: "cand-456", persona_id: "p-1" },
+      });
+      prisma.persona.findUnique.mockResolvedValue({ id: "p-1", name: "Sophia", prompt: "prompt" });
+      prisma.candidate.findUnique.mockResolvedValue({
+        id: "cand-456",
+        full_name: "John Smith",
+        resume_summary: "Dev",
+        skills: ["JS"],
+      });
+      prisma.interviewTurn.findMany.mockResolvedValue([]);
+      prisma.interviewQuestion.findMany.mockResolvedValue(curated);
+      prisma.interviewEvent.create.mockResolvedValue({});
+      jest.spyOn(service, "appendTurn").mockImplementation(async (_s, _sp, text) => ({
+        id: "turn-1",
+        speaker: "persona",
+        text,
+      }));
+    };
+
+    afterEach(() => {
+      delete process.env.LIVE_QUESTION_TIMEOUT_MS;
+    });
+
+    it("falls back to a sensible question when the AI is slower than the budget", async () => {
+      process.env.LIVE_QUESTION_TIMEOUT_MS = "50";
+      setup();
+      aiOrchestrator.generateInterviewQuestion.mockImplementation(
+        () => new Promise((resolve) => setTimeout(() => resolve("too late"), 500)),
+      );
+
+      const result = await service.getNextQuestion("sess-999");
+
+      expect(result.text).toMatch(/^Hi John, thanks for joining/);
+      expect(prisma.interviewEvent.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          type: "ai_question_fallback",
+          payload: expect.objectContaining({ reason: expect.stringContaining("timed out") }),
+        }),
+      });
+    });
+
+    it("falls back when the AI call fails outright", async () => {
+      setup();
+      aiOrchestrator.generateInterviewQuestion.mockRejectedValue(new Error("503 high demand"));
+
+      const result = await service.getNextQuestion("sess-999");
+
+      expect(result.text).toContain("thanks for joining");
+    });
+
+    it("prefers the next curated question as the fallback", async () => {
+      process.env.LIVE_QUESTION_TIMEOUT_MS = "50";
+      setup([{ id: "q1", question: { prompt: "Explain database indexing." } }]);
+      aiOrchestrator.generateInterviewQuestion.mockImplementation(
+        () => new Promise(() => undefined),
+      );
+
+      const result = await service.getNextQuestion("sess-999");
+
+      expect(result.text).toBe("Explain database indexing.");
+    });
+
+    it("uses the AI question when it answers in time (no fallback event)", async () => {
+      setup();
+      aiOrchestrator.generateInterviewQuestion.mockResolvedValue(
+        "What is your experience with Kafka?",
+      );
+
+      const result = await service.getNextQuestion("sess-999");
+
+      expect(result.text).toBe("What is your experience with Kafka?");
+      expect(prisma.interviewEvent.create).not.toHaveBeenCalled();
     });
   });
 
@@ -303,11 +415,12 @@ describe("InterviewEngineService", () => {
         data: { evaluation_status: "queued" },
       });
 
-      expect(candidateWorkflow.transition).toHaveBeenCalledWith(
+      // steps through interview_running instead of an illegal direct jump
+      expect(candidateWorkflow.advanceTo).toHaveBeenCalledWith(
         "cand-456",
         "evaluation_processing",
         expect.any(String),
-        { sessionId: "sess-999" }
+        { sessionId: "sess-999" },
       );
 
       expect(queue.enqueue).toHaveBeenCalledWith("finalize-evaluation", {

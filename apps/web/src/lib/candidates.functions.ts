@@ -647,6 +647,8 @@ export type DecisionRecord = {
   overrode_ai: boolean;
   decided_by_email: string | null;
   decided_at: string;
+  outcome_notified_at?: string | null;
+  outcome_notified_by?: string | null;
 };
 export type DecisionState = {
   awaiting: boolean;
@@ -701,5 +703,21 @@ export const submitCandidateDecision = createServerFn({ method: "POST" })
       body: JSON.stringify({ decision: data.decision, note: data.note }),
     });
     if (!res.ok) throw await backendError(res, "Could not record the decision");
+    return (await res.json()) as DecisionRecord;
+  });
+
+/** Human-triggered: tell the candidate the outcome of the latest hire/reject decision (sent once). */
+export const notifyCandidateOutcome = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ id: z.string().uuid(), message: z.string().max(1000).optional() }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const res = await fetch(`${getBackendUrl()}/api/candidates/${data.id}/decision/notify`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...getAuthHeader() },
+      body: JSON.stringify({ message: data.message }),
+    });
+    if (!res.ok) throw await backendError(res, "Could not send the outcome email");
     return (await res.json()) as DecisionRecord;
   });

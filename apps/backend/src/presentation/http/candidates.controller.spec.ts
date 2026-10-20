@@ -47,6 +47,7 @@ describe("CandidatesController", () => {
     awaiting: jest.fn(),
     state: jest.fn(),
     decide: jest.fn(),
+    notifyOutcome: jest.fn(),
   };
 
   const mockPrisma = {
@@ -212,6 +213,19 @@ describe("CandidatesController", () => {
         email: "r@x.com",
         orgId: "org-1",
       });
+    });
+
+    it("outcome email is a deliberate human action passed to the service with the signed-in person", async () => {
+      mockDecisions.notifyOutcome.mockResolvedValue({ id: "d1" });
+      const req = { user: { userId: "u1", email: "r@x.com", orgId: "org-1" } };
+
+      await controller.notifyOutcome(req, "c1", { message: "Good luck" });
+
+      expect(mockDecisions.notifyOutcome).toHaveBeenCalledWith(
+        "c1",
+        { userId: "u1", email: "r@x.com", orgId: "org-1" },
+        "Good luck",
+      );
     });
 
     it("lists the review queue and a candidate's decision state", async () => {

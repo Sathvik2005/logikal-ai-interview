@@ -1,4 +1,5 @@
-import { BadRequestException, ConflictException, Injectable } from "@nestjs/common";
+import { BadRequestException, ConflictException, Inject, Injectable } from "@nestjs/common";
+import { IQueueService, IQueueServiceToken } from "../common/queue/queue.service";
 import { PrismaService } from "../../infrastructure/database/prisma.service";
 import { CandidateWorkflowService } from "./candidate-workflow.service";
 
@@ -30,6 +31,8 @@ export class HiringDecisionService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly workflow: CandidateWorkflowService,
+    @Inject(IQueueServiceToken)
+    private readonly queue: IQueueService,
   ) {}
 
   /** Candidates whose AI evaluation is done and who are waiting for a human decision. */
@@ -88,6 +91,54 @@ export class HiringDecisionService {
       where: { candidate_id: candidateId },
       orderBy: { decided_at: "desc" },
     });
+  }
+
+  /**
+   * Tell the candidate the outcome of a hire/reject decision. Only a person triggers this, at most once per
+   * decision, and the email never contains AI scores or the internal decision notes.
+   */
+  async notifyOutcome(candidateId: string, actor: DecisionActor, message?: string) {
+    const decision = await this.prisma.candidateDecision.findFirst({
+      where: { candidate_id: candidateId, decision: { in: ["hire", "reject"] } },
+      orderBy: { decided_at: "desc" },
+    });
+    if (!decision) {
+      throw new ConflictException(
+        "There is no hire or reject decision to notify the candidate about.",
+      );
+    }
+    if (decision.outcome_notified_at) {
+      throw new ConflictException(
+        "The candidate has already been told the outcome of this decision.",
+      );
+    }
+    const candidate = await this.prisma.candidate.findUnique({ where: { id: candidateId } });
+    if (!candidate) throw new BadRequestException("Candidate not found.");
+
+    const custom = (message ?? "").trim().slice(0, 1000);
+    await this.queue.enqueue("send-notification", {
+      orgId: decision.org_id,
+      kind: "candidate_outcome",
+      recipientEmail: candidate.email,
+      payload: {
+        candidateName: candidate.full_name,
+        role: candidate.role_applied,
+        outcome: decision.decision === "hire" ? "hire" : "reject",
+        message: custom || undefined,
+      },
+    });
+    const updated = await this.prisma.candidateDecision.update({
+      where: { id: decision.id },
+      data: { outcome_notified_at: new Date(), outcome_notified_by: actor.email ?? actor.userId },
+    });
+    await this.workflow.logTimeline(
+      candidateId,
+      "outcome_email_sent",
+      "Outcome email sent to candidate",
+      `Outcome (${decision.decision}) sent by ${actor.email ?? actor.userId}.`,
+      { decisionId: decision.id },
+    );
+    return updated;
   }
 
   async decide(

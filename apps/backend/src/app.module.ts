@@ -8,6 +8,7 @@ import { PrismaInterviewRepository } from "./infrastructure/database/repositorie
 import { EventEmitterBusService } from "./infrastructure/event-bus/event-emitter-bus.service";
 import { InMemoryQueueService } from "./infrastructure/queue/in-memory-queue.service";
 import { PgQueueService } from "./infrastructure/queue/pg-queue.service";
+import { HealthController } from "./presentation/http/health.controller";
 import { GeminiOrchestratorService } from "./infrastructure/ai/gemini-orchestrator.service";
 
 // Repository Tokens
@@ -52,6 +53,7 @@ import { AdminController } from "./presentation/http/admin.controller";
     }),
   ],
   controllers: [
+    HealthController,
     CandidatesController,
     JobsController,
     PersonasController,

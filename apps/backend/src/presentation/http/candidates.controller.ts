@@ -78,6 +78,25 @@ export class CandidatesController {
     return this.decisions.awaiting(claimedOrg);
   }
 
+  /** Human-triggered: tell the candidate the outcome of the latest hire/reject decision (once). */
+  @Post(":id/decision/notify")
+  @Roles("recruiter", "admin")
+  async notifyOutcome(
+    @Req() req: any,
+    @Param("id") id: string,
+    @Body() body: { message?: string },
+  ) {
+    return this.decisions.notifyOutcome(
+      id,
+      {
+        userId: req.user.userId,
+        email: req.user.email,
+        orgId: req.user.orgId || "00000000-0000-0000-0000-000000000000",
+      },
+      body?.message,
+    );
+  }
+
   @Get(":id/decisions")
   @Roles("recruiter", "admin")
   async decisionState(@Param("id") id: string) {

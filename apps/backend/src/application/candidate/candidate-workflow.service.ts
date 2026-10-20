@@ -3,7 +3,11 @@ import {
   ICandidateRepository,
   ICandidateRepositoryToken,
 } from "../../domain/candidate/candidate.repository.interface";
-import { Candidate, CandidateStatus, CANDIDATE_STATUSES } from "../../domain/candidate/candidate.entity";
+import {
+  Candidate,
+  CandidateStatus,
+  CANDIDATE_STATUSES,
+} from "../../domain/candidate/candidate.entity";
 import { IEventBus, IEventBusToken } from "../common/event-bus/event-bus.interface";
 import { PrismaService } from "../../infrastructure/database/prisma.service";
 import { CandidateAppliedEvent } from "../../domain/candidate/events/candidate-events";
@@ -96,7 +100,12 @@ export class CandidateWorkflowService {
    * state so the entity's transition rules stay enforced. Archiving, same-state and
    * backward moves are delegated to a single `transition` (which validates them).
    */
-  async advanceTo(candidateId: string, target: CandidateStatus, details?: string): Promise<void> {
+  async advanceTo(
+    candidateId: string,
+    target: CandidateStatus,
+    details?: string,
+    meta?: any,
+  ): Promise<void> {
     const candidate = await this.candidateRepo.findById(candidateId);
     if (!candidate) {
       throw new Error(`Candidate with ID ${candidateId} not found.`);
@@ -105,10 +114,15 @@ export class CandidateWorkflowService {
     const from = CANDIDATE_STATUSES.indexOf(candidate.status);
     const to = CANDIDATE_STATUSES.indexOf(target);
     if (target === "archived" || to <= from) {
-      return this.transition(candidateId, target, details);
+      return this.transition(candidateId, target, details, meta);
     }
     for (let i = from + 1; i <= to; i++) {
-      await this.transition(candidateId, CANDIDATE_STATUSES[i], i === to ? details : undefined);
+      await this.transition(
+        candidateId,
+        CANDIDATE_STATUSES[i],
+        i === to ? details : undefined,
+        i === to ? meta : undefined,
+      );
     }
   }
 
@@ -172,7 +186,7 @@ export class CandidateWorkflowService {
     jobId?: string | null,
   ): Promise<{ imported: number; skipped: number; candidateIds: string[] }> {
     const emails = rows.map((r) => r.email.trim().toLowerCase());
-    
+
     // Find existing candidates with the same emails in this org
     const existing = await this.prisma.candidate.findMany({
       where: {
@@ -182,18 +196,20 @@ export class CandidateWorkflowService {
       },
       select: { email: true },
     });
-    
+
     const existingEmails = new Set(existing.map((e) => e.email.toLowerCase()));
-    
+
     const toInsert = rows.filter((r) => !existingEmails.has(r.email.trim().toLowerCase()));
-    
+
     const importedIds: string[] = [];
-    
+
     for (const row of toInsert) {
       const id = crypto.randomUUID();
       const hasResume = !!row.resumeUrl;
-      const initialAnalysis = hasResume ? { processingStatus: "queued" } : { processingStatus: "completed" };
-      
+      const initialAnalysis = hasResume
+        ? { processingStatus: "queued" }
+        : { processingStatus: "completed" };
+
       const candidate = new Candidate(
         id,
         orgId,
@@ -210,10 +226,10 @@ export class CandidateWorkflowService {
         null,
         initialAnalysis,
       );
-      
+
       await this.candidateRepo.create(candidate);
       importedIds.push(id);
-      
+
       // Log timeline
       await this.logTimeline(
         id,
@@ -221,7 +237,7 @@ export class CandidateWorkflowService {
         "Application Submitted (Bulk Import)",
         "Candidate profile created via bulk CSV import.",
       );
-      
+
       if (hasResume) {
         // Enqueue background resume parsing
         await this.queue.enqueue("process-candidate-resume", { candidateId: id });
@@ -230,7 +246,7 @@ export class CandidateWorkflowService {
         await this.queue.enqueue("match-candidate-jd", { candidateId: id });
       }
     }
-    
+
     if (importedIds.length > 0) {
       // Audit
       await this.prisma.auditEvent.create({
@@ -244,7 +260,7 @@ export class CandidateWorkflowService {
         },
       });
     }
-    
+
     return {
       imported: importedIds.length,
       skipped: rows.length - importedIds.length,
