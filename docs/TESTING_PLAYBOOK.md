@@ -11,7 +11,7 @@ The backend features unit tests covering the domain lifecycle entities, applicat
 ### 1.1. Execution Command
 Due to memory allocations during parallel Jest worker processes on some development environments, run the tests sequentially:
 ```bash
-cd backend
+cd apps/backend
 npm run test -- --runInBand
 ```
 
@@ -23,7 +23,7 @@ npm run test:cov
 The output is saved inside `/coverage/index.html` detailing line and branch coverage rates.
 
 ### 1.3. Test Suite Specification Reference
-For a granular, class-by-class breakdown of the 12 spec files, including their mock designs, scenario mappings, and event dispatch parameters, refer to the [TEST_SUITE_SPECIFICATION.md](file:///e:/logikaiinterview/docs/TEST_SUITE_SPECIFICATION.md).
+For a granular, class-by-class breakdown of the 12 spec files, including their mock designs, scenario mappings, and event dispatch parameters, refer to the [TEST_SUITE_SPECIFICATION.md](TEST_SUITE_SPECIFICATION.md).
 
 
 ---
@@ -32,7 +32,7 @@ For a granular, class-by-class breakdown of the 12 spec files, including their m
 
 ### 2.1. Testing Heuristic AI Fallback Mode
 You can test the full interview execution lifecycle without entering real Gemini API keys:
-1.  Set `GEMINI_API_KEY="your-gemini-api-key-here"` (or keep it empty) in `backend/.env`.
+1.  Set `GEMINI_API_KEY="your-gemini-api-key-here"` (or keep it empty) in `apps/backend/.env`.
 2.  Start the NestJS backend: `npm run start:dev`.
 3.  Upload a resume. The console should log: `[AI Mock] Parsing resume text mock fallback`.
 4.  The system parses mock attributes and match compatibility values automatically.

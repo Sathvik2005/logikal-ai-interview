@@ -51,7 +51,7 @@ To prevent emails from landing in spam folders:
     `RESEND_API_KEY="re_yourApiKey"`
 
 ### 2.2. Customizing Templates
-Email templates are defined inside [notification.service.ts](file:///e:/logikaiinterview/backend/src/application/services/notification.service.ts#L92-L134). You can modify HTML layout parameters to update corporate typography, color palettes, and header assets.
+Email templates are defined inside [notification.service.ts](../apps/backend/src/application/services/notification.service.ts#L92-L134). You can modify HTML layout parameters to update corporate typography, color palettes, and header assets.
 
 ---
 

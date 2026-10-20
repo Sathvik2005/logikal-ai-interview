@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-The Lokality AI Recruitment Intelligence Platform has successfully finalized its core backend integration, verified all API wiring interfaces, and deployed a robust test suite comprising 12 test suites (73 unit tests) which pass at a 100% rate.
+The Lokality AI Recruitment Intelligence Platform has successfully finalized its core backend integration, verified all API wiring interfaces, and deployed a robust test suite comprising 12 test suites (74 unit tests) which pass at a 100% rate.
 
 By mocking database connections in automated testing, the backend is validated against all state machines, controller routes, and event-bus notifications. An enterprise documentation suite has been fully compiled inside `/docs`.
 
@@ -38,30 +38,30 @@ A complete enterprise-grade documentation portal is available inside `/docs`:
 
 | Document | File Path | Focus |
 |---|---|---|
-| **Architecture Guide** | [ARCHITECTURE.md](file:///e:/logikaiinterview/docs/ARCHITECTURE.md) | High-level layer blueprints, WebSocket maps, and dependencies. |
-| **API Reference Manual** | [API_REFERENCE.md](file:///e:/logikaiinterview/docs/API_REFERENCE.md) | Request/response payloads schemas for all 56 routes. |
-| **Database Schema Reference**| [DATABASE_SCHEMA.md](file:///e:/logikaiinterview/docs/DATABASE_SCHEMA.md) | Table relational indexes for 30+ PostgreSQL tables. |
-| **Developer Setup Guide** | [SETUP.md](file:///e:/logikaiinterview/docs/SETUP.md) | Initial setup, seeds execution commands. |
-| **Product Requirements (PRD)**| [PRD.md](file:///e:/logikaiinterview/docs/PRD.md) | Vision, capability matrices, out-of-scope boundaries. |
-| **Product Specification** | [PRODUCT_SPECIFICATION.md](file:///e:/logikaiinterview/docs/PRODUCT_SPECIFICATION.md) | User Stories (Gherkin), screen tables, and core algorithms. |
-| **Glossary of Terms** | [GLOSSARY.md](file:///e:/logikaiinterview/docs/GLOSSARY.md) | Platform dictionary, states checklists, abbreviations. |
-| **User Operations Manual** | [USER_MANUAL.md](file:///e:/logikaiinterview/docs/USER_MANUAL.md) | Operational guidelines for Recruiters and Candidates. |
-| **Compliance & Security** | [COMPLIANCE_AND_SECURITY.md](file:///e:/logikaiinterview/docs/COMPLIANCE_AND_SECURITY.md)| Scoped tenant isolation, auth claims, GDPR audits. |
-| **Integration Guide** | [INTEGRATION_GUIDE.md](file:///e:/logikaiinterview/docs/INTEGRATION_GUIDE.md) | ATS Webhooks, Resend domains config, calendar APIs. |
-| **Testing Playbook** | [TESTING_PLAYBOOK.md](file:///e:/logikaiinterview/docs/TESTING_PLAYBOOK.md) | Jest execution runs and proctoring event simulations. |
-| **Test Suite Spec** | [TEST_SUITE_SPECIFICATION.md](file:///e:/logikaiinterview/docs/TEST_SUITE_SPECIFICATION.md) | Detailed analysis of all 12 backend test suites and mocks. |
-| **Client Frontend Guide** | [CLIENT_DEVELOPMENT.md](file:///e:/logikaiinterview/docs/CLIENT_DEVELOPMENT.md) | React 19, TanStack Start proxy functions, WebRTC analyser. |
-| **Administration Guide** | [ADMINISTRATION_GUIDE.md](file:///e:/logikaiinterview/docs/ADMINISTRATION_GUIDE.md) | Key config variables, Supabase buckets, database seeding. |
-| **Deployment Playbook** | [DEPLOYMENT_AND_OPERATIONS.md](file:///e:/logikaiinterview/docs/DEPLOYMENT_AND_OPERATIONS.md)| PM2 ecosystem clusters, Nginx reverse proxies, SSL settings, and Redis scale configurations. |
+| **Architecture Guide** | [ARCHITECTURE.md](ARCHITECTURE.md) | High-level layer blueprints, WebSocket maps, and dependencies. |
+| **API Reference Manual** | [API_REFERENCE.md](API_REFERENCE.md) | Request/response payloads schemas for all 63 routes. |
+| **Database Schema Reference**| [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md) | Table relational indexes for 30+ PostgreSQL tables. |
+| **Developer Setup Guide** | [SETUP.md](SETUP.md) | Initial setup, seeds execution commands. |
+| **Product Requirements (PRD)**| [PRD.md](PRD.md) | Vision, capability matrices, out-of-scope boundaries. |
+| **Product Specification** | [PRODUCT_SPECIFICATION.md](PRODUCT_SPECIFICATION.md) | User Stories (Gherkin), screen tables, and core algorithms. |
+| **Glossary of Terms** | [GLOSSARY.md](GLOSSARY.md) | Platform dictionary, states checklists, abbreviations. |
+| **User Operations Manual** | [USER_MANUAL.md](USER_MANUAL.md) | Operational guidelines for Recruiters and Candidates. |
+| **Compliance & Security** | [COMPLIANCE_AND_SECURITY.md](COMPLIANCE_AND_SECURITY.md)| Scoped tenant isolation, auth claims, GDPR audits. |
+| **Integration Guide** | [INTEGRATION_GUIDE.md](INTEGRATION_GUIDE.md) | ATS Webhooks, Resend domains config, calendar APIs. |
+| **Testing Playbook** | [TESTING_PLAYBOOK.md](TESTING_PLAYBOOK.md) | Jest execution runs and proctoring event simulations. |
+| **Test Suite Spec** | [TEST_SUITE_SPECIFICATION.md](TEST_SUITE_SPECIFICATION.md) | Detailed analysis of all 12 backend test suites and mocks. |
+| **Client Frontend Guide** | [CLIENT_DEVELOPMENT.md](CLIENT_DEVELOPMENT.md) | React 19, TanStack Start proxy functions, WebRTC analyser. |
+| **Administration Guide** | [ADMINISTRATION_GUIDE.md](ADMINISTRATION_GUIDE.md) | Key config variables, Supabase buckets, database seeding. |
+| **Deployment Playbook** | [DEPLOYMENT_AND_OPERATIONS.md](DEPLOYMENT_AND_OPERATIONS.md)| PM2 ecosystem clusters, Nginx reverse proxies, SSL settings, and Redis scale configurations. |
 
 ---
 
 ## 🔴 BLOCKERS & NEXT ACTIONS
 
-*   **Database Key Configuration**: Plug in your PostgreSQL connection passwords into `DATABASE_URL` within the root [.env](file:///e:/logikaiinterview/.env) and [backend/.env](file:///e:/logikaiinterview/backend/.env) files.
+*   **Database Key Configuration**: Plug in your PostgreSQL connection passwords into `DATABASE_URL` within the root [.env](../.env) and [apps/backend/.env](../apps/backend/.env) files.
 *   **Run Seeding & Client Generation**:
     ```bash
-    cd backend
+    cd apps/backend
     npx prisma db push
     npx prisma generate
     npm run start:dev

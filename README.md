@@ -12,7 +12,7 @@ An enterprise-grade, AI-powered recruitment intelligence platform. Lokality AI a
 - **AI Evaluation Reports**: Detailed candidate scorecard, competency analysis, integrity assessment, and hire/no-hire recommendations.
 - **Live Interview Monitoring**: Real-time WebSocket-based monitoring of active interviews with proctoring alerts.
 - **Multi-Tenant Architecture**: Robust organization and role-based permissions (Super Admin, Org Admin, Recruiter, Candidate).
-- **Production NestJS Backend**: Clean Architecture backend with 56 API endpoints, domain-driven design, and Swagger documentation.
+- **Production NestJS Backend**: Clean Architecture backend with 63 API endpoints, domain-driven design, and Swagger documentation.
 
 ---
 
@@ -52,7 +52,7 @@ An enterprise-grade, AI-powered recruitment intelligence platform. Lokality AI a
 | Document | Description |
 |----------|-------------|
 | [**Architecture Guide**](docs/ARCHITECTURE.md) | System overview, tech stack, architecture diagrams, data flows |
-| [**API Reference**](docs/API_REFERENCE.md) | Complete REST & WebSocket API documentation (56 endpoints) |
+| [**API Reference**](docs/API_REFERENCE.md) | Complete REST & WebSocket API documentation (63 endpoints) |
 | [**Database Schema**](docs/DATABASE_SCHEMA.md) | All 30 tables with column reference and ER diagram |
 | [**Setup Guide**](docs/SETUP.md) | Installation, configuration, deployment instructions |
 | [**Progress Report**](docs/PROGRESS.md) | Development status, completion matrix, remaining work |
@@ -69,11 +69,11 @@ An enterprise-grade, AI-powered recruitment intelligence platform. Lokality AI a
 
 | Role | Email | Password | Purpose |
 |---|---|---|---|
-| **Super Admin** | `superadmin@lokality.ai` | `SuperAdmin@2026` | Global control, tenant onboarding |
-| **Org Admin** | `orgadmin@acme.com` | `OrgAdmin@2026` | Organization configuration |
-| **Recruiter** | `recruitersatya@logikality.demo` | `Recruiter@2026` | Dashboard, JD editing, AI reports |
-| **Candidate (Strong Hire)** | `aisha.k@example.com` | `Candidate@2026` | Completed interview reports |
-| **Candidate (Scheduled)** | `m.chen@example.com` | `Candidate@2026` | Pre-interview testing |
+| **Super Admin** | `superadmin@lokality.ai` | `SuperAdmin@2026!Active` | Global control, tenant onboarding |
+| **Org Admin** | `orgadmin@acme.com` | `OrgAdmin@2026!Active` | Organization configuration |
+| **Recruiter** | `recruitersatya@logikality.demo` | `Recruiter@2026!Active` | Dashboard, JD editing, AI reports |
+| **Candidate (Strong Hire)** | `aisha.k@example.com` | `Candidate@2026!Active` | Completed interview reports |
+| **Candidate (Scheduled)** | `m.chen@example.com` | `Candidate@2026!Active` | Pre-interview testing |
 
 ---
 
@@ -100,28 +100,28 @@ VITE_SUPABASE_URL=https://giwxdcjqoymqxuprjuix.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=your-supabase-anon-key
 ```
 
-### 3. Install Backend Dependencies
+### 3. Install Dependencies
+
+The repo is an npm workspace (`apps/*`, `packages/*`); one install at the root covers the web app, backend and shared packages:
 
 ```bash
-cd backend
 npm install
 ```
 
 ### 4. Configure Backend Environment
 
-Create `backend/.env` — see [Setup Guide](docs/SETUP.md#step-3-configure-backend-environment) for all required variables.
+Create `apps/backend/.env` — see [Setup Guide](docs/SETUP.md#step-3-configure-backend-environment) for all required variables.
 
 ### 5. Start Development Servers
 
 **Terminal 1 — Frontend:**
 ```bash
-npm run dev
+npm run dev:web
 ```
 
 **Terminal 2 — Backend:**
 ```bash
-cd backend
-npm run start:dev
+npm run dev:backend
 ```
 
 ### 6. Access the Platform
@@ -138,23 +138,23 @@ npm run start:dev
 
 ```
 logikaiinterview/
-├── src/                        # Frontend (TanStack Start + React)
-│   ├── routes/                # File-based route pages
-│   │   ├── _authenticated/    # Protected routes
-│   │   │   ├── recruiter/    # Recruiter dashboard & tools
-│   │   │   ├── candidate/    # Candidate interview portal
-│   │   │   └── admin/        # Platform administration
-│   │   └── index.tsx         # Public landing page
-│   ├── components/            # Reusable UI components
-│   ├── lib/                   # Server functions (API proxy)
-│   └── hooks/                 # Custom React hooks
-├── backend/                    # Backend (NestJS)
-│   ├── src/
-│   │   ├── domain/           # Domain entities & events
-│   │   ├── application/      # Business logic services
-│   │   ├── infrastructure/   # Database, AI, queues
-│   │   └── presentation/     # Controllers, guards, gateways
-│   └── prisma/               # Database schema
+├── apps/
+│   ├── web/                    # Frontend (@logikality/web, TanStack Start + React)
+│   │   └── src/
+│   │       ├── routes/        # File-based route pages (_authenticated/recruiter|candidate|admin)
+│   │       ├── components/    # Reusable UI components
+│   │       ├── lib/           # Server functions (API proxy)
+│   │       └── hooks/         # Custom React hooks
+│   └── backend/                # Backend (NestJS)
+│       ├── src/
+│       │   ├── domain/        # Domain entities & events
+│       │   ├── application/   # Business logic services
+│       │   ├── infrastructure/# Database, AI, queues
+│       │   └── presentation/  # Controllers, guards, gateways
+│       └── prisma/            # Database schema
+├── packages/
+│   ├── types/                  # Shared types & zod schemas (@logikality/types)
+│   └── ts-config/              # Shared tsconfig
 ├── docs/                       # Documentation
 └── supabase/                   # Supabase migrations & config
 ```

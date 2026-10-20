@@ -44,25 +44,30 @@
 logikaiinterview/
 ├── .env                    # Frontend environment variables
 ├── .env.example            # Environment template
-├── package.json            # Frontend dependencies
-├── vite.config.ts          # Vite build configuration
-├── tsconfig.json           # TypeScript configuration
-├── src/                    # Frontend source code
-│   ├── routes/            # TanStack Router pages
-│   ├── components/        # React UI components
-│   ├── lib/               # Server functions (API proxy layer)
-│   ├── hooks/             # Custom React hooks
-│   └── integrations/      # Third-party integrations
-├── backend/                # NestJS backend
-│   ├── .env               # Backend environment variables
-│   ├── package.json       # Backend dependencies
-│   ├── prisma/            # Database schema & migrations
-│   │   └── schema.prisma  # Prisma schema (30+ models)
-│   └── src/               # Backend source code
-│       ├── domain/        # Domain entities & events
-│       ├── application/   # Business logic services
-│       ├── infrastructure/# Database, AI, queues
-│       └── presentation/  # Controllers, guards, gateways
+├── package.json            # npm workspace root (apps/*, packages/*)
+├── apps/
+│   ├── web/                # Frontend (@logikality/web)
+│   │   ├── vite.config.ts  # Vite build configuration
+│   │   ├── tsconfig.json   # TypeScript configuration
+│   │   └── src/
+│   │       ├── routes/     # TanStack Router pages
+│   │       ├── components/ # React UI components
+│   │       ├── lib/        # Server functions (API proxy layer)
+│   │       ├── hooks/      # Custom React hooks
+│   │       └── integrations/ # Third-party integrations
+│   └── backend/            # NestJS backend
+│       ├── .env            # Backend environment variables
+│       ├── package.json    # Backend dependencies
+│       ├── prisma/         # Database schema
+│       │   └── schema.prisma # Prisma schema (33 models)
+│       └── src/            # Backend source code
+│           ├── domain/         # Domain entities & events
+│           ├── application/    # Business logic services
+│           ├── infrastructure/ # Database, AI, queues
+│           └── presentation/   # Controllers, guards, gateways
+├── packages/
+│   ├── types/              # Shared types & zod schemas
+│   └── ts-config/          # Shared tsconfig
 ├── docs/                   # Project documentation
 │   ├── ARCHITECTURE.md    # Architecture guide
 │   ├── API_REFERENCE.md   # API endpoint reference
@@ -99,7 +104,7 @@ VITE_SUPABASE_URL="https://giwxdcjqoymqxuprjuix.supabase.co"
 
 ### Step 3: Configure Backend Environment
 
-Create `backend/.env`:
+Create `apps/backend/.env`:
 
 ```env
 # Supabase
@@ -149,7 +154,7 @@ postgresql://postgres.[project-ref]:[PASSWORD]@aws-0-[region].pooler.supabase.co
 Once `DATABASE_URL` is configured:
 
 ```bash
-cd backend
+cd apps/backend
 
 # Pull the live database schema into Prisma
 npx prisma db pull
@@ -172,7 +177,7 @@ npm install
 ### Start Development Server
 
 ```bash
-npm run dev
+npm run dev:web
 ```
 
 The frontend will be available at: `http://localhost:5173`
@@ -184,8 +189,7 @@ The frontend will be available at: `http://localhost:5173`
 ### Install Dependencies
 
 ```bash
-cd backend
-npm install
+# Already covered by the root `npm install` (npm workspaces)
 ```
 
 ### Generate Prisma Client
@@ -197,7 +201,7 @@ npx prisma generate
 ### Start Development Server
 
 ```bash
-npm run start:dev
+npm run dev:backend   # from the project root
 ```
 
 The backend will be available at:
@@ -214,12 +218,12 @@ The backend will be available at:
 **Terminal 1 — Frontend:**
 ```bash
 cd logikaiinterview
-npm run dev
+npm run dev:web
 ```
 
 **Terminal 2 — Backend:**
 ```bash
-cd logikaiinterview/backend
+cd logikaiinterview/apps/backend
 npm run start:dev
 ```
 
@@ -263,15 +267,15 @@ curl http://localhost:3000/api/docs
 
 #### `PrismaClientInitializationError: Environment variable not found: DATABASE_URL`
 
-**Cause:** The `backend/.env` file is missing or `DATABASE_URL` is not set.
+**Cause:** The `apps/backend/.env` file is missing or `DATABASE_URL` is not set.
 
-**Fix:** Create `backend/.env` with a valid PostgreSQL connection string from your Supabase dashboard.
+**Fix:** Create `apps/backend/.env` with a valid PostgreSQL connection string from your Supabase dashboard.
 
 #### `Error P1012: Prisma schema validation error`
 
 **Cause:** Prisma 6+ requires explicit configuration for environment variables.
 
-**Fix:** Ensure `DATABASE_URL` is set in `backend/.env` and run:
+**Fix:** Ensure `DATABASE_URL` is set in `apps/backend/.env` and run:
 ```bash
 npx prisma generate
 ```
@@ -282,7 +286,7 @@ npx prisma generate
 
 **Fix:**
 1. Ensure the backend is running on port 3000
-2. Check `FRONTEND_URL` in `backend/.env` matches the frontend port
+2. Check `FRONTEND_URL` in `apps/backend/.env` matches the frontend port
 
 #### JWT verification fails
 
@@ -294,7 +298,7 @@ npx prisma generate
 
 **Cause:** `GEMINI_API_KEY` is not configured or is set to the template value.
 
-**Fix:** Get a real API key from [Google AI Studio](https://aistudio.google.com/apikey) and set it in `backend/.env`.
+**Fix:** Get a real API key from [Google AI Studio](https://aistudio.google.com/apikey) and set it in `apps/backend/.env`.
 
 ---
 
@@ -309,7 +313,7 @@ npm run build
 
 **Backend:**
 ```bash
-cd backend
+cd apps/backend
 npm run build
 npm run start:prod
 ```

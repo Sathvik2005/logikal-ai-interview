@@ -16,7 +16,7 @@ This document serves as the single source of truth for all default application c
 Super Admin accounts have global access across the entire platform, including system settings, system-wide metrics, tenant/organization onboarding, global user management, and security audit logs.
 
 - **Email**: `superadmin@lokality.ai`
-- **Password**: `SuperAdmin@2026`
+- **Password**: `SuperAdmin@2026!Active`
 - **Role**: `admin` (System Super Admin)
 - **Permissions**: Full read/write access to all database tables, organization setup, and global feature toggles.
 - **Default Organization**: Lokality AI (System Tenant)
@@ -29,7 +29,7 @@ Super Admin accounts have global access across the entire platform, including sy
 Organization Admins have administrative permissions scoped to their specific tenant organization. They manage recruiters, hiring managers, company settings, and custom branding.
 
 - **Email**: `orgadmin@acme.com`
-- **Password**: `OrgAdmin@2026`
+- **Password**: `OrgAdmin@2026!Active`
 - **Organization**: `Acme Corp`
 - **Role**: `admin` (Tenant Admin)
 - **Permissions**: Manage organization-level users, branding preferences, job templates, and billing settings.
@@ -47,7 +47,7 @@ _This account is pre-configured and updated automatically via the database migra
 
 - **Name**: Satya Recruiter
 - **Email**: `recruitersatya@logikality.demo`
-- **Password**: `Recruiter@2026`
+- **Password**: `Recruiter@2026!Active`
 - **Organization**: `Logikality Demo Org`
 - **Assigned Role**: `recruiter`
 - **Department**: Talent Acquisition
@@ -57,7 +57,7 @@ _This account is pre-configured and updated automatically via the database migra
 
 - **Name**: Sarah Recruiter
 - **Email**: `recruiter.sarah@acme.com`
-- **Password**: `Recruiter@2026`
+- **Password**: `Recruiter@2026!Active`
 - **Organization**: `Acme Corp`
 - **Assigned Role**: `recruiter`
 - **Department**: Engineering Recruitment
@@ -185,8 +185,8 @@ Service accounts utilized for automation testing, external integrations (ATS syn
 
 To quickly login locally and inspect specific dashboards, use:
 
-- **Local Admin Login**: `superadmin@lokality.ai` / `SuperAdmin@2026`
-- **Test Recruiter Login**: `recruitersatya@logikality.demo` / `Recruiter@2026`
+- **Local Admin Login**: `superadmin@lokality.ai` / `SuperAdmin@2026!Active`
+- **Test Recruiter Login**: `recruitersatya@logikality.demo` / `Recruiter@2026!Active`
 - **Test Candidate Login**: Signup on-demand via the candidate option in the `/auth?mode=signup` tab.
 
 ---
@@ -214,11 +214,11 @@ To quickly login locally and inspect specific dashboards, use:
 
 | Role                    | Email                            | Password          | Purpose                                                              |
 | ----------------------- | -------------------------------- | ----------------- | -------------------------------------------------------------------- |
-| Super Admin             | `superadmin@lokality.ai`         | `SuperAdmin@2026` | Global control panel, audit logs, system-wide admin dashboards       |
-| Org Admin               | `orgadmin@acme.com`              | `OrgAdmin@2026`   | Organization/tenant customization, recruiter provisioning            |
-| Recruiter (Seeded)      | `recruitersatya@logikality.demo` | `Recruiter@2026`  | Managing candidate lists, editing JDs, reviewing AI reports          |
-| Candidate (Strong Hire) | `aisha.k@example.com`            | `Candidate@2026`  | Demonstrating score reports, audio transcribing, strong evaluations  |
-| Candidate (Scheduled)   | `m.chen@example.com`             | `Candidate@2026`  | Testing scheduled candidates, system checkups, pre-interview layouts |
+| Super Admin             | `superadmin@lokality.ai`         | `SuperAdmin@2026!Active` | Global control panel, audit logs, system-wide admin dashboards       |
+| Org Admin               | `orgadmin@acme.com`              | `OrgAdmin@2026!Active`   | Organization/tenant customization, recruiter provisioning            |
+| Recruiter (Seeded)      | `recruitersatya@logikality.demo` | `Recruiter@2026!Active`  | Managing candidate lists, editing JDs, reviewing AI reports          |
+| Candidate (Strong Hire) | `aisha.k@example.com`            | `Candidate@2026!Active`  | Demonstrating score reports, audio transcribing, strong evaluations  |
+| Candidate (Scheduled)   | `m.chen@example.com`             | `Candidate@2026!Active`  | Testing scheduled candidates, system checkups, pre-interview layouts |
 
 ---
 
@@ -228,7 +228,7 @@ To quickly login locally and inspect specific dashboards, use:
 
 The database user `recruitersatya@logikality.demo` is configured and attached to the `Logikality Demo Org` during migrations via:
 
-- [20260606034600_6f4f18bc-c35b-4128-a2ef-36389906449a.sql](file:///e:/logikaiinterview/supabase/migrations/20260606034600_6f4f18bc-c35b-4128-a2ef-36389906449a.sql)
+- [20260606034600_6f4f18bc-c35b-4128-a2ef-36389906449a.sql](../supabase/migrations/20260606034600_6f4f18bc-c35b-4128-a2ef-36389906449a.sql)
 
 ### How to Regenerate or Add New Seed Accounts
 
@@ -240,7 +240,7 @@ The database user `recruitersatya@logikality.demo` is configured and attached to
    VALUES (
      '00000000-0000-0000-0000-000000000001',
      'superadmin@lokality.ai',
-     crypt('SuperAdmin@2026', gen_salt('bf')),
+     crypt('SuperAdmin@2026!Active', gen_salt('bf')),
      now(),
      '{"provider":"email","providers":["email"]}',
      '{"full_name":"Super Admin","role":"admin"}',

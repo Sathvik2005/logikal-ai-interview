@@ -2,7 +2,7 @@
 
 > **Database Provider:** Supabase (PostgreSQL)  
 > **ORM:** Prisma 6.x  
-> **Schema File:** `backend/prisma/schema.prisma`  
+> **Schema File:** `apps/backend/prisma/schema.prisma`  
 > **Total Models:** 30  
 > **Last Updated:** June 22, 2026
 

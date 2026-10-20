@@ -6,7 +6,7 @@ This guide details the operational procedures, environment configurations, Supab
 
 ## 1. DETAILED ENVIRONMENT VARIABLES CONFIGURATION
 
-The platform reads process configurations from environment files. Ensure the values are set in both the root [.env](file:///e:/logikaiinterview/.env) and [backend/.env](file:///e:/logikaiinterview/backend/.env):
+The platform reads process configurations from environment files. Ensure the values are set in both the root [.env](../.env) and [apps/backend/.env](../apps/backend/.env):
 
 | Variable | Required | Default | Description |
 | :--- | :--- | :--- | :--- |
@@ -45,7 +45,7 @@ Prisma manages schema deployments and database seeding.
 ### 3.1. Generating Prisma Client
 To compile the type-safe Prisma client matching the Supabase schema:
 ```bash
-cd backend
+cd apps/backend
 npx prisma generate
 ```
 

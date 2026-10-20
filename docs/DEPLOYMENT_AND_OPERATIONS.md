@@ -20,7 +20,7 @@ module.exports = {
     {
       name: 'lokality-backend',
       script: 'dist/src/main.js',
-      cwd: './backend',
+      cwd: './apps/backend',
       instances: 'max',
       exec_mode: 'cluster',
       env_production: {
@@ -45,7 +45,7 @@ module.exports = {
 To build and launch the ecosystem:
 ```bash
 # Build Backend
-cd backend
+cd apps/backend
 npm run build
 
 # Build Frontend
@@ -122,7 +122,7 @@ For development, the platform runs tasks using `InMemoryQueueService`. In produc
 1.  Verify that Redis is installed and running on your infrastructure.
 2.  Install NestJS BullMQ integration:
     `npm install @nestjs/bullmq bullmq`
-3.  Modify [app.module.ts](file:///e:/logikaiinterview/backend/src/app.module.ts) to register the Redis connection module:
+3.  Modify [app.module.ts](../apps/backend/src/app.module.ts) to register the Redis connection module:
     ```typescript
     import { BullModule } from '@nestjs/bullmq';
 

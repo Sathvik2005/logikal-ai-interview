@@ -234,7 +234,7 @@ export const listCandidates = createServerFn({ method: 'GET' })
 The backend follows **Clean Architecture** principles with four distinct layers:
 
 ```
-backend/src/
+apps/backend/src/
 ├── domain/                      # Domain Layer (innermost)
 │   ├── candidate/
 │   │   ├── candidate.entity.ts          # Candidate aggregate root

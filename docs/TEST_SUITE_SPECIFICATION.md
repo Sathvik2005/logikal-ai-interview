@@ -2,7 +2,7 @@
 
 This document provides a detailed specification and execution reference for the Lokality AI backend test suites. The platform uses **NestJS (TypeScript)**, **Jest**, and **Prisma** to run a decoupled, test-driven backend.
 
-The backend test architecture consists of **12 test suites (73 test cases)** covering domain state machines, application workflows, background queue runners, security guards, and HTTP REST controllers. By mocking database and external network boundaries, the test suite guarantees execution speed, reliability, and isolation.
+The backend test architecture consists of **12 test suites (74 test cases)** covering domain state machines, application workflows, background queue runners, security guards, and HTTP REST controllers. By mocking database and external network boundaries, the test suite guarantees execution speed, reliability, and isolation.
 
 ---
 
@@ -48,7 +48,7 @@ The backend test suite is divided into four distinct layers:
 ### 2.1. Domain Layer (Entity State Machines)
 
 #### 1. Candidate Entity State Machine
-*   **File Path**: [candidate.entity.spec.ts](file:///e:/logikaiinterview/backend/src/domain/candidate/candidate.entity.spec.ts)
+*   **File Path**: [candidate.entity.spec.ts](../apps/backend/src/domain/candidate/candidate.entity.spec.ts)
 *   **Target Class**: `Candidate`
 *   **Focus**: Verifies domain model construction, event recording, and workflow state invariants.
 *   **Verified Scenarios**:
@@ -60,7 +60,7 @@ The backend test suite is divided into four distinct layers:
     *   **Invariants Control**: Throws a descriptive error when trying to skip states or perform illegal transitions (e.g. transitioning directly from `applied` to `hiring_decision`).
 
 #### 2. Interview Entity State Machine
-*   **File Path**: [interview.entity.spec.ts](file:///e:/logikaiinterview/backend/src/domain/interview/interview.entity.spec.ts)
+*   **File Path**: [interview.entity.spec.ts](../apps/backend/src/domain/interview/interview.entity.spec.ts)
 *   **Target Class**: `Interview`
 *   **Focus**: Verifies interview scheduling parameters, proctor scores mapping, and lifecycle states.
 *   **Verified Scenarios**:
@@ -75,7 +75,7 @@ The backend test suite is divided into four distinct layers:
 ### 2.2. Application Layer (Workflow & Business Logic)
 
 #### 3. Candidate Workflow Service
-*   **File Path**: [candidate-workflow.service.spec.ts](file:///e:/logikaiinterview/backend/src/application/candidate/candidate-workflow.service.spec.ts)
+*   **File Path**: [candidate-workflow.service.spec.ts](../apps/backend/src/application/candidate/candidate-workflow.service.spec.ts)
 *   **Target Class**: `CandidateWorkflowService`
 *   **Focus**: Police database persistence of candidate state transitions and timelines logs.
 *   **Verified Scenarios**:
@@ -84,7 +84,7 @@ The backend test suite is divided into four distinct layers:
     *   `logTimeline`: Directly appends system and administrator events to the database timeline with metadata payloads.
 
 #### 4. Interview Engine Service
-*   **File Path**: [interview-engine.service.spec.ts](file:///e:/logikaiinterview/backend/src/application/interview/interview-engine.service.spec.ts)
+*   **File Path**: [interview-engine.service.spec.ts](../apps/backend/src/application/interview/interview-engine.service.spec.ts)
 *   **Target Class**: `InterviewEngineService`
 *   **Focus**: Directs real-time session execution, proctor event handling, and turn appending.
 *   **Verified Scenarios**:
@@ -95,7 +95,7 @@ The backend test suite is divided into four distinct layers:
     *   `endSession`: Saves the session `ended_at` timestamp, changes interview state to `evaluation_pending`, sets queue status to `queued`, and registers the finalized task in the processing queue.
 
 #### 5. Evaluation Service
-*   **File Path**: [evaluation.service.spec.ts](file:///e:/logikaiinterview/backend/src/application/interview/evaluation.service.spec.ts)
+*   **File Path**: [evaluation.service.spec.ts](../apps/backend/src/application/interview/evaluation.service.spec.ts)
 *   **Target Class**: `EvaluationService`
 *   **Focus**: Orchestrates post-interview conversation analysis, grading, and report delivery.
 *   **Verified Scenarios**:
@@ -111,7 +111,7 @@ The backend test suite is divided into four distinct layers:
     *   **Failure Recovery**: Changes evaluation status to `failed` and rethrows exceptions if database operations or AI calls fail.
 
 #### 6. Notification Outbox Service
-*   **File Path**: [notification.service.spec.ts](file:///e:/logikaiinterview/backend/src/application/services/notification.service.spec.ts)
+*   **File Path**: [notification.service.spec.ts](../apps/backend/src/application/services/notification.service.spec.ts)
 *   **Target Class**: `NotificationService`
 *   **Focus**: Manages transaction email delivery via Resend and handles offline mock fallbacks.
 *   **Verified Scenarios**:
@@ -120,7 +120,7 @@ The backend test suite is divided into four distinct layers:
     *   **Resend Client Integration**: When `RESEND_API_KEY` is present, formats HTML email templates (invitations, welcomes, summaries) and dispatches via Resend SDK. Sets outbox status to `sent` or `failed` with error text on SMTP failure.
 
 #### 7. Prompt Library Service
-*   **File Path**: [prompt-library.service.spec.ts](file:///e:/logikaiinterview/backend/src/application/services/prompt-library.service.spec.ts)
+*   **File Path**: [prompt-library.service.spec.ts](../apps/backend/src/application/services/prompt-library.service.spec.ts)
 *   **Target Class**: `PromptLibraryService`
 *   **Focus**: Seeds and manages AI system instructions and templates.
 *   **Verified Scenarios**:
@@ -133,7 +133,7 @@ The backend test suite is divided into four distinct layers:
 ### 2.3. Infrastructure Layer (AI Orchestrator & Queues)
 
 #### 8. Gemini Orchestrator Service (Mock Fallback Mode)
-*   **File Path**: [gemini-orchestrator.service.spec.ts](file:///e:/logikaiinterview/backend/src/infrastructure/ai/gemini-orchestrator.service.spec.ts)
+*   **File Path**: [gemini-orchestrator.service.spec.ts](../apps/backend/src/infrastructure/ai/gemini-orchestrator.service.spec.ts)
 *   **Target Class**: `GeminiOrchestratorService`
 *   **Focus**: Assures heuristic mock parsing logic is functional when running offline.
 *   **Verified Scenarios**:
@@ -145,7 +145,7 @@ The backend test suite is divided into four distinct layers:
     *   `generateReportMarkdown`: Outputs clean, structured candidate evaluation reports formatted in markdown.
 
 #### 9. In-Memory Queue Service
-*   **File Path**: [in-memory-queue.service.spec.ts](file:///e:/logikaiinterview/backend/src/infrastructure/queue/in-memory-queue.service.spec.ts)
+*   **File Path**: [in-memory-queue.service.spec.ts](../apps/backend/src/infrastructure/queue/in-memory-queue.service.spec.ts)
 *   **Target Class**: `InMemoryQueueService`
 *   **Focus**: Tests process-local, timer-driven task execution.
 *   **Verified Scenarios**:
@@ -159,7 +159,7 @@ The backend test suite is divided into four distinct layers:
 ### 2.4. Presentation Layer (Controllers & Security)
 
 #### 10. Candidates HTTP REST Controller
-*   **File Path**: [candidates.controller.spec.ts](file:///e:/logikaiinterview/backend/src/presentation/http/candidates.controller.spec.ts)
+*   **File Path**: [candidates.controller.spec.ts](../apps/backend/src/presentation/http/candidates.controller.spec.ts)
 *   **Target Class**: `CandidatesController`
 *   **Focus**: Routes candidate operations and handles file ingestion requests.
 *   **Verified Scenarios**:
@@ -171,7 +171,7 @@ The backend test suite is divided into four distinct layers:
     *   `getTimeline`: Returns sorted timeline activity events for a candidate.
 
 #### 11. Interviews HTTP REST Controller
-*   **File Path**: [interviews.controller.spec.ts](file:///e:/logikaiinterview/backend/src/presentation/http/interviews.controller.spec.ts)
+*   **File Path**: [interviews.controller.spec.ts](../apps/backend/src/presentation/http/interviews.controller.spec.ts)
 *   **Target Class**: `InterviewsController`
 *   **Focus**: Directs REST paths for scheduling, real-time WebSocket signals, and evaluation status lookups.
 *   **Verified Scenarios**:
@@ -185,7 +185,7 @@ The backend test suite is divided into four distinct layers:
     *   `getEvaluation`: Exposes live scorecard status for recruiter review.
 
 #### 12. Supabase Authentication Guard
-*   **File Path**: [supabase-auth.guard.spec.ts](file:///e:/logikaiinterview/backend/src/presentation/guards/supabase-auth.guard.spec.ts)
+*   **File Path**: [supabase-auth.guard.spec.ts](../apps/backend/src/presentation/guards/supabase-auth.guard.spec.ts)
 *   **Target Class**: `SupabaseAuthGuard`
 *   **Focus**: Security gate policing REST routes access.
 *   **Verified Scenarios**:
