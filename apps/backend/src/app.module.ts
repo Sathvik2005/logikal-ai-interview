@@ -7,6 +7,7 @@ import { PrismaCandidateRepository } from "./infrastructure/database/repositorie
 import { PrismaInterviewRepository } from "./infrastructure/database/repositories/interview.repository";
 import { EventEmitterBusService } from "./infrastructure/event-bus/event-emitter-bus.service";
 import { InMemoryQueueService } from "./infrastructure/queue/in-memory-queue.service";
+import { PgQueueService } from "./infrastructure/queue/pg-queue.service";
 import { GeminiOrchestratorService } from "./infrastructure/ai/gemini-orchestrator.service";
 
 // Repository Tokens
@@ -81,9 +82,19 @@ import { AdminController } from "./presentation/http/admin.controller";
       provide: IEventBusToken,
       useClass: EventEmitterBusService,
     },
+    InMemoryQueueService,
+    PgQueueService,
     {
+      // Durable Postgres queue by default in production; in-memory for local dev/tests.
+      // Override with QUEUE_DRIVER=memory|postgres.
       provide: IQueueServiceToken,
-      useClass: InMemoryQueueService,
+      useFactory: (memory: InMemoryQueueService, pg: PgQueueService) => {
+        const driver =
+          process.env.QUEUE_DRIVER ??
+          (process.env.NODE_ENV === "production" ? "postgres" : "memory");
+        return driver === "postgres" ? pg : memory;
+      },
+      inject: [InMemoryQueueService, PgQueueService],
     },
     {
       provide: IAIOrchestratorToken,

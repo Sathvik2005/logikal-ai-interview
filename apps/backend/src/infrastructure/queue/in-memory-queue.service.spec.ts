@@ -63,7 +63,9 @@ describe("InMemoryQueueService", () => {
     const handler = jest.fn().mockRejectedValue(new Error("Processor error"));
     service.registerProcessor("failing-task", handler);
 
-    const loggerErrorSpy = jest.spyOn((service as any).logger, "error").mockImplementation(() => {});
+    const loggerErrorSpy = jest
+      .spyOn((service as any).logger, "error")
+      .mockImplementation(() => {});
 
     await service.enqueue("failing-task", { count: 5 });
     jest.runAllTimers();
@@ -73,7 +75,7 @@ describe("InMemoryQueueService", () => {
     expect(handler).toHaveBeenCalled();
     expect(loggerErrorSpy).toHaveBeenCalledWith(
       "Task [failing-task] failed: Processor error",
-      expect.any(String)
+      expect.any(String),
     );
   });
 });
