@@ -29,7 +29,7 @@ _Last updated 2026-10-20. Source of truth for "what is done, what is verified, w
 ## Left to do (in priority order)
 
 ### Blocks a real launch
-1. **Run one real interview end to end.** Invite, candidate joins, camera/mic check, live AI questions, proctoring, report, recruiter decision. Needs a candidate test account. Nothing in the candidate portal has been exercised yet.
+1. **Run one real interview end to end.** Invite, candidate joins, camera/mic check, live AI questions, proctoring, report, recruiter decision. The candidate test account now exists and its login and portal pages load; the interview itself (needs a scheduled interview + browser camera/mic) has not been run yet.
 2. **Recording at production level.** Capture, storage (Supabase `recordings` bucket exists), playback and retention are unaudited.
 3. **Real email.** `RESEND_API_KEY` is a mock; production needs a real key and a verified sending domain. Invitation emails and the decision outcome email depend on it.
 4. **Paid Gemini key.** The current key is on a free plan (Pro returned "quota exceeded"; 20 parallel interviews will hit rate limits). Set `GEMINI_PRO_MODEL=gemini-pro-latest` on a paid key.
@@ -42,7 +42,7 @@ _Last updated 2026-10-20. Source of truth for "what is done, what is verified, w
 9. **Queue handlers are at-least-once.** Resume parsing, matching, evaluation and notifications need an idempotency audit.
 10. **Observability.** No error tracking, metrics or alerting; add before real users.
 11. **Always-on hosting.** Use a paid, always-on Render instance (free tier sleeps).
-12. **Demo accounts.** The two candidate demo accounts do not exist in the Supabase project; documented demo passwords were reset on the live project earlier.
+12. **Demo accounts.** A candidate test account exists in the Supabase project (`candidate.test@logikality.demo`, linked to a candidate record in status `shortlisted`; password shared out of band, not in git). It has no interview yet: schedule one for it, then run the candidate flow. The older documented demo candidates (`aisha.k@`, `m.chen@`) do not exist; documented demo passwords for admin/recruiter were reset on the live project earlier.
 
 ### Nice to have
 13. Replace the ~70 lint `any` warnings gradually.
