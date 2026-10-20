@@ -15,15 +15,34 @@ function validateEnvironment() {
   ];
   const missing = required.filter((key) => {
     const val = process.env[key];
-    return !val || val.includes("your-") || val.includes("re_your") || val.includes("[YOUR-DB-PASSWORD]");
+    return (
+      !val || val.includes("your-") || val.includes("re_your") || val.includes("[YOUR-DB-PASSWORD]")
+    );
   });
+
+  if (process.env.NODE_ENV === "production") {
+    const prodChecks: Array<[string, boolean]> = [
+      [
+        "RESEND_API_KEY must be a real key (mock/dev value found)",
+        /^(mock|dev)/i.test(process.env.RESEND_API_KEY ?? ""),
+      ],
+      [
+        "FRONTEND_URL must be set to the deployed web origin (CORS)",
+        !process.env.FRONTEND_URL || process.env.FRONTEND_URL === "*",
+      ],
+      ["JWT_SECRET is too short (min 32 chars)", (process.env.JWT_SECRET ?? "").length < 32],
+    ];
+    prodChecks.filter(([, bad]) => bad).forEach(([msg]) => missing.push(msg));
+  }
 
   if (missing.length > 0) {
     console.error("====================================================");
     console.error("CRITICAL CONFIGURATION ERROR: MISSING ENV VARIABLES");
     console.error("====================================================");
     missing.forEach((key) => {
-      console.error(`- ${key} is not configured or uses placeholder value.`);
+      console.error(
+        key.includes(" ") ? `- ${key}` : `- ${key} is not configured or uses placeholder value.`,
+      );
     });
     console.error("\nPlease configure these in your .env file before starting the application.");
     console.error("====================================================");

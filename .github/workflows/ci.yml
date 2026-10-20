@@ -1,0 +1,32 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run prisma:generate
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/db
+          DIRECT_URL: postgresql://user:pass@localhost:5432/db
+      - name: Backend typecheck + tests + build
+        working-directory: apps/backend
+        run: |
+          npx tsc --noEmit
+          npx jest --ci --runInBand
+          npx nest build
+      - name: Web typecheck + lint + build
+        working-directory: apps/web
+        run: |
+          npx tsc --noEmit
+          npx eslint . --max-warnings=100
+          npm run build

@@ -43,6 +43,12 @@ DECLARE
   v_recruiter_id UUID;
   v_org_id UUID;
 BEGIN
+  -- Demo data guard: only seed when explicitly enabled (dev/QA). Never in production.
+  -- Enable with: ALTER DATABASE postgres SET app.seed_demo = 'on';
+  IF current_setting('app.seed_demo', true) IS DISTINCT FROM 'on' THEN
+    RAISE NOTICE 'Skipping demo seed (app.seed_demo is not on).';
+    RETURN;
+  END IF;
   -- Get the demo org
   SELECT id INTO v_org_id FROM public.organizations WHERE name = 'Logikality Demo Org' LIMIT 1;
 
