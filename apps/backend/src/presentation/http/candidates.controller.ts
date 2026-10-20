@@ -101,12 +101,18 @@ export class CandidatesController {
         email: body.email !== undefined ? body.email : candidate.email,
         phone: body.phone !== undefined ? body.phone : candidate.phone,
         skills: body.skills !== undefined ? body.skills : candidate.skills,
-        experience_years: body.experienceYears !== undefined ? body.experienceYears : candidate.experience_years,
-        resume_summary: body.resumeSummary !== undefined ? body.resumeSummary : candidate.resume_summary,
+        experience_years:
+          body.experienceYears !== undefined ? body.experienceYears : candidate.experience_years,
+        resume_summary:
+          body.resumeSummary !== undefined ? body.resumeSummary : candidate.resume_summary,
         role_applied: body.role !== undefined ? body.role : candidate.role_applied,
         job_id: body.jobId !== undefined ? body.jobId : candidate.job_id,
-        custom_role: body.customRole !== undefined ? body.customRole : (candidate.custom_role ?? {}),
-        resume_analysis: body.resumeAnalysis !== undefined ? body.resumeAnalysis : (candidate.resume_analysis ?? {}),
+        custom_role:
+          body.customRole !== undefined ? body.customRole : (candidate.custom_role ?? {}),
+        resume_analysis:
+          body.resumeAnalysis !== undefined
+            ? body.resumeAnalysis
+            : (candidate.resume_analysis ?? {}),
       },
     });
     return updated;
@@ -114,11 +120,18 @@ export class CandidatesController {
 
   @Patch(":id/status")
   @Roles("recruiter", "admin")
-  async updateStatus(@Param("id") id: string, @Body() body: { status: CandidateStatus; reason?: string }) {
+  async updateStatus(
+    @Param("id") id: string,
+    @Body() body: { status: CandidateStatus; reason?: string; advance?: boolean },
+  ) {
     if (!CANDIDATE_STATUSES.includes(body?.status)) {
       throw new BadRequestException(`Invalid candidate status "${body?.status}".`);
     }
-    await this.workflow.transition(id, body.status, body.reason);
+    if (body.advance) {
+      await this.workflow.advanceTo(id, body.status, body.reason);
+    } else {
+      await this.workflow.transition(id, body.status, body.reason);
+    }
     return { message: "Candidate state transitioned successfully." };
   }
 

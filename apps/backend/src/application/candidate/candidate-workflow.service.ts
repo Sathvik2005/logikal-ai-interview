@@ -3,7 +3,7 @@ import {
   ICandidateRepository,
   ICandidateRepositoryToken,
 } from "../../domain/candidate/candidate.repository.interface";
-import { Candidate, CandidateStatus } from "../../domain/candidate/candidate.entity";
+import { Candidate, CandidateStatus, CANDIDATE_STATUSES } from "../../domain/candidate/candidate.entity";
 import { IEventBus, IEventBusToken } from "../common/event-bus/event-bus.interface";
 import { PrismaService } from "../../infrastructure/database/prisma.service";
 import { CandidateAppliedEvent } from "../../domain/candidate/events/candidate-events";
@@ -89,6 +89,27 @@ export class CandidateWorkflowService {
     await this.logTimeline(candidateId, newStatus, title, description, meta);
 
     this.logger.log(`Workflow State Changed [${candidateId}]: ${oldStatus} -> ${newStatus}`);
+  }
+
+  /**
+   * Move a candidate forward to `target`, stepping through each intermediate workflow
+   * state so the entity's transition rules stay enforced. Archiving, same-state and
+   * backward moves are delegated to a single `transition` (which validates them).
+   */
+  async advanceTo(candidateId: string, target: CandidateStatus, details?: string): Promise<void> {
+    const candidate = await this.candidateRepo.findById(candidateId);
+    if (!candidate) {
+      throw new Error(`Candidate with ID ${candidateId} not found.`);
+    }
+
+    const from = CANDIDATE_STATUSES.indexOf(candidate.status);
+    const to = CANDIDATE_STATUSES.indexOf(target);
+    if (target === "archived" || to <= from) {
+      return this.transition(candidateId, target, details);
+    }
+    for (let i = from + 1; i <= to; i++) {
+      await this.transition(candidateId, CANDIDATE_STATUSES[i], i === to ? details : undefined);
+    }
   }
 
   async logTimeline(

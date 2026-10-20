@@ -137,6 +137,30 @@ describe("CandidateWorkflowService", () => {
       });
     });
 
+    it("advanceTo should step through every intermediate state", async () => {
+      const candidate = new Candidate("cand-123", "org-123", "John Doe", "john@example.com", "applied");
+      candidateRepo.findById.mockResolvedValue(candidate);
+      candidateRepo.save.mockResolvedValue(undefined);
+      prisma.candidateTimeline.create.mockResolvedValue({});
+
+      await service.advanceTo("cand-123", "shortlisted");
+
+      expect(candidate.status).toBe("shortlisted");
+      expect(prisma.candidateTimeline.create).toHaveBeenCalledTimes(4);
+    });
+
+    it("advanceTo should archive directly", async () => {
+      const candidate = new Candidate("cand-123", "org-123", "John Doe", "john@example.com", "applied");
+      candidateRepo.findById.mockResolvedValue(candidate);
+      candidateRepo.save.mockResolvedValue(undefined);
+      prisma.candidateTimeline.create.mockResolvedValue({});
+
+      await service.advanceTo("cand-123", "archived");
+
+      expect(candidate.status).toBe("archived");
+      expect(prisma.candidateTimeline.create).toHaveBeenCalledTimes(1);
+    });
+
     it("should throw error if candidate not found", async () => {
       candidateRepo.findById.mockResolvedValue(null);
 

@@ -350,24 +350,55 @@ export const listNotifications = createServerFn({ method: "POST" })
   });
 
 // ---------- update status ----------
+/**
+ * UI display status -> workflow status the backend state machine understands.
+ * The backend steps forward through intermediate states to reach the target.
+ * `offer` has no workflow equivalent and is rejected explicitly.
+ */
+export const UI_TO_WORKFLOW_STATUS: Record<CandidateStatus, string | null> = {
+  new: "applied",
+  screening: "shortlisted",
+  interviewing: "interview_running",
+  evaluated: "recruiter_review",
+  offer: null,
+  hired: "hiring_decision",
+  rejected: "archived",
+  archived: "archived",
+};
+
 export const updateCandidateStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) =>
     z
       .object({
         id: z.string().uuid(),
-        status: z.string(),
+        status: z.enum([
+          "new",
+          "screening",
+          "interviewing",
+          "evaluated",
+          "offer",
+          "hired",
+          "rejected",
+          "archived",
+        ]),
       })
       .parse(data),
   )
   .handler(async ({ data }) => {
+    const workflowStatus = UI_TO_WORKFLOW_STATUS[data.status];
+    if (!workflowStatus) {
+      throw new Error(
+        `Status "${data.status}" has no workflow equivalent and cannot be set manually.`,
+      );
+    }
     const res = await fetch(`${getBackendUrl()}/api/candidates/${data.id}/status`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
         ...getAuthHeader(),
       },
-      body: JSON.stringify({ status: data.status }),
+      body: JSON.stringify({ status: workflowStatus, advance: true }),
     });
 
     if (!res.ok) {
