@@ -38,7 +38,7 @@ function AccessDenied() {
         title="Access Restricted"
         description={
           <div className="space-y-6">
-            <p className="text-body-lg text-on-surface-variant max-w-md mx-auto">
+            <p className="text-body-lg text-on-surface-variant max-w-[28rem] mx-auto">
               Your current role does not grant access to this resource. Contact your administrator
               to request elevated permissions.
             </p>

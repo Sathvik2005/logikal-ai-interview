@@ -33,7 +33,7 @@ function NotFoundComponent() {
         title="Page not found"
         description={
           <div className="space-y-6">
-            <p className="text-body-lg text-on-surface-variant max-w-md mx-auto">
+            <p className="text-body-lg text-on-surface-variant max-w-[28rem] mx-auto">
               The endpoint you requested doesn't exist or has been moved. Double-check the URL or
               navigate back to safety.
             </p>
@@ -96,7 +96,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
   return (
     <div className="min-h-screen flex items-center justify-center p-lg bg-background">
-      <div className="text-center space-y-md max-w-md">
+      <div className="text-center space-y-md max-w-[28rem]">
         <h1 className="text-headline-lg font-headline-lg text-on-surface">This page didn't load</h1>
         <p className="text-body-md text-on-surface-variant">Something went wrong on our end.</p>
         <button

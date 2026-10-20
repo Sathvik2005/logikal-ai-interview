@@ -30,7 +30,7 @@ export function ErrorState({
         </span>
       </div>
       <h3 className="text-headline-sm font-headline-sm text-on-surface">{title}</h3>
-      <p className="text-body-md text-on-surface-variant mt-1 max-w-md">{message}</p>
+      <p className="text-body-md text-on-surface-variant mt-1 max-w-[28rem]">{message}</p>
       <button
         type="button"
         onClick={retry}

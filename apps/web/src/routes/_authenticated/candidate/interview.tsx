@@ -187,7 +187,7 @@ function InterviewOrchestrator() {
 
 function CenterMsg({ icon, title, body }: { icon: string; title: string; body?: string }) {
   return (
-    <Card className="max-w-xl mx-auto p-lg text-center space-y-md">
+    <Card className="max-w-[36rem] mx-auto p-lg text-center space-y-md">
       <div className="w-16 h-16 rounded-full bg-primary-container text-on-primary-container mx-auto flex items-center justify-center">
         <Icon name={icon} className="text-3xl" />
       </div>
@@ -263,7 +263,7 @@ function WaitingScreen({
         . You'll be let into the room automatically 10 minutes before it starts.
       </p>
 
-      <div className="grid grid-cols-4 gap-2 max-w-md mx-auto pt-2" aria-label="Countdown">
+      <div className="grid grid-cols-4 gap-2 max-w-[28rem] mx-auto pt-2" aria-label="Countdown">
         {[
           { l: "Days", v: d },
           { l: "Hours", v: h },
@@ -957,7 +957,7 @@ function InterviewRoom({
       {/* Paused Overlay */}
       {isPaused && (
         <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm z-40 flex items-center justify-center p-md rounded-2xl">
-          <div className="bg-white rounded-xl shadow-2xl p-lg text-center max-w-md space-y-md border border-outline-variant">
+          <div className="bg-white rounded-xl shadow-2xl p-lg text-center max-w-[28rem] space-y-md border border-outline-variant">
             <div className="w-16 h-16 bg-error-container text-on-error-container rounded-full flex items-center justify-center mx-auto">
               <Icon name="pause" className="text-3xl" />
             </div>
@@ -1183,7 +1183,7 @@ function InterviewRoom({
 function CompletionScreen() {
   const navigate = useNavigate();
   return (
-    <Card className="max-w-xl mx-auto p-lg text-center space-y-md">
+    <Card className="max-w-[36rem] mx-auto p-lg text-center space-y-md">
       <div className="w-20 h-20 rounded-full bg-success-container text-on-success-container mx-auto flex items-center justify-center">
         <Icon name="task_alt" className="text-4xl" />
       </div>
@@ -1215,7 +1215,7 @@ function Modal({ children, onClose }: { children: React.ReactNode; onClose?: () 
       aria-modal="true"
     >
       <div
-        className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-soft max-w-md w-full p-lg"
+        className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-soft max-w-[28rem] w-full p-lg"
         onClick={(e) => e.stopPropagation()}
       >
         {children}

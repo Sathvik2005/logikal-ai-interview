@@ -643,7 +643,7 @@ function HeroSection() {
           </div>
 
           {/* Trust Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 pt-5 border-t border-slate-200/60 w-full max-w-xl text-slate-500 font-medium text-xs sm:text-sm">
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 pt-5 border-t border-slate-200/60 w-full max-w-[36rem] text-slate-500 font-medium text-xs sm:text-sm">
             <div className="flex items-center gap-1.5">
               <span className="material-symbols-outlined text-emerald-500 text-[18px] icon-fill">
                 verified
@@ -1413,7 +1413,7 @@ function Footer() {
               </div>
               <span className="text-base font-bold text-slate-900 tracking-tight">Lokality AI</span>
             </div>
-            <p className="text-xs text-slate-500 leading-relaxed max-w-xs">
+            <p className="text-xs text-slate-500 leading-relaxed max-w-[20rem]">
               Automating hiring pipelines with explainable assessments, domain personas, and secure
               proctoring logs.
             </p>

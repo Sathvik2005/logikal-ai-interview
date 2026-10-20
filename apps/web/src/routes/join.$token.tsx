@@ -82,7 +82,7 @@ function JoinPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
-      <div className="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-xl w-full p-8 space-y-6">
+      <div className="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-[36rem] w-full p-8 space-y-6">
         <div className="text-center space-y-1">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-indigo-100 text-indigo-700 text-2xl mb-2">
             🎤
@@ -215,7 +215,7 @@ function Countdown({ to }: { to: string }) {
 function Centered({ title, body }: { title: string; body?: string }) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
-      <div className="bg-white rounded-2xl shadow border border-slate-200 max-w-md w-full p-8 text-center space-y-3">
+      <div className="bg-white rounded-2xl shadow border border-slate-200 max-w-[28rem] w-full p-8 text-center space-y-3">
         <h1 className="text-xl font-semibold text-slate-900">{title}</h1>
         {body && <p className="text-slate-600">{body}</p>}
       </div>
