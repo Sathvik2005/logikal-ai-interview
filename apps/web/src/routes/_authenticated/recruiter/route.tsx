@@ -16,8 +16,8 @@ export const Route = createFileRoute("/_authenticated/recruiter")({
       .select("role")
       .eq("user_id", user.id)
       .in("role", ["recruiter", "admin"])
-      .maybeSingle();
-    if (!data) throw redirect({ to: "/access-denied" });
+      .limit(1);
+    if (!data?.length) throw redirect({ to: "/access-denied" });
   },
   component: RecruiterShell,
   pendingComponent: () => (
