@@ -10,6 +10,11 @@ import {
 } from "@/components/recruiter/use-candidates";
 import { useJobsQuery } from "@/components/recruiter/use-jobs";
 import { useServerFn } from "@tanstack/react-start";
+import { parseResumeFile } from "@/lib/candidates.functions";
+import {
+  DocumentDropzone,
+  fileToBase64 as readFileBase64,
+} from "@/components/shared/DocumentDropzone";
 
 // ============================================================================
 // Types
@@ -136,6 +141,46 @@ export function AddCandidateWizard({
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<Form>(DEFAULT);
   const [isProcessing, setIsProcessing] = useState(false);
+  const parseResumeFn = useServerFn(parseResumeFile);
+  const [parsing, setParsing] = useState(false);
+  const [autofilledFrom, setAutofilledFrom] = useState<string | null>(null);
+
+  /** Read the resume with AI and pre-fill whatever it found; the file is also attached to the new candidate. */
+  const autofillFromResume = async (file: File) => {
+    setParsing(true);
+    try {
+      const p = await parseResumeFn({
+        data: {
+          fileName: file.name,
+          mimeType: file.type || "application/octet-stream",
+          fileBase64: await readFileBase64(file),
+        },
+      });
+      const seniorities: Seniority[] = ["Junior", "Mid", "Senior", "Staff", "Principal"];
+      const seniority = seniorities.find((x) => x === p.suggestedSeniority);
+      setForm((f) => ({
+        ...f,
+        name: p.name && p.name !== "Unknown Name" ? p.name : f.name,
+        email: p.email && p.email !== "unknown@example.com" ? p.email : f.email,
+        phone: p.phone || f.phone,
+        role: p.currentRole || f.role,
+        seniority: seniority ?? f.seniority,
+        experienceYears: Number.isFinite(p.experienceYears)
+          ? Math.min(60, Math.max(0, Math.round(p.experienceYears)))
+          : f.experienceYears,
+        skills: p.skills?.length ? p.skills.slice(0, 15) : f.skills,
+        notes: p.resumeSummary || f.notes,
+        resumeFile: file,
+        resumeName: file.name,
+      }));
+      setAutofilledFrom(file.name);
+      toast.success("Resume read — details filled in. Please review them.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not read that resume");
+    } finally {
+      setParsing(false);
+    }
+  };
 
   const set = <K extends keyof Form>(k: K, v: Form[K]) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -161,6 +206,7 @@ export function AddCandidateWizard({
     setTimeout(() => {
       setStep(1);
       setForm(DEFAULT);
+      setAutofilledFrom(null);
     }, 200);
   };
 
@@ -330,7 +376,23 @@ export function AddCandidateWizard({
         <div className="flex-1 overflow-y-auto px-6 py-6 bg-white">
           <div className="grid md:grid-cols-[1fr_300px] gap-6">
             <div>
-              {step === 1 && <StepBasics form={form} set={set} emailValid={emailValid} />}
+              {step === 1 && (
+                <StepBasics
+                  form={form}
+                  set={set}
+                  emailValid={emailValid}
+                  autofill={
+                    <DocumentDropzone
+                      title="Auto-fill from a resume"
+                      hint="Drop a PDF, DOCX or TXT resume — we read it and fill in the form for you."
+                      busy={parsing}
+                      doneLabel={autofilledFrom}
+                      onFile={autofillFromResume}
+                      onError={(m) => toast.error(m)}
+                    />
+                  }
+                />
+              )}
               {step === 2 && <StepRole form={form} set={set} />}
               {step === 3 && <StepSkills form={form} set={set} />}
               {step === 4 && <StepReview form={form} set={set} onJump={setStep} />}
@@ -441,13 +503,16 @@ function StepBasics({
   form,
   set,
   emailValid,
+  autofill,
 }: {
   form: Form;
   set: <K extends keyof Form>(k: K, v: Form[K]) => void;
   emailValid: boolean;
+  autofill?: ReactNode;
 }) {
   return (
     <StepFrame title="Candidate basics" subtitle="Who are you adding to the pipeline?">
+      {autofill ? <div className="mb-4">{autofill}</div> : null}
       <div className="grid sm:grid-cols-2 gap-4">
         <Field label="Full name">
           <input

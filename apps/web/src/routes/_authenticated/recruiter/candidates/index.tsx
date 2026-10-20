@@ -12,6 +12,7 @@ import {
 import { AddCandidateWizard } from "@/components/recruiter/AddCandidateWizard";
 import { ImportCandidatesWizard } from "@/components/recruiter/ImportCandidatesWizard";
 import { ScheduleInterviewWizard } from "@/components/recruiter/ScheduleInterviewWizard";
+import { QuickScheduleDialog } from "@/components/recruiter/QuickScheduleDialog";
 import { useInterviewSchedule } from "@/components/recruiter/use-interview-schedule";
 import { isProfileComplete } from "@/components/recruiter/candidate-completeness";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -57,6 +58,15 @@ function CandidatesPage() {
   const [wizardOpen, setWizardOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [quickOpen, setQuickOpen] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const toggleSelected = (id: string) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
 
   const [editingSummary, setEditingSummary] = useState<{ id: string; text: string } | null>(null);
 
@@ -149,20 +159,58 @@ function CandidatesPage() {
         </select>
       </CardShadow>
 
+      {selected.size > 0 && (
+        <div
+          role="region"
+          aria-label="Bulk actions"
+          className="mb-md flex flex-wrap items-center justify-between gap-md rounded-xl border border-primary bg-primary-container/10 px-md py-sm"
+        >
+          <p className="text-body-md font-semibold text-on-background">
+            {selected.size} candidate{selected.size === 1 ? "" : "s"} selected
+          </p>
+          <div className="flex gap-sm">
+            <button
+              type="button"
+              onClick={() => setSelected(new Set())}
+              className="rounded-lg border border-outline-variant px-3 py-2 text-body-md hover:bg-surface-container-low"
+            >
+              Clear
+            </button>
+            <button
+              type="button"
+              onClick={() => setQuickOpen(true)}
+              className="rounded-lg bg-primary px-3 py-2 text-body-md font-semibold text-on-primary hover:brightness-110"
+            >
+              Quick schedule
+            </button>
+          </div>
+        </div>
+      )}
+
       <CardShadow className="overflow-hidden">
         <div className="w-full overflow-x-auto">
           <table
             className={[
               "w-full text-body-md min-w-[820px]",
               // progressively hide the widest, least critical columns on narrower screens
-              "max-2xl:[&_td:nth-child(4)]:hidden max-2xl:[&_th:nth-child(4)]:hidden",
-              "max-2xl:[&_td:nth-child(6)]:hidden max-2xl:[&_th:nth-child(6)]:hidden",
               "max-2xl:[&_td:nth-child(5)]:hidden max-2xl:[&_th:nth-child(5)]:hidden",
+              "max-2xl:[&_td:nth-child(6)]:hidden max-2xl:[&_th:nth-child(6)]:hidden",
               "max-2xl:[&_td:nth-child(7)]:hidden max-2xl:[&_th:nth-child(7)]:hidden",
+              "max-2xl:[&_td:nth-child(8)]:hidden max-2xl:[&_th:nth-child(8)]:hidden",
             ].join(" ")}
           >
             <thead className="bg-surface-container-low text-label-caps uppercase text-on-surface-variant">
               <tr>
+                <th className="w-10 p-lg">
+                  <input
+                    type="checkbox"
+                    aria-label="Select all candidates"
+                    checked={filtered.length > 0 && filtered.every((c) => selected.has(c.id))}
+                    onChange={(e) =>
+                      setSelected(e.target.checked ? new Set(filtered.map((c) => c.id)) : new Set())
+                    }
+                  />
+                </th>
                 <th className="text-left p-lg min-w-[200px]">Candidate</th>
                 <th className="text-left p-lg min-w-[120px]">Role</th>
                 <th className="text-left p-lg min-w-[120px]">Status</th>
@@ -177,14 +225,14 @@ function CandidatesPage() {
             <tbody className="divide-y divide-outline-variant">
               {isLoading && (
                 <tr>
-                  <td colSpan={9} className="p-xl text-center text-on-surface-variant">
+                  <td colSpan={10} className="p-xl text-center text-on-surface-variant">
                     Loading candidates…
                   </td>
                 </tr>
               )}
               {error && !isLoading && (
                 <tr>
-                  <td colSpan={9} className="p-xl text-center text-error">
+                  <td colSpan={10} className="p-xl text-center text-error">
                     Failed to load candidates: {(error as Error).message}
                   </td>
                 </tr>
@@ -195,6 +243,14 @@ function CandidatesPage() {
                   const incomplete = !isProfileComplete(c);
                   return (
                     <tr key={c.id} className="hover:bg-surface-container-low transition">
+                      <td className="w-10 p-lg">
+                        <input
+                          type="checkbox"
+                          aria-label={`Select ${c.name}`}
+                          checked={selected.has(c.id)}
+                          onChange={() => toggleSelected(c.id)}
+                        />
+                      </td>
                       <td className="p-lg">
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-semibold shrink-0">
@@ -479,7 +535,7 @@ function CandidatesPage() {
                 })}
               {!isLoading && !error && filtered.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="p-0">
+                  <td colSpan={10} className="p-0">
                     <EmptyState
                       icon="person_search"
                       title="No candidates match your filters"
@@ -500,6 +556,16 @@ function CandidatesPage() {
       />
       <ImportCandidatesWizard open={importOpen} onOpenChange={setImportOpen} />
 
+      <QuickScheduleDialog
+        open={quickOpen}
+        onOpenChange={(o) => {
+          setQuickOpen(o);
+          if (!o) setSelected(new Set());
+        }}
+        candidates={candidates
+          .filter((c) => selected.has(c.id))
+          .map((c) => ({ id: c.id, name: c.name, email: c.email, role: c.role }))}
+      />
       <ScheduleInterviewWizard
         open={scheduleOpen}
         onOpenChange={setScheduleOpen}

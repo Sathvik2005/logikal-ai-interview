@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { backendError } from "@/lib/backend-error";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getRequest } from "@tanstack/react-start/server";
 import type { Database } from "@/integrations/supabase/types";
@@ -588,4 +589,44 @@ export const getCandidateResumeUrl = createServerFn({ method: "POST" })
 
       return { url: signed.signedUrl };
     }
+  });
+
+// ---------- resume auto-fill ----------
+export type ParsedResumeFields = {
+  name: string;
+  email: string;
+  phone: string | null;
+  experienceYears: number;
+  skills: string[];
+  resumeSummary: string;
+  currentRole?: string;
+  suggestedSeniority?: string;
+};
+
+/** Reads an uploaded resume (PDF/DOCX/TXT) and returns profile fields to pre-fill the form. Creates nothing. */
+export const parseResumeFile = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        fileName: z.string(),
+        fileBase64: z.string().max(12_000_000),
+        mimeType: z.string(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const formData = new FormData();
+    formData.append(
+      "file",
+      new Blob([Buffer.from(data.fileBase64, "base64")], { type: data.mimeType }),
+      data.fileName,
+    );
+    const res = await fetch(`${getBackendUrl()}/api/candidates/parse-resume`, {
+      method: "POST",
+      headers: { ...getAuthHeader() },
+      body: formData,
+    });
+    if (!res.ok) throw await backendError(res, "Could not read the resume");
+    return (await res.json()) as ParsedResumeFields;
   });

@@ -31,11 +31,11 @@ export class AppConfigService {
   }
 
   getGeminiFlashModel(): string {
-    return this.get("GEMINI_FLASH_MODEL", "gemini-2.0-flash");
+    return this.get("GEMINI_FLASH_MODEL", "gemini-flash-lite-latest");
   }
 
   getGeminiProModel(): string {
-    return this.get("GEMINI_PRO_MODEL", "gemini-1.5-pro");
+    return this.get("GEMINI_PRO_MODEL", "gemini-flash-latest");
   }
 
   getAiTemperature(): number {

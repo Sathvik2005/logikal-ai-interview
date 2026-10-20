@@ -3,7 +3,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { CardShadow, Icon, PageHeader } from "@/components/recruiter/RecruiterShell";
 import { useServerFn } from "@tanstack/react-start";
-import { upsertJob, suggestJobDescription, runJDAssist } from "@/lib/jobs.functions";
+import { upsertJob, suggestJobDescription, runJDAssist, parseJdFile } from "@/lib/jobs.functions";
+import { DocumentDropzone, fileToBase64 } from "@/components/shared/DocumentDropzone";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_authenticated/recruiter/jobs/new")({
@@ -28,6 +29,51 @@ function NewJob() {
   const [experienceLevel, setExperienceLevel] = useState("Mid-level (3-5 years)");
   const [assistOpen, setAssistOpen] = useState(false);
   const [assistData, setAssistData] = useState<any>(null);
+
+  const parseJdFn = useServerFn(parseJdFile);
+  const [parsingJd, setParsingJd] = useState(false);
+  const [jdFrom, setJdFrom] = useState<string | null>(null);
+
+  /** Read an uploaded JD with AI and pre-fill the form; nothing is saved until the user clicks Save/Publish. */
+  const autofillFromJd = async (file: File) => {
+    setParsingJd(true);
+    try {
+      const p = await parseJdFn({
+        data: {
+          fileName: file.name,
+          mimeType: file.type || "application/octet-stream",
+          fileBase64: await fileToBase64(file),
+        },
+      });
+      const types = ["Full-time", "Part-time", "Contract", "Intern"];
+      const employment = types.find((x) =>
+        p.employmentType.toLowerCase().startsWith(x.toLowerCase()),
+      );
+      setForm((f) => ({
+        ...f,
+        title: p.title || f.title,
+        department: p.department || f.department,
+        location: p.location || f.location,
+        employment_type: employment ?? f.employment_type,
+        description: p.description || f.description,
+        requirements: p.requirements || f.requirements,
+      }));
+      const levels: Record<string, string> = {
+        junior: "Junior (0-2 years)",
+        mid: "Mid-level (3-5 years)",
+        senior: "Senior (5-8 years)",
+        lead: "Lead (8+ years)",
+      };
+      const key = Object.keys(levels).find((k) => p.experienceLevel.toLowerCase().startsWith(k));
+      if (key) setExperienceLevel(levels[key]);
+      setJdFrom(file.name);
+      toast.success("Job description read — details filled in. Please review them.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not read that job description");
+    } finally {
+      setParsingJd(false);
+    }
+  };
 
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
@@ -122,6 +168,14 @@ function NewJob() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg">
         <CardShadow className="lg:col-span-2 p-lg space-y-md">
+          <DocumentDropzone
+            title="Auto-fill from a job description file"
+            hint="Drop a PDF, DOCX or TXT job description — we read it and fill in the form for you."
+            busy={parsingJd}
+            doneLabel={jdFrom}
+            onFile={autofillFromJd}
+            onError={(m) => toast.error(m)}
+          />
           <Field label="Title">
             <input
               value={form.title}

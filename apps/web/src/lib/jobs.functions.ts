@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { backendError } from "@/lib/backend-error";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getRequest } from "@tanstack/react-start/server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
@@ -272,4 +273,43 @@ export const runJDAssist = createServerFn({ method: "POST" })
     }
 
     return res.json() as Promise<any>;
+  });
+
+// ---------- JD auto-fill ----------
+export type ParsedJdFields = {
+  title: string;
+  department: string;
+  location: string;
+  employmentType: string;
+  experienceLevel: string;
+  description: string;
+  requirements: string;
+};
+
+/** Reads an uploaded job description (PDF/DOCX/TXT) and returns fields to pre-fill the job form. Creates nothing. */
+export const parseJdFile = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        fileName: z.string(),
+        fileBase64: z.string().max(12_000_000),
+        mimeType: z.string(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const formData = new FormData();
+    formData.append(
+      "file",
+      new Blob([Buffer.from(data.fileBase64, "base64")], { type: data.mimeType }),
+      data.fileName,
+    );
+    const res = await fetch(`${getBackendUrl()}/api/jobs/parse-jd`, {
+      method: "POST",
+      headers: { ...getAuthHeader() },
+      body: formData,
+    });
+    if (!res.ok) throw await backendError(res, "Could not read the job description");
+    return (await res.json()) as ParsedJdFields;
   });

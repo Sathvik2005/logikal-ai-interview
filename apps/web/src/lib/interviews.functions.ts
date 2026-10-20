@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { backendError } from "@/lib/backend-error";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getRequest } from "@tanstack/react-start/server";
 
@@ -193,4 +194,52 @@ export const cancelInterview = createServerFn({ method: "POST" })
     }
 
     return { ok: true } as const;
+  });
+
+// ---------- bulk scheduling ----------
+export type BulkScheduleRow = {
+  candidateId: string;
+  name: string | null;
+  email: string | null;
+  ok: boolean;
+  scheduledAt?: string;
+  interviewId?: string;
+  error?: string;
+};
+export type BulkScheduleResult = {
+  dryRun: boolean;
+  requested: number;
+  schedulable: number;
+  created: number;
+  failed: number;
+  results: BulkScheduleRow[];
+};
+
+/** Plan (dryRun) or create interviews for many candidates at once; invitation emails are queued server-side. */
+export const bulkScheduleInterviews = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        candidateIds: z.array(z.string().uuid()).min(1).max(100),
+        startAt: z.string(),
+        jobId: z.string().uuid().nullable().optional(),
+        personaId: z.string().uuid().nullable().optional(),
+        durationMinutes: z.number().int().min(10).max(240).optional(),
+        gapMinutes: z.number().int().min(0).max(120).optional(),
+        workStartHour: z.number().int().min(0).max(23).optional(),
+        workEndHour: z.number().int().min(1).max(24).optional(),
+        utcOffsetMinutes: z.number().int().min(-720).max(840).optional(),
+        dryRun: z.boolean().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const res = await fetch(`${getBackendUrl()}/api/interviews/bulk-schedule`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...getAuthHeader() },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw await backendError(res, "Scheduling failed");
+    return (await res.json()) as BulkScheduleResult;
   });
