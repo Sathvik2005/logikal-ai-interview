@@ -14,13 +14,22 @@ export class StorageService implements OnModuleInit {
     const supabaseUrl = process.env.SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    if (
-      supabaseUrl &&
-      serviceRoleKey &&
-      serviceRoleKey !== "your-service-role-key-here" &&
-      serviceRoleKey.length > 50
-    ) {
-      this.supabaseClient = createClient(supabaseUrl, serviceRoleKey, {
+    const forceLocal = process.env.STORAGE_DRIVER === "local";
+    const hasSupabase =
+      !!supabaseUrl &&
+      !!serviceRoleKey &&
+      !supabaseUrl.includes("your-") &&
+      !serviceRoleKey.includes("your-");
+
+    if (!hasSupabase && process.env.NODE_ENV === "production") {
+      // Local disk is ephemeral on most hosts (e.g. Render): never silently fall back in production.
+      throw new Error(
+        "Supabase storage is not configured (SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY). Refusing to use local disk in production.",
+      );
+    }
+
+    if (hasSupabase && !forceLocal) {
+      this.supabaseClient = createClient(supabaseUrl!, serviceRoleKey!, {
         auth: { persistSession: false },
       });
       this.isLocal = false;
@@ -37,7 +46,15 @@ export class StorageService implements OnModuleInit {
   }
 
   async onModuleInit() {
-    const buckets = ["resumes", "recordings", "reports", "candidate-documents", "avatars"];
+    const buckets = [
+      "resumes",
+      "recordings",
+      "reports",
+      "candidate-documents",
+      "avatars",
+      "identity",
+      "snapshots",
+    ];
     if (this.isLocal || !this.supabaseClient) {
       for (const bucket of buckets) {
         const dirPath = path.join(this.localStorageDir, bucket);
@@ -49,7 +66,8 @@ export class StorageService implements OnModuleInit {
     }
 
     try {
-      const { data: bucketList, error: listError } = await this.supabaseClient.storage.listBuckets();
+      const { data: bucketList, error: listError } =
+        await this.supabaseClient.storage.listBuckets();
       if (listError) {
         this.logger.error(`Failed to list Supabase storage buckets: ${listError.message}`);
         return;
@@ -123,6 +141,17 @@ export class StorageService implements OnModuleInit {
 
     const arrayBuffer = await data.arrayBuffer();
     return Buffer.from(arrayBuffer);
+  }
+
+  /**
+   * Recover the object key from a stored URL (Supabase public/signed URL or local URL).
+   * Falls back to treating the value as the key itself.
+   */
+  extractKey(urlOrKey: string, bucket: string): string {
+    const marker = `/${bucket}/`;
+    const idx = urlOrKey.indexOf(marker);
+    if (idx === -1) return urlOrKey.split("?")[0];
+    return decodeURIComponent(urlOrKey.slice(idx + marker.length).split("?")[0]);
   }
 
   async getFileSignedUrl(bucket: string, fileKey: string): Promise<string> {

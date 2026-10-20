@@ -170,7 +170,7 @@ export class CandidatesController {
       throw new Error("Unauthorized to access this resume URL");
     }
 
-    const fileKey = candidate.resume_url.split("/").pop()?.split("?")[0];
+    const fileKey = this.storage.extractKey(candidate.resume_url, "resumes");
     if (!fileKey) return { url: candidate.resume_url };
 
     const url = await this.storage.getFileSignedUrl("resumes", fileKey);

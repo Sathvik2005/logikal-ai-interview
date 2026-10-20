@@ -24,6 +24,10 @@ describe("CandidatesController", () => {
 
   const mockStorage = {
     getFileSignedUrl: jest.fn(),
+    extractKey: jest.fn((url: string, bucket: string) => {
+      const i = url.indexOf(`/${bucket}/`);
+      return i === -1 ? url : url.slice(i + bucket.length + 2).split("?")[0];
+    }),
   };
 
   const mockPrisma = {
@@ -195,7 +199,7 @@ describe("CandidatesController", () => {
 
   describe("getResumeUrl", () => {
     it("should return signed URL if recruiter/admin checks it", async () => {
-      const candidate = { id: "c1", resume_url: "http://localhost:3000/resumes/c1-resume.pdf", user_id: "user-123" };
+      const candidate = { id: "c1", resume_url: "http://localhost:3000/api/storage/resumes/c1/1700_resume.pdf", user_id: "user-123" };
       mockPrisma.candidate.findUnique.mockResolvedValue(candidate);
       mockStorage.getFileSignedUrl.mockResolvedValue("http://localhost:3000/signed/c1-resume.pdf");
 
@@ -203,7 +207,7 @@ describe("CandidatesController", () => {
       const result = await controller.getResumeUrl(req, "c1");
 
       expect(mockPrisma.candidate.findUnique).toHaveBeenCalledWith({ where: { id: "c1" } });
-      expect(mockStorage.getFileSignedUrl).toHaveBeenCalledWith("resumes", "c1-resume.pdf");
+      expect(mockStorage.getFileSignedUrl).toHaveBeenCalledWith("resumes", "c1/1700_resume.pdf");
       expect(result).toEqual({ url: "http://localhost:3000/signed/c1-resume.pdf" });
     });
   });

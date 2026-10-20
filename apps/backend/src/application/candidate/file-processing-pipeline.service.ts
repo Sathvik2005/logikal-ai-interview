@@ -29,9 +29,12 @@ export class FileProcessingPipelineService implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    this.queue.registerProcessor("process-candidate-resume", async (payload: { candidateId: string }) => {
-      await this.runResumeProcessingPipeline(payload.candidateId);
-    });
+    this.queue.registerProcessor(
+      "process-candidate-resume",
+      async (payload: { candidateId: string }) => {
+        await this.runResumeProcessingPipeline(payload.candidateId);
+      },
+    );
   }
 
   async processResume(
@@ -118,7 +121,9 @@ export class FileProcessingPipelineService implements OnModuleInit {
   }
 
   async runResumeProcessingPipeline(candidateId: string): Promise<void> {
-    this.logger.log(`Running background resume intelligence pipeline for candidate: ${candidateId}`);
+    this.logger.log(
+      `Running background resume intelligence pipeline for candidate: ${candidateId}`,
+    );
     const candidate = await this.candidateRepo.findById(candidateId);
     if (!candidate) {
       this.logger.warn(`Candidate ${candidateId} not found in pipeline processing.`);
@@ -186,7 +191,9 @@ export class FileProcessingPipelineService implements OnModuleInit {
         await this.candidateRepo.save(updatedCandidate);
       }
     } catch (err: any) {
-      this.logger.error(`Error in resume processing pipeline for candidate ${candidateId}: ${err.message}`);
+      this.logger.error(
+        `Error in resume processing pipeline for candidate ${candidateId}: ${err.message}`,
+      );
       const latestCandidate = await this.candidateRepo.findById(candidateId);
       if (latestCandidate) {
         const parsedAnalysis = (latestCandidate.resumeAnalysis as any) || {};
@@ -197,7 +204,7 @@ export class FileProcessingPipelineService implements OnModuleInit {
         };
         await this.candidateRepo.save(latestCandidate);
       }
-      
+
       await this.workflow.transition(
         candidateId,
         "applied", // Rollback state or keep applied
@@ -223,12 +230,6 @@ export class FileProcessingPipelineService implements OnModuleInit {
   }
 
   private extractFileKey(url: string, bucketName: string): string {
-    const marker = `/${bucketName}/`;
-    const idx = url.indexOf(marker);
-    if (idx === -1) {
-      return url.split("/").pop() || url;
-    }
-    const rawKey = url.slice(idx + marker.length);
-    return rawKey.split("?")[0];
+    return this.storage.extractKey(url, bucketName);
   }
 }
