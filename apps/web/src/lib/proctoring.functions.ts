@@ -9,6 +9,7 @@ export type InterviewReportBundle = {
   report: JsonValue;
   interview: {
     id: string;
+    candidateId: string;
     candidateName: string;
     role: string;
     personaName: string;

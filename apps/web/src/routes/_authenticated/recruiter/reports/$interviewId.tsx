@@ -5,6 +5,7 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { CardShadow, Icon, EmptyState, SkeletonCard } from "@/components/recruiter/RecruiterShell";
 import { scoreColor, fmtDate } from "@/components/recruiter/mock-data";
+import { DecisionPanel } from "@/components/recruiter/DecisionPanel";
 import {
   getInterviewReportBundle,
   generateInterviewReport,
@@ -410,6 +411,10 @@ function ReportView() {
             hint="Run 'Generate Evaluation Report' to process structural transcripts and signals."
           />
         </CardShadow>
+      )}
+
+      {iv?.candidateId && (
+        <DecisionPanel candidateId={iv.candidateId} className="mb-lg print:hidden" />
       )}
 
       {/* Main Review Center Layout Grid */}

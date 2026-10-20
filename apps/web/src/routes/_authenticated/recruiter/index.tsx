@@ -5,6 +5,7 @@ import { CardShadow, Icon, EmptyState, SkeletonCard } from "@/components/recruit
 import { fmtDate, scoreColor } from "@/components/recruiter/mock-data";
 import { useAuth } from "@/hooks/use-auth";
 import { GettingStarted } from "@/components/recruiter/GettingStarted";
+import { AwaitingDecisionCard } from "@/components/recruiter/AwaitingDecisionCard";
 import {
   getRecruiterDashboard,
   type RecruiterDashboardDTO,
@@ -67,6 +68,8 @@ function DashboardPage() {
           Here is the latest intelligence on your recruitment pipeline.
         </p>
       </div>
+
+      <AwaitingDecisionCard />
 
       <GettingStarted />
 

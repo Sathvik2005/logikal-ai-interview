@@ -630,3 +630,76 @@ export const parseResumeFile = createServerFn({ method: "POST" })
     if (!res.ok) throw await backendError(res, "Could not read the resume");
     return (await res.json()) as ParsedResumeFields;
   });
+
+// ---------- human-in-the-loop hiring decisions ----------
+export type DecisionContext = {
+  interviewId: string | null;
+  aiRecommendation: string | null;
+  aiScore: number | null;
+  integrityScore: number | null;
+};
+export type DecisionRecord = {
+  id: string;
+  decision: "hire" | "hold" | "reject";
+  note: string | null;
+  ai_recommendation: string | null;
+  ai_score: number | string | null;
+  overrode_ai: boolean;
+  decided_by_email: string | null;
+  decided_at: string;
+};
+export type DecisionState = {
+  awaiting: boolean;
+  history: DecisionRecord[];
+  context: DecisionContext;
+};
+export type AwaitingDecision = DecisionContext & {
+  candidateId: string;
+  name: string;
+  email: string;
+  role: string | null;
+  waitingSince: string;
+};
+
+export const getCandidateDecisionState = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data }) => {
+    const res = await fetch(`${getBackendUrl()}/api/candidates/${data.id}/decisions`, {
+      headers: { ...getAuthHeader() },
+    });
+    if (!res.ok) throw await backendError(res, "Could not load decision state");
+    return (await res.json()) as DecisionState;
+  });
+
+export const listAwaitingDecisions = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async () => {
+    const res = await fetch(`${getBackendUrl()}/api/candidates/awaiting-decision`, {
+      headers: { ...getAuthHeader() },
+    });
+    if (!res.ok) throw await backendError(res, "Could not load the review queue");
+    return (await res.json()) as AwaitingDecision[];
+  });
+
+/** Record a person's hire / hold / reject decision. The backend enforces the rules (notes, state). */
+export const submitCandidateDecision = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        decision: z.enum(["hire", "hold", "reject"]),
+        note: z.string().max(2000).optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const res = await fetch(`${getBackendUrl()}/api/candidates/${data.id}/decision`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...getAuthHeader() },
+      body: JSON.stringify({ decision: data.decision, note: data.note }),
+    });
+    if (!res.ok) throw await backendError(res, "Could not record the decision");
+    return (await res.json()) as DecisionRecord;
+  });
