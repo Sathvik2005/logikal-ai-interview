@@ -98,9 +98,9 @@ export class EvaluationService implements OnModuleInit {
 Experience Level: ${cr.experienceLevel || "N/A"}
 Employment Type: ${cr.employmentType || "N/A"}
 Location: ${cr.location || "N/A"}
-Skills: ${Array.isArray(cr.skills) ? cr.skills.join(", ") : (cr.skills || "")}
+Skills: ${Array.isArray(cr.skills) ? cr.skills.join(", ") : cr.skills || ""}
 Responsibilities: ${cr.responsibilities || ""}
-Notes: ${cr.notes || ""}`
+Notes: ${cr.notes || ""}`,
           };
         }
       }
@@ -143,17 +143,8 @@ Notes: ${cr.notes || ""}`
         ),
       );
 
-      // 10. Queue email delivery
-      await this.queue.enqueue("send-notification", {
-        orgId: interview.org_id,
-        kind: "interview_report_ready",
-        recipientEmail: interview.candidate.email,
-        payload: {
-          candidateName: interview.candidate.full_name,
-          score: evaluation.overallScore,
-          interviewId,
-        },
-      });
+      // No candidate email here: AI results are for the recruiter only. Candidates are told the
+      // outcome only after a person records a decision (see HiringDecisionService).
     } catch (err) {
       this.logger.error(`AI Evaluation task failed: ${err}`);
       await this.prisma.interview.update({

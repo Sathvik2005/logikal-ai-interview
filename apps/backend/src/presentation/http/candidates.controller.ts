@@ -13,6 +13,7 @@ import {
   Inject,
   ServiceUnavailableException,
   BadRequestException,
+  ForbiddenException,
 } from "@nestjs/common";
 import { CANDIDATE_STATUSES, type CandidateStatus } from "../../domain/candidate/candidate.entity";
 import { FileInterceptor } from "@nestjs/platform-express";
@@ -22,6 +23,10 @@ import { CandidateWorkflowService } from "../../application/candidate/candidate-
 import { FileProcessingPipelineService } from "../../application/candidate/file-processing-pipeline.service";
 import { PrismaService } from "../../infrastructure/database/prisma.service";
 import { StorageService } from "../../application/services/storage.service";
+import {
+  HiringDecisionService,
+  type Decision,
+} from "../../application/candidate/hiring-decision.service";
 import {
   DocumentTextService,
   MAX_DOCUMENT_BYTES,
@@ -40,6 +45,7 @@ export class CandidatesController {
     private readonly prisma: PrismaService,
     private readonly storage: StorageService,
     private readonly documentText: DocumentTextService,
+    private readonly decisions: HiringDecisionService,
     @Inject(IAIOrchestratorToken)
     private readonly aiOrchestrator: IAIOrchestrator,
   ) {}
@@ -61,6 +67,35 @@ export class CandidatesController {
     return this.prisma.candidate.findMany({
       where,
       orderBy: { created_at: "desc" },
+    });
+  }
+
+  /** Candidates whose AI evaluation is finished and who are waiting for a human decision. */
+  @Get("awaiting-decision")
+  @Roles("recruiter", "admin")
+  async awaitingDecision(@Req() req: any) {
+    const claimedOrg: string | undefined = req.user.claims?.user_metadata?.orgId;
+    return this.decisions.awaiting(claimedOrg);
+  }
+
+  @Get(":id/decisions")
+  @Roles("recruiter", "admin")
+  async decisionState(@Param("id") id: string) {
+    return this.decisions.state(id);
+  }
+
+  /** The only route that can hire or reject a candidate. Records who decided, when and why. */
+  @Post(":id/decision")
+  @Roles("recruiter", "admin")
+  async decide(
+    @Req() req: any,
+    @Param("id") id: string,
+    @Body() body: { decision: Decision; note?: string },
+  ) {
+    return this.decisions.decide(id, body?.decision, body?.note, {
+      userId: req.user.userId,
+      email: req.user.email,
+      orgId: req.user.orgId || "00000000-0000-0000-0000-000000000000",
     });
   }
 
@@ -137,6 +172,11 @@ export class CandidatesController {
     @Param("id") id: string,
     @Body() body: { status: CandidateStatus; reason?: string; advance?: boolean },
   ) {
+    if (body?.status === "hiring_decision") {
+      throw new ForbiddenException(
+        "A hiring decision must be made by a person. Use POST /candidates/:id/decision.",
+      );
+    }
     if (!CANDIDATE_STATUSES.includes(body?.status)) {
       throw new BadRequestException(`Invalid candidate status "${body?.status}".`);
     }

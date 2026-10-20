@@ -8,6 +8,7 @@ import { RolesGuard } from "../guards/roles.guard";
 import { StorageService } from "../../application/services/storage.service";
 import { DocumentTextService } from "../../application/services/document-text.service";
 import { IAIOrchestratorToken } from "../../application/common/ai/ai-orchestrator.interface";
+import { HiringDecisionService } from "../../application/candidate/hiring-decision.service";
 
 describe("CandidatesController", () => {
   let controller: CandidatesController;
@@ -18,6 +19,7 @@ describe("CandidatesController", () => {
   const mockWorkflow = {
     apply: jest.fn(),
     transition: jest.fn(),
+    advanceTo: jest.fn(),
   };
 
   const mockFilePipeline = {
@@ -39,6 +41,12 @@ describe("CandidatesController", () => {
   const mockAi = {
     isAvailable: jest.fn().mockReturnValue(true),
     parseResume: jest.fn(),
+  };
+
+  const mockDecisions = {
+    awaiting: jest.fn(),
+    state: jest.fn(),
+    decide: jest.fn(),
   };
 
   const mockPrisma = {
@@ -78,6 +86,7 @@ describe("CandidatesController", () => {
           useValue: mockPrisma,
         },
         { provide: DocumentTextService, useValue: mockDocumentText },
+        { provide: HiringDecisionService, useValue: mockDecisions },
         { provide: IAIOrchestratorToken, useValue: mockAi },
         {
           provide: StorageService,
@@ -180,6 +189,39 @@ describe("CandidatesController", () => {
 
       expect(workflow.transition).toHaveBeenCalledWith("c1", "shortlisted", "Good resume");
       expect(result).toEqual({ message: "Candidate state transitioned successfully." });
+    });
+  });
+
+  describe("human-in-the-loop decisions", () => {
+    it("the generic status route can never produce a hiring decision", async () => {
+      await expect(
+        controller.updateStatus("c1", { status: "hiring_decision", advance: true }),
+      ).rejects.toThrow(/must be made by a person/);
+      expect(mockWorkflow.transition).not.toHaveBeenCalled();
+      expect(mockWorkflow.advanceTo).not.toHaveBeenCalled();
+    });
+
+    it("decision endpoint passes the signed-in person to the service", async () => {
+      mockDecisions.decide.mockResolvedValue({ id: "d1" });
+      const req = { user: { userId: "u1", email: "r@x.com", orgId: "org-1" } };
+
+      await controller.decide(req, "c1", { decision: "hire", note: "Strong" });
+
+      expect(mockDecisions.decide).toHaveBeenCalledWith("c1", "hire", "Strong", {
+        userId: "u1",
+        email: "r@x.com",
+        orgId: "org-1",
+      });
+    });
+
+    it("lists the review queue and a candidate's decision state", async () => {
+      mockDecisions.awaiting.mockResolvedValue([{ candidateId: "c1" }]);
+      mockDecisions.state.mockResolvedValue({ awaiting: true, history: [], context: {} });
+
+      await expect(controller.awaitingDecision({ user: { claims: {} } })).resolves.toEqual([
+        { candidateId: "c1" },
+      ]);
+      await expect(controller.decisionState("c1")).resolves.toMatchObject({ awaiting: true });
     });
   });
 

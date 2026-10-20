@@ -666,3 +666,22 @@ model QuestionBank {
 
   @@map("question_banks")
 }
+
+/// Human-in-the-loop hiring decision (see migration 20260707000000_candidate_decisions).
+model CandidateDecision {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  org_id           String   @db.Uuid
+  candidate_id     String   @db.Uuid
+  interview_id     String?  @db.Uuid
+  decision         String
+  note             String?
+  ai_recommendation String?
+  ai_score         Decimal? @db.Decimal
+  overrode_ai      Boolean  @default(false)
+  decided_by       String   @db.Uuid
+  decided_by_email String?
+  decided_at       DateTime @default(now()) @db.Timestamptz
+
+  @@index([candidate_id, decided_at(sort: Desc)])
+  @@map("candidate_decisions")
+}

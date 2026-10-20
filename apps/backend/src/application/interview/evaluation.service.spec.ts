@@ -102,13 +102,13 @@ describe("EvaluationService", () => {
         aiOrchestrator,
         workflow,
         inMemoryQueue,
-        eventBus
+        eventBus,
       );
 
       serviceWithInMemory.onModuleInit();
       expect(inMemoryQueue.registerProcessor).toHaveBeenCalledWith(
         "finalize-evaluation",
-        expect.any(Function)
+        expect.any(Function),
       );
     });
   });
@@ -116,17 +116,14 @@ describe("EvaluationService", () => {
   describe("finalizeEvaluation", () => {
     it("should grade interview transcript, update db, create report, transition candidate and enqueue emails", async () => {
       prisma.interview.update.mockResolvedValue({});
-      
+
       const mockTurns = [
         { speaker: "persona", text: "Question?" },
-        { speaker: "candidate", text: "Answer." }
+        { speaker: "candidate", text: "Answer." },
       ];
       prisma.interviewTurn.findMany.mockResolvedValue(mockTurns);
 
-      const mockEvents = [
-        { type: "tab_switch" },
-        { type: "tab_switch" }
-      ];
+      const mockEvents = [{ type: "tab_switch" }, { type: "tab_switch" }];
       prisma.interviewEvent.findMany.mockResolvedValue(mockEvents);
 
       const mockInterview = {
@@ -135,7 +132,7 @@ describe("EvaluationService", () => {
         candidate_id: "cand-456",
         candidate: { full_name: "John Doe", email: "john@example.com" },
         job: { title: "Dev", requirements: "Node" },
-        template: { evaluation_criteria: { competency: "standard" } }
+        template: { evaluation_criteria: { competency: "standard" } },
       };
       prisma.interview.findUnique.mockResolvedValue(mockInterview);
 
@@ -146,7 +143,7 @@ describe("EvaluationService", () => {
         concerns: ["None"],
         summary: "Excellent candidate",
         competencyScores: { "Node.js": 90 },
-        integrityScore: 80
+        integrityScore: 80,
       };
       aiOrchestrator.evaluateInterview.mockResolvedValue(mockEvaluationResult);
       aiOrchestrator.generateReportMarkdown.mockResolvedValue("# Report markdown content");
@@ -169,8 +166,11 @@ describe("EvaluationService", () => {
       // 2. Evaluates interview
       expect(aiOrchestrator.evaluateInterview).toHaveBeenCalledWith(
         { competency: "standard" },
-        [{ speaker: "persona", text: "Question?" }, { speaker: "candidate", text: "Answer." }],
-        { tab_switch: 2 }
+        [
+          { speaker: "persona", text: "Question?" },
+          { speaker: "candidate", text: "Answer." },
+        ],
+        { tab_switch: 2 },
       );
 
       // 3. Updates interview with results
@@ -190,7 +190,7 @@ describe("EvaluationService", () => {
       expect(aiOrchestrator.generateReportMarkdown).toHaveBeenCalledWith(
         { name: "John Doe", email: "john@example.com" },
         { title: "Dev", requirements: "Node" },
-        mockEvaluationResult
+        mockEvaluationResult,
       );
 
       // 5. Stores report in DB
@@ -212,34 +212,26 @@ describe("EvaluationService", () => {
         "cand-456",
         "recruiter_review",
         expect.any(String),
-        { score: 88, recommendation: "strong_hire" }
+        { score: 88, recommendation: "strong_hire" },
       );
 
       // 7. Dispatches Event
-      expect(eventBus.publish).toHaveBeenCalledWith(
-        expect.any(EvaluationCompletedEvent)
-      );
+      expect(eventBus.publish).toHaveBeenCalledWith(expect.any(EvaluationCompletedEvent));
 
-      // 8. Enqueues email delivery
-      expect(queue.enqueue).toHaveBeenCalledWith("send-notification", {
-        orgId: "org-123",
-        kind: "interview_report_ready",
-        recipientEmail: "john@example.com",
-        payload: {
-          candidateName: "John Doe",
-          score: 88,
-          interviewId: "int-123",
-        },
-      });
+      // 8. The candidate is NOT emailed the AI result: a human must review and decide first.
+      expect(queue.enqueue).not.toHaveBeenCalledWith(
+        "send-notification",
+        expect.objectContaining({ kind: "interview_report_ready" }),
+      );
     });
 
     it("should set evaluation status to failed and rethrow on error", async () => {
       prisma.interview.update.mockResolvedValue({});
       prisma.interviewTurn.findMany.mockRejectedValue(new Error("Database error"));
 
-      await expect(
-        service.finalizeEvaluation("int-123", "sess-999")
-      ).rejects.toThrow("Database error");
+      await expect(service.finalizeEvaluation("int-123", "sess-999")).rejects.toThrow(
+        "Database error",
+      );
 
       expect(prisma.interview.update).toHaveBeenCalledWith({
         where: { id: "int-123" },

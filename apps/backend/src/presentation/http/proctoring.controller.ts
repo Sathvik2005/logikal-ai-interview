@@ -187,6 +187,7 @@ export class ProctoringController {
         overallScore: interview.overall_score ? Number(interview.overall_score) : null,
         recommendation: interview.recommendation,
         integrityScore: interview.integrity_score ? Number(interview.integrity_score) : null,
+        candidateId: interview.candidate_id,
         candidateEmail: interview.candidate.email,
         candidatePhone: interview.candidate.phone || "",
         candidateResumeSummary: interview.candidate.resume_summary || "",
