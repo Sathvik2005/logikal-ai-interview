@@ -68,9 +68,3 @@ recruiter sends the outcome email (once). Repeatable with `scripts/demo-intervie
 ## Deploying
 
 See `docs/DEPLOY_RENDER_CLOUDFLARE.md` (Render for the API, Cloudflare for the web app) and `supabase/manual/apply_pending_remote.md`.
-
-## Operations docs
-
-- `docs/DEPLOYMENT_GUIDELINES.md`: rules, gates, release and rollback
-- `docs/RUNBOOK.md`: daily operation and common problems
-- `docs/PLAYBOOKS.md`: scenario scripts (account switch, rotation, incidents, scaling)

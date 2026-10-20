@@ -39,3 +39,6 @@ dist-ssr
 # Large archives and zip files
 *.zip
 
+
+# Private operations docs (runbook, playbooks, deployment guidelines): keep local, never publish
+docs/private/
