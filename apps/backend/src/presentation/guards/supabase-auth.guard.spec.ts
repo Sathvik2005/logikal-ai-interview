@@ -1,6 +1,7 @@
 import { ExecutionContext, UnauthorizedException } from "@nestjs/common";
 import { SupabaseAuthGuard } from "./supabase-auth.guard";
 import * as jwt from "jsonwebtoken";
+import { generateKeyPairSync } from "node:crypto";
 
 describe("SupabaseAuthGuard", () => {
   let guard: SupabaseAuthGuard;
@@ -85,5 +86,40 @@ describe("SupabaseAuthGuard", () => {
     await expect(guard.canActivate(context)).rejects.toThrow(
       expect.any(UnauthorizedException)
     );
+  });
+
+  describe("asymmetric (ES256) tokens via JWKS", () => {
+    const { publicKey, privateKey } = generateKeyPairSync("ec", { namedCurve: "P-256" });
+    const jwk = { ...publicKey.export({ format: "jwk" }), kid: "test-kid", alg: "ES256" };
+    const originalFetch = global.fetch;
+
+    beforeEach(() => {
+      process.env.SUPABASE_JWKS_URL = "https://example.test/jwks.json";
+      global.fetch = jest.fn().mockResolvedValue({ ok: true, json: async () => ({ keys: [jwk] }) }) as any;
+    });
+    afterEach(() => {
+      global.fetch = originalFetch;
+      delete process.env.SUPABASE_JWKS_URL;
+    });
+
+    it("should verify an ES256 token against the JWKS", async () => {
+      const token = jwt.sign({ sub: "user-es", email: "a@b.c" }, privateKey, {
+        algorithm: "ES256",
+        keyid: "test-kid",
+      });
+      const context = createMockContext(`Bearer ${token}`);
+
+      await expect(guard.canActivate(context)).resolves.toBe(true);
+      expect(context.switchToHttp().getRequest().user.userId).toBe("user-es");
+    });
+
+    it("should reject an ES256 token signed by a different key", async () => {
+      const other = generateKeyPairSync("ec", { namedCurve: "P-256" });
+      const token = jwt.sign({ sub: "evil" }, other.privateKey, { algorithm: "ES256", keyid: "test-kid" });
+
+      await expect(guard.canActivate(createMockContext(`Bearer ${token}`))).rejects.toThrow(
+        expect.any(UnauthorizedException),
+      );
+    });
   });
 });

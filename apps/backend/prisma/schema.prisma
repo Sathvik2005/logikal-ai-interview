@@ -14,6 +14,54 @@ enum AppRole {
   candidate
 }
 
+enum CandidateStatus {
+  new
+  applied
+  resume_imported
+  resume_parsed
+  jd_matched
+  shortlisted
+  interview_assigned
+  interview_scheduled
+  invitation_sent
+  interview_started
+  interview_running
+  evaluation_processing
+  recruiter_review
+  hiring_decision
+  screening
+  interviewing
+  evaluated
+  offer
+  hired
+  rejected
+  archived
+
+  @@map("candidate_status")
+}
+
+enum InterviewStatus {
+  scheduled
+  in_progress
+  completed
+  cancelled
+  no_show
+  evaluation_pending
+  failed
+
+  @@map("interview_status")
+}
+
+enum JobStatus {
+  draft
+  open
+  paused
+  closed
+  archived
+
+  @@map("job_status")
+}
+
 model Organization {
   id                    String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name                  String
@@ -78,7 +126,7 @@ model JobDescription {
   employment_type String?
   description    String?
   requirements   String?
-  status         String            @default("draft")
+  status         JobStatus         @default(draft)
   competencies   Json              @default("{}")
   seniority      String?
   salary_min     Decimal?          @db.Decimal
@@ -188,7 +236,7 @@ model Candidate {
   email                 String
   phone                 String?
   role_applied          String?
-  status                String                 @default("new")
+  status                CandidateStatus        @default(new)
   ai_score              Decimal?               @db.Decimal
   resume_url            String?
   resume_summary        String?
@@ -220,7 +268,7 @@ model Interview {
   persona_version_id String?            @db.Uuid
   scheduled_at      DateTime?           @db.Timestamptz
   duration_minutes  Int?                @default(45)
-  status            String              @default("scheduled")
+  status            InterviewStatus     @default(scheduled)
   transcript        Json                @default("[]")
   evaluation        Json                @default("{}")
   overall_score     Decimal?            @db.Decimal
