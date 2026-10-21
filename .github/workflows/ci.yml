@@ -30,3 +30,36 @@ jobs:
           npx tsc --noEmit
           npx eslint . --max-warnings=100
           npm run build
+
+  # Continuous deployment: any commit that lands on main (including collaborators') goes live once `check` passes.
+  # Backend: Render redeploys itself (render.yaml autoDeployTrigger: checksPass). Frontend: deployed here.
+  deploy-web:
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    concurrency: deploy-web
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - name: Skip if Cloudflare secrets are not configured
+        if: env.CLOUDFLARE_API_TOKEN == ''
+        run: echo "CLOUDFLARE_API_TOKEN not set; skipping web deploy."
+      - uses: actions/checkout@v4
+        if: env.CLOUDFLARE_API_TOKEN != ''
+      - uses: actions/setup-node@v4
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+        if: env.CLOUDFLARE_API_TOKEN != ''
+      - name: Build and deploy web
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        working-directory: apps/web
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          npm run build
+          npx wrangler deploy

@@ -50,3 +50,11 @@ deploy command `npx wrangler deploy`, and add the same variables in the dashboar
 1. Set Render's `FRONTEND_URL` to the final web URL and redeploy the backend (CORS).
 2. In Supabase > Authentication > URL configuration, add the web URL as Site URL and redirect URL.
 3. Open the web URL, log in, and run `BACKEND_URL=<render url> SMOKE_EMAIL=... SMOKE_PASSWORD=... node scripts/smoke-e2e.mjs`.
+
+## 4. Continuous deployment (free)
+Every push to `main` runs `.github/workflows/ci.yml`: typecheck, tests and build (`check`), then `deploy-web` publishes the web app to Cloudflare. Render redeploys the backend only after the same check passes (`autoDeployTrigger: checksPass`). GitHub Actions is free for public repos.
+
+One-time setup in GitHub > Settings > Secrets and variables > Actions:
+`CLOUDFLARE_API_TOKEN` (Workers edit permission), `CLOUDFLARE_ACCOUNT_ID`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`. Without `CLOUDFLARE_API_TOKEN` the deploy job skips itself.
+
+Collaborators: add them under Settings > Collaborators (Write access). Their pull requests run `check`; once merged to `main` they deploy automatically. Optionally protect `main` (require PR + the `check` status) so nothing deploys without a green build.

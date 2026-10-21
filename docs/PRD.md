@@ -89,3 +89,36 @@ Lokality AI is an enterprise SaaS Recruitment Intelligence Platform that automat
 ## 6. Out of Scope
 *   **OOS-1**: Native video redirects to Microsoft Teams or Zoom standalone applications. All proctoring, webcam telemetry, and AI dialogue are hosted inside the Lokality AI interview room to maintain compliance and strict focus control. (Calendar metadata support is retained in templates for organization coordination).
 *   **OOS-2**: Custom browser extension installations. Proctoring relies entirely on standard browser APIs (page visibility API, focus listeners, canvas captures).
+
+---
+
+## 7. Delivery Path: From Start to Deployment
+
+### 7.1. Local Start
+1.  **Prerequisites**: Node.js ≥ 20, npm ≥ 10, a Supabase project.
+2.  **Install**: run `npm install` once at the repo root (npm workspaces cover `apps/web`, `apps/backend` and `packages/*`).
+3.  **Configure**: copy `.env.example` to `.env` (`VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`) and create `apps/backend/.env` (Supabase keys, `DATABASE_URL`/`DIRECT_URL`, optional `GEMINI_API_KEY`, `RESEND_API_KEY`, `JWT_SECRET`). Missing AI or email keys fall back to mock/log mode (NFR-3.1). Full variable list: `docs/SETUP.md`.
+4.  **Database**: sync the Prisma schema, run `npm run prisma:generate`, and apply Supabase migrations.
+5.  **Run**: `npm run dev:web` (http://localhost:5173) and `npm run dev:backend` (http://localhost:3000/api, Swagger at `/api/docs`).
+6.  **Verify**: sign in with a demo account (`docs/CREDENTIALS.md`) and run the tests and `scripts/smoke-e2e.mjs`.
+
+### 7.2. Build and Release
+1.  Build with `npm run build:backend` and `npm run build:web`; confirm CI is green on `main`.
+2.  Use a **separate production Supabase project**; do not enable `app.seed_demo` there.
+3.  Apply migrations: `npx supabase db push --db-url "<PROD DIRECT_URL>"`.
+4.  Create the first admin in Supabase Authentication and add a matching `user_roles` row (role `admin`).
+
+### 7.3. Deployment
+| Tier | Target | How |
+|---|---|---|
+| Backend (NestJS) | Render | New > Blueprint from `render.yaml` (service `lokality-backend`); set DB, Supabase, `JWT_SECRET`, `GEMINI_API_KEY`, real `RESEND_API_KEY` and `FRONTEND_URL`; health check `/api/docs` |
+| Frontend (TanStack Start) | Cloudflare Workers | Set `VITE_SUPABASE_*`, run `npm run build` and `npx wrangler deploy` in `apps/web`; set secrets `BACKEND_URL`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY` |
+| Self-hosted alternative | PM2 + Nginx + SSL | See `docs/DEPLOYMENT_AND_OPERATIONS.md` (includes Redis/BullMQ scaling) |
+
+### 7.4. Go-Live Wiring and Verification
+1.  Set Render `FRONTEND_URL` to the final web origin (no trailing slash) and redeploy, for CORS.
+2.  In Supabase > Authentication > URL configuration, add the web URL as Site URL and redirect URL.
+3.  Log in on the live URL and run `BACKEND_URL=<render url> SMOKE_EMAIL=... SMOKE_PASSWORD=... node scripts/smoke-e2e.mjs`.
+4.  **Before real use**: run the backend on an always-on paid instance and move resumes to Supabase Storage, since the in-memory queue and local file storage are not durable.
+
+Detail: `docs/SETUP.md`, `docs/DEPLOY_RENDER_CLOUDFLARE.md`, `docs/DEPLOYMENT_AND_OPERATIONS.md`.

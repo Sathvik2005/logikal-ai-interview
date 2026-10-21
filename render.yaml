@@ -9,7 +9,7 @@ services:
     buildCommand: npm ci --include=dev && npm run prisma:generate && npm run build:backend
     startCommand: node apps/backend/dist/main.js
     healthCheckPath: /api/health
-    autoDeploy: true
+    autoDeployTrigger: checksPass   # redeploy only after the GitHub CI check passes
     envVars:
       - key: NODE_VERSION
         value: 22
