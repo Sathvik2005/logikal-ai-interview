@@ -87,7 +87,7 @@ export class RetentionService implements OnApplicationBootstrap, OnModuleDestroy
         SELECT s.id, s.storage_path
         FROM public.proctoring_snapshots s
         LEFT JOIN public.workspace_settings w ON w.org_id = s.org_id
-        WHERE s.captured_at < now() - make_interval(months => GREATEST(COALESCE(w.retention_months, ${DEFAULT_RETENTION_MONTHS}), 1))
+        WHERE s.captured_at < now() - make_interval(months => GREATEST(COALESCE(w.retention_months, ${DEFAULT_RETENTION_MONTHS}::int), 1)::int)
         ORDER BY s.captured_at
         LIMIT ${this.batch}`;
       if (rows.length === 0) break;
@@ -110,7 +110,7 @@ export class RetentionService implements OnApplicationBootstrap, OnModuleDestroy
         FROM public.identity_verifications v
         LEFT JOIN public.workspace_settings w ON w.org_id = v.org_id
         WHERE (v.selfie_path IS NOT NULL OR v.id_document_path IS NOT NULL)
-          AND v.created_at < now() - make_interval(months => GREATEST(COALESCE(w.retention_months, ${DEFAULT_RETENTION_MONTHS}), 1))
+          AND v.created_at < now() - make_interval(months => GREATEST(COALESCE(w.retention_months, ${DEFAULT_RETENTION_MONTHS}::int), 1)::int)
         ORDER BY v.created_at
         LIMIT ${this.batch}`;
       if (rows.length === 0) break;
