@@ -4,7 +4,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
-import { useAuth, roleHome, type AppRole } from "@/hooks/use-auth";
+import { useAuth, roleHome } from "@/hooks/use-auth";
 
 const searchSchema = z.object({ mode: z.enum(["login", "signup"]).optional() });
 
@@ -22,7 +22,6 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const [signupRole, setSignupRole] = useState<AppRole>("recruiter");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -39,7 +38,7 @@ function AuthPage() {
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/`,
-            data: { full_name: fullName, role: signupRole },
+            data: { full_name: fullName },
           },
         });
         if (error) throw error;
@@ -156,23 +155,9 @@ function AuthPage() {
             </div>
 
             {mode === "signup" && (
-              <div className="flex flex-col gap-xs">
-                <label className="text-label-caps font-label-caps text-on-surface-variant uppercase">
-                  I am a
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {(["recruiter", "candidate"] as AppRole[]).map((r) => (
-                    <button
-                      type="button"
-                      key={r}
-                      onClick={() => setSignupRole(r)}
-                      className={`py-2 rounded-lg border text-body-md capitalize transition-all ${signupRole === r ? "border-primary bg-primary/5 text-primary" : "border-outline-variant text-on-surface-variant hover:bg-surface-container-low"}`}
-                    >
-                      {r}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <p className="text-body-md text-on-surface-variant">
+                Candidate accounts only. Recruiters and admins are invited by their organization.
+              </p>
             )}
 
             {mode === "login" && (
