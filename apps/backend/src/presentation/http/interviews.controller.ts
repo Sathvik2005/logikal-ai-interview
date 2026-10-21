@@ -114,7 +114,7 @@ export class InterviewsController {
     });
 
     // 3. Update candidate workflow timelines
-    await this.workflow.transition(
+    await this.workflow.advanceIfBehind(
       body.candidateId,
       "interview_assigned",
       "Assigned interview template to candidate. Link is ready.",
@@ -122,7 +122,7 @@ export class InterviewsController {
     );
 
     if (body.scheduledAt) {
-      await this.workflow.transition(
+      await this.workflow.advanceIfBehind(
         body.candidateId,
         "interview_scheduled",
         `Scheduled interview window starting at ${body.scheduledAt}.`,
@@ -135,7 +135,7 @@ export class InterviewsController {
     });
 
     if (candidate) {
-      await this.workflow.transition(
+      await this.workflow.advanceIfBehind(
         body.candidateId,
         "invitation_sent",
         "Dispatched interview invitation email with entry instructions.",
@@ -588,7 +588,7 @@ export class InterviewsController {
     });
 
     if (candidate) {
-      await this.workflow.transition(
+      await this.workflow.advanceIfBehind(
         existing.candidate_id,
         "interview_scheduled",
         `Rescheduled interview window starting at ${body.scheduledAt}.`,

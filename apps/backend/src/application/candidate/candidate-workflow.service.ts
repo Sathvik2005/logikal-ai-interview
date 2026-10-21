@@ -126,6 +126,25 @@ export class CandidateWorkflowService {
     }
   }
 
+  /**
+   * Move a candidate forward to `target` only when they are still behind it. Used where a candidate may
+   * legitimately already be at or past the stage (a second interview, a reschedule after the invitation went out),
+   * so those cases leave the status alone instead of failing on a backward move.
+   */
+  async advanceIfBehind(
+    candidateId: string,
+    target: CandidateStatus,
+    details?: string,
+    meta?: any,
+  ): Promise<void> {
+    const candidate = await this.candidateRepo.findById(candidateId);
+    if (!candidate) {
+      throw new Error(`Candidate with ID ${candidateId} not found.`);
+    }
+    if (CANDIDATE_STATUSES.indexOf(candidate.status) >= CANDIDATE_STATUSES.indexOf(target)) return;
+    await this.advanceTo(candidateId, target, details, meta);
+  }
+
   async logTimeline(
     candidateId: string,
     eventType: string,

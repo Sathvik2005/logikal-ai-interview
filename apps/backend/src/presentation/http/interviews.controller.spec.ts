@@ -61,6 +61,7 @@ describe("InterviewsController", () => {
   const mockWorkflow = {
     transition: jest.fn(),
     advanceTo: jest.fn(),
+    advanceIfBehind: jest.fn(),
   };
 
   const mockQueue = {
@@ -172,20 +173,20 @@ describe("InterviewsController", () => {
         }),
       });
 
-      expect(workflow.transition).toHaveBeenNthCalledWith(
+      expect(workflow.advanceIfBehind).toHaveBeenNthCalledWith(
         1,
         "cand-1",
         "interview_assigned",
         expect.any(String),
         { interviewId: "iv-5" },
       );
-      expect(workflow.transition).toHaveBeenNthCalledWith(
+      expect(workflow.advanceIfBehind).toHaveBeenNthCalledWith(
         2,
         "cand-1",
         "interview_scheduled",
         expect.any(String),
       );
-      expect(workflow.transition).toHaveBeenNthCalledWith(
+      expect(workflow.advanceIfBehind).toHaveBeenNthCalledWith(
         3,
         "cand-1",
         "invitation_sent",

@@ -93,7 +93,7 @@ describe("CandidateWorkflowService", () => {
           orgId,
           phone,
           status: "applied",
-        })
+        }),
       );
 
       expect(prisma.candidateTimeline.create).toHaveBeenCalledWith({
@@ -104,9 +104,7 @@ describe("CandidateWorkflowService", () => {
         }),
       });
 
-      expect(eventBus.publish).toHaveBeenCalledWith(
-        expect.any(CandidateAppliedEvent)
-      );
+      expect(eventBus.publish).toHaveBeenCalledWith(expect.any(CandidateAppliedEvent));
       const dispatchedEvent = eventBus.publish.mock.calls[0][0];
       expect(dispatchedEvent.candidateId).toBe(candidateId);
       expect(dispatchedEvent.name).toBe(name);
@@ -116,7 +114,13 @@ describe("CandidateWorkflowService", () => {
 
   describe("transition", () => {
     it("should transition candidate status and log to timeline", async () => {
-      const candidate = new Candidate("cand-123", "org-123", "John Doe", "john@example.com", "applied");
+      const candidate = new Candidate(
+        "cand-123",
+        "org-123",
+        "John Doe",
+        "john@example.com",
+        "applied",
+      );
       candidateRepo.findById.mockResolvedValue(candidate);
       candidateRepo.save.mockResolvedValue(undefined);
       prisma.candidateTimeline.create.mockResolvedValue({});
@@ -126,7 +130,7 @@ describe("CandidateWorkflowService", () => {
       expect(candidateRepo.findById).toHaveBeenCalledWith("cand-123");
       expect(candidate.status).toBe("resume_imported");
       expect(candidateRepo.save).toHaveBeenCalledWith(candidate);
-      
+
       expect(prisma.candidateTimeline.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           candidate_id: "cand-123",
@@ -138,7 +142,13 @@ describe("CandidateWorkflowService", () => {
     });
 
     it("advanceTo should step through every intermediate state", async () => {
-      const candidate = new Candidate("cand-123", "org-123", "John Doe", "john@example.com", "applied");
+      const candidate = new Candidate(
+        "cand-123",
+        "org-123",
+        "John Doe",
+        "john@example.com",
+        "applied",
+      );
       candidateRepo.findById.mockResolvedValue(candidate);
       candidateRepo.save.mockResolvedValue(undefined);
       prisma.candidateTimeline.create.mockResolvedValue({});
@@ -149,8 +159,34 @@ describe("CandidateWorkflowService", () => {
       expect(prisma.candidateTimeline.create).toHaveBeenCalledTimes(4);
     });
 
+    it("advanceIfBehind moves a brand-new candidate all the way to the target stage", async () => {
+      const candidate = new Candidate("cand-1", "org-1", "Jo", "jo@example.com", "applied");
+      candidateRepo.findById.mockResolvedValue(candidate);
+      prisma.candidateTimeline.create.mockResolvedValue({});
+
+      await service.advanceIfBehind("cand-1", "interview_scheduled");
+
+      expect(candidate.status).toBe("interview_scheduled");
+    });
+
+    it("advanceIfBehind leaves a candidate who is already past the stage untouched", async () => {
+      const candidate = new Candidate("cand-1", "org-1", "Jo", "jo@example.com", "invitation_sent");
+      candidateRepo.findById.mockResolvedValue(candidate);
+
+      await service.advanceIfBehind("cand-1", "interview_scheduled");
+
+      expect(candidate.status).toBe("invitation_sent");
+      expect(candidateRepo.save).not.toHaveBeenCalled();
+    });
+
     it("advanceTo should archive directly", async () => {
-      const candidate = new Candidate("cand-123", "org-123", "John Doe", "john@example.com", "applied");
+      const candidate = new Candidate(
+        "cand-123",
+        "org-123",
+        "John Doe",
+        "john@example.com",
+        "applied",
+      );
       candidateRepo.findById.mockResolvedValue(candidate);
       candidateRepo.save.mockResolvedValue(undefined);
       prisma.candidateTimeline.create.mockResolvedValue({});
@@ -164,9 +200,9 @@ describe("CandidateWorkflowService", () => {
     it("should throw error if candidate not found", async () => {
       candidateRepo.findById.mockResolvedValue(null);
 
-      await expect(
-        service.transition("cand-123", "resume_imported")
-      ).rejects.toThrow("Candidate with ID cand-123 not found.");
+      await expect(service.transition("cand-123", "resume_imported")).rejects.toThrow(
+        "Candidate with ID cand-123 not found.",
+      );
     });
   });
 
