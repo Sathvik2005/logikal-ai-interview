@@ -23,6 +23,13 @@ export class AdminController {
     private readonly storage: StorageService,
   ) {}
 
+  /** Deliberately throws a 500 so error tracking (Sentry, error_events, alert webhook) can be verified end to end. */
+  @Post("sentry-test")
+  @Roles("admin")
+  sentryTest(@Req() req: any) {
+    throw new Error(`Sentry test error triggered by ${req?.user?.userId ?? "unknown"}`);
+  }
+
   @Get("organizations")
   @Roles("admin")
   async listOrganizations() {
