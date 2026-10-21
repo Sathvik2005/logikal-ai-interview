@@ -98,6 +98,18 @@ export class CandidatesController {
     );
   }
 
+  @Get("notifications")
+  @Roles("recruiter", "admin")
+  async listNotifications(@Req() req: any, @Query("limit") limit?: string) {
+    const orgId = req.user.orgId || "00000000-0000-0000-0000-000000000000";
+    const lim = limit ? parseInt(limit, 10) : 20;
+    return this.prisma.notificationOutbox.findMany({
+      where: { org_id: orgId },
+      orderBy: { created_at: "desc" },
+      take: Math.min(lim, 100),
+    });
+  }
+
   @Get(":id/decisions")
   @Roles("recruiter", "admin")
   async decisionState(@Param("id") id: string) {
@@ -349,18 +361,6 @@ export class CandidatesController {
       upcoming: mapped.filter((i) => i.status === "scheduled" || i.status === "in_progress"),
       past: mapped.filter((i) => i.status !== "scheduled" && i.status !== "in_progress"),
     };
-  }
-
-  @Get("notifications")
-  @Roles("recruiter", "admin")
-  async listNotifications(@Req() req: any, @Query("limit") limit?: string) {
-    const orgId = req.user.orgId || "00000000-0000-0000-0000-000000000000";
-    const lim = limit ? parseInt(limit, 10) : 20;
-    return this.prisma.notificationOutbox.findMany({
-      where: { org_id: orgId },
-      orderBy: { created_at: "desc" },
-      take: Math.min(lim, 100),
-    });
   }
 
   @Post("bulk-import")

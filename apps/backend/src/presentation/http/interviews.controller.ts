@@ -415,6 +415,113 @@ export class InterviewsController {
     return { status: "queued" };
   }
 
+  @Get("live")
+  async listLive(@Req() req: any) {
+    const orgId = req.user.orgId || "00000000-0000-0000-0000-000000000000";
+    const now = new Date();
+    const horizon = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
+    const interviews = await this.prisma.interview.findMany({
+      where: {
+        org_id: orgId,
+        deleted_at: null,
+        status: { in: ["scheduled", "in_progress"] },
+        scheduled_at: { lte: horizon },
+      },
+      include: {
+        candidate: {
+          select: {
+            full_name: true,
+            email: true,
+            role_applied: true,
+          },
+        },
+        persona: {
+          select: {
+            name: true,
+          },
+        },
+        sessions: {
+          select: {
+            id: true,
+          },
+          orderBy: { started_at: "desc" },
+          take: 1,
+        },
+      },
+      orderBy: { scheduled_at: "asc" },
+    });
+
+    return interviews.map((iv) => ({
+      id: iv.id,
+      candidateName: iv.candidate?.full_name ?? "Candidate",
+      candidateEmail: iv.candidate?.email ?? "",
+      role: iv.candidate?.role_applied ?? "Interview",
+      personaName: iv.persona?.name ?? "AI Interviewer",
+      scheduledAt: iv.scheduled_at ? iv.scheduled_at.toISOString() : null,
+      durationMinutes: iv.duration_minutes ?? 45,
+      status: iv.status,
+      sessionId: iv.sessions[0]?.id ?? null,
+    }));
+  }
+
+  @Get("recorded")
+  async listRecorded(@Req() req: any) {
+    const orgId = req.user.orgId || "00000000-0000-0000-0000-000000000000";
+
+    const interviews = await this.prisma.interview.findMany({
+      where: {
+        org_id: orgId,
+        deleted_at: null,
+        status: { in: ["completed", "evaluation_pending"] },
+      },
+      include: {
+        candidate: {
+          select: {
+            full_name: true,
+            email: true,
+            role_applied: true,
+          },
+        },
+        persona: {
+          select: {
+            name: true,
+          },
+        },
+        sessions: {
+          select: {
+            id: true,
+            started_at: true,
+            ended_at: true,
+          },
+          orderBy: { started_at: "desc" },
+          take: 1,
+        },
+      },
+      orderBy: { scheduled_at: "desc" },
+      take: 60,
+    });
+
+    return interviews.map((iv) => {
+      const s = iv.sessions[0];
+      const start = s?.started_at ? s.started_at.getTime() : 0;
+      const end = s?.ended_at ? s.ended_at.getTime() : 0;
+      const durationSec =
+        end > start ? Math.round((end - start) / 1000) : (iv.duration_minutes ?? 45) * 60;
+
+      return {
+        id: s?.id ?? iv.id,
+        interviewId: iv.id,
+        candidateName: iv.candidate?.full_name ?? "Candidate",
+        role: iv.candidate?.role_applied ?? "Interview",
+        personaName: iv.persona?.name ?? "AI Interviewer",
+        durationSec,
+        scheduledAt: iv.scheduled_at ? iv.scheduled_at.toISOString() : null,
+        score: iv.overall_score ? Number(iv.overall_score) : null,
+      };
+    });
+  }
+
   @Get(":id/evaluation")
   async getEvaluation(@Param("id") id: string) {
     return this.prisma.interview.findUnique({
@@ -546,113 +653,6 @@ export class InterviewsController {
     }
 
     return { ok: true };
-  }
-
-  @Get("live")
-  async listLive(@Req() req: any) {
-    const orgId = req.user.orgId || "00000000-0000-0000-0000-000000000000";
-    const now = new Date();
-    const horizon = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-
-    const interviews = await this.prisma.interview.findMany({
-      where: {
-        org_id: orgId,
-        deleted_at: null,
-        status: { in: ["scheduled", "in_progress"] },
-        scheduled_at: { lte: horizon },
-      },
-      include: {
-        candidate: {
-          select: {
-            full_name: true,
-            email: true,
-            role_applied: true,
-          },
-        },
-        persona: {
-          select: {
-            name: true,
-          },
-        },
-        sessions: {
-          select: {
-            id: true,
-          },
-          orderBy: { started_at: "desc" },
-          take: 1,
-        },
-      },
-      orderBy: { scheduled_at: "asc" },
-    });
-
-    return interviews.map((iv) => ({
-      id: iv.id,
-      candidateName: iv.candidate?.full_name ?? "Candidate",
-      candidateEmail: iv.candidate?.email ?? "",
-      role: iv.candidate?.role_applied ?? "Interview",
-      personaName: iv.persona?.name ?? "AI Interviewer",
-      scheduledAt: iv.scheduled_at ? iv.scheduled_at.toISOString() : null,
-      durationMinutes: iv.duration_minutes ?? 45,
-      status: iv.status,
-      sessionId: iv.sessions[0]?.id ?? null,
-    }));
-  }
-
-  @Get("recorded")
-  async listRecorded(@Req() req: any) {
-    const orgId = req.user.orgId || "00000000-0000-0000-0000-000000000000";
-
-    const interviews = await this.prisma.interview.findMany({
-      where: {
-        org_id: orgId,
-        deleted_at: null,
-        status: { in: ["completed", "evaluation_pending"] },
-      },
-      include: {
-        candidate: {
-          select: {
-            full_name: true,
-            email: true,
-            role_applied: true,
-          },
-        },
-        persona: {
-          select: {
-            name: true,
-          },
-        },
-        sessions: {
-          select: {
-            id: true,
-            started_at: true,
-            ended_at: true,
-          },
-          orderBy: { started_at: "desc" },
-          take: 1,
-        },
-      },
-      orderBy: { scheduled_at: "desc" },
-      take: 60,
-    });
-
-    return interviews.map((iv) => {
-      const s = iv.sessions[0];
-      const start = s?.started_at ? s.started_at.getTime() : 0;
-      const end = s?.ended_at ? s.ended_at.getTime() : 0;
-      const durationSec =
-        end > start ? Math.round((end - start) / 1000) : (iv.duration_minutes ?? 45) * 60;
-
-      return {
-        id: s?.id ?? iv.id,
-        interviewId: iv.id,
-        candidateName: iv.candidate?.full_name ?? "Candidate",
-        role: iv.candidate?.role_applied ?? "Interview",
-        personaName: iv.persona?.name ?? "AI Interviewer",
-        durationSec,
-        scheduledAt: iv.scheduled_at ? iv.scheduled_at.toISOString() : null,
-        score: iv.overall_score ? Number(iv.overall_score) : null,
-      };
-    });
   }
 
   @Get("monitor/:interviewId")
