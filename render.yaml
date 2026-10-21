@@ -35,3 +35,5 @@ services:
         sync: false
       - key: FRONTEND_URL        # exact origin of the deployed web app (CORS)
         sync: false
+      - key: SENTRY_DSN          # optional: enables Sentry error tracking for the backend
+        sync: false

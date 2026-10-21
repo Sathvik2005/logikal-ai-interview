@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import { RedisIoAdapter } from "./presentation/ws/redis-io.adapter";
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
@@ -53,6 +54,14 @@ function validateEnvironment() {
 
 async function bootstrap() {
   validateEnvironment();
+  // Optional error tracking: enabled only when SENTRY_DSN is set (Sentry free tier works).
+  if (process.env.SENTRY_DSN) {
+    Sentry.init({
+      dsn: process.env.SENTRY_DSN,
+      environment: process.env.NODE_ENV ?? "development",
+      tracesSampleRate: 0,
+    });
+  }
   const logger = new Logger("Bootstrap");
   const app = await NestFactory.create(AppModule);
 
