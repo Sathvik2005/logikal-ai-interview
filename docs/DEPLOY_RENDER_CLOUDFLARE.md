@@ -58,3 +58,6 @@ One-time setup in GitHub > Settings > Secrets and variables > Actions:
 `CLOUDFLARE_API_TOKEN` (Workers edit permission), `CLOUDFLARE_ACCOUNT_ID`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`. Without `CLOUDFLARE_API_TOKEN` the deploy job skips itself.
 
 Collaborators: add them under Settings > Collaborators (Write access). Their pull requests run `check`; once merged to `main` they deploy automatically. Optionally protect `main` (require PR + the `check` status) so nothing deploys without a green build.
+
+## 5. Error tracking (Sentry, free tier)
+The backend reports every 5xx to Sentry when `SENTRY_DSN` is set (unset = disabled, nothing else changes). Create a free Sentry project (platform: Node.js), copy its DSN, and add it as `SENTRY_DSN` in the Render service's environment. Errors carry the `request_id` returned to the caller, so they match the logs and the `error_events` table.

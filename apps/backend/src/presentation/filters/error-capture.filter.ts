@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Logger,
 } from "@nestjs/common";
+import * as Sentry from "@sentry/node";
 import { randomUUID } from "node:crypto";
 import { PrismaService } from "../../infrastructure/database/prisma.service";
 
@@ -16,6 +17,7 @@ const MAX_EVENTS_PER_MINUTE = 30;
  *  - are logged as one structured JSON line (easy to ship to any log platform),
  *  - are stored in `error_events` (the admin dashboard's "Errors (24h)" reads this table),
  *  - get a request id returned to the caller so support can find the exact failure.
+ *  - are sent to Sentry when `SENTRY_DSN` is set (no-op otherwise),
  *  - are posted to `ERROR_ALERT_WEBHOOK_URL` when set (Slack/Teams/Discord-style `{ text }` JSON), at most once
  *    per `ERROR_ALERT_COOLDOWN_SEC` (default 300) per distinct error message, so an outage pages once, not 1000 times.
  * Capturing never throws and is rate-limited so an outage can't flood the database.
@@ -59,6 +61,12 @@ export class ErrorCaptureFilter implements ExceptionFilter {
       }),
       err.stack,
     );
+    Sentry.withScope((scope) => {
+      scope.setTag("request_id", requestId);
+      scope.setUser({ id: req?.user?.userId });
+      scope.setContext("request", { method: req?.method, url: req?.originalUrl ?? req?.url, status });
+      Sentry.captureException(err);
+    });
     this.persist(req, err, status, requestId);
     this.alert(req, err, status, requestId);
 
