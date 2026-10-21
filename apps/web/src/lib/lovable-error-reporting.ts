@@ -1,3 +1,5 @@
+import { captureWebError } from "./sentry";
+
 type LovableErrorOptions = {
   mechanism?: "manual" | "onerror" | "unhandledrejection" | "react_error_boundary";
   handled?: boolean;
@@ -20,6 +22,7 @@ declare global {
 
 export function reportLovableError(error: unknown, context: Record<string, unknown> = {}) {
   if (typeof window === "undefined") return;
+  captureWebError(error, { route: window.location.pathname, ...context });
   window.__lovableEvents?.captureException?.(
     error,
     {

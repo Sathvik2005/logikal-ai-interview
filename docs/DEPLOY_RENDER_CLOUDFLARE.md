@@ -61,3 +61,5 @@ Collaborators: add them under Settings > Collaborators (Write access). Their pul
 
 ## 5. Error tracking (Sentry, free tier)
 The backend reports every 5xx to Sentry when `SENTRY_DSN` is set (unset = disabled, nothing else changes). Create a free Sentry project (platform: Node.js), copy its DSN, and add it as `SENTRY_DSN` in the Render service's environment. Errors carry the `request_id` returned to the caller, so they match the logs and the `error_events` table.
+
+The web app reports browser errors (React error boundaries, uncaught errors, unhandled rejections) when `VITE_SENTRY_DSN` is set at build time. Add it as a GitHub Actions secret named `VITE_SENTRY_DSN` (a browser DSN is public by design; the same project's DSN as the backend works, or create a second Node/React project). Unset = disabled. Cloudflare Worker (SSR) errors are not sent to Sentry.
