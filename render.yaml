@@ -4,7 +4,7 @@ services:
   - type: web
     name: lokality-backend
     runtime: node
-    plan: starter
+    plan: free
     region: singapore          # same region as the Supabase pooler (ap-southeast-1)
     buildCommand: npm ci && npm run prisma:generate && npm run build:backend
     startCommand: node apps/backend/dist/main.js
