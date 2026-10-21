@@ -44,7 +44,7 @@ export class InterviewEngineService {
     });
 
     // Update candidate state
-    await this.candidateWorkflow.transition(
+    await this.candidateWorkflow.advanceIfBehind(
       interview.candidateId,
       "interview_started",
       "Candidate joined the interview room and initialized their session.",

@@ -58,6 +58,7 @@ describe("InterviewEngineService", () => {
   const mockCandidateWorkflow = {
     transition: jest.fn(),
     advanceTo: jest.fn(),
+    advanceIfBehind: jest.fn(),
     logTimeline: jest.fn(),
   };
 
@@ -122,7 +123,7 @@ describe("InterviewEngineService", () => {
         started_at: new Date(),
       };
       prisma.interviewSession.create.mockResolvedValue(mockSession);
-      candidateWorkflow.transition.mockResolvedValue(undefined);
+      candidateWorkflow.advanceIfBehind.mockResolvedValue(undefined);
 
       const result = await service.startSession("int-123", { browser: "chrome" });
 
@@ -138,7 +139,7 @@ describe("InterviewEngineService", () => {
         },
       });
 
-      expect(candidateWorkflow.transition).toHaveBeenCalledWith(
+      expect(candidateWorkflow.advanceIfBehind).toHaveBeenCalledWith(
         "cand-456",
         "interview_started",
         expect.any(String),
@@ -278,13 +279,11 @@ describe("InterviewEngineService", () => {
       aiOrchestrator.generateInterviewQuestion.mockResolvedValue("Generated Question text?");
 
       // Spy appendTurn
-      const appendTurnSpy = jest
-        .spyOn(service, "appendTurn")
-        .mockResolvedValue({
-          id: "turn-gen",
-          speaker: "persona",
-          text: "Generated Question text?",
-        });
+      const appendTurnSpy = jest.spyOn(service, "appendTurn").mockResolvedValue({
+        id: "turn-gen",
+        speaker: "persona",
+        text: "Generated Question text?",
+      });
 
       const result = await service.getNextQuestion("sess-999");
 

@@ -2,7 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { CardShadow, Icon, PageHeader } from "@/components/recruiter/RecruiterShell";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { upsertPersona } from "@/lib/personas.functions";
 
 export const Route = createFileRoute("/_authenticated/recruiter/personas/new")({
   component: NewPersona,
@@ -10,6 +11,7 @@ export const Route = createFileRoute("/_authenticated/recruiter/personas/new")({
 
 function NewPersona() {
   const navigate = useNavigate();
+  const createPersona = useServerFn(upsertPersona);
   const [form, setForm] = useState({
     name: "",
     persona_type: "technical",
@@ -23,16 +25,22 @@ function NewPersona() {
   const save = async () => {
     if (!form.name) return toast.error("Name is required");
     setSaving(true);
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
+    try {
+      // Goes through the backend, which stamps the persona with the recruiter's organization.
+      await createPersona({
+        data: {
+          name: form.name,
+          personaType: form.persona_type,
+          tone: form.tone,
+          difficulty: form.difficulty,
+          prompt: form.prompt,
+        },
+      });
+    } catch (err) {
       setSaving(false);
-      return toast.error("Not signed in");
+      return toast.error(err instanceof Error ? err.message : "Could not create the persona");
     }
-    const { error } = await supabase.from("personas").insert({ ...form, created_by: user.id });
     setSaving(false);
-    if (error) return toast.error(error.message);
     toast.success("Persona created");
     navigate({ to: "/recruiter/personas" });
   };

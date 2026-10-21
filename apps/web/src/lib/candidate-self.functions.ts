@@ -57,7 +57,9 @@ export const getMyCandidateInterview = createServerFn({ method: "POST" })
       throw new Error(`Failed to fetch self interview: ${res.statusText}`);
     }
 
-    return res.json();
+    // The backend answers with an empty body when this account has no interview yet.
+    const body = await res.text();
+    return body ? JSON.parse(body) : null;
   });
 
 export const getMyUpcomingInterviews = createServerFn({ method: "GET" })

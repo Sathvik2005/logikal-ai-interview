@@ -50,5 +50,6 @@ export function useAuth() {
 export function roleHome(role: AppRole | null): string {
   if (role === "admin") return "/admin";
   if (role === "recruiter") return "/recruiter";
-  return "/candidate/prepare";
+  // The dashboard claims a pending invitation (from /join/<token>) and then forwards to the interview.
+  return "/candidate";
 }
