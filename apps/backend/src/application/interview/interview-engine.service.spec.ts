@@ -415,7 +415,7 @@ describe("InterviewEngineService", () => {
       });
 
       // steps through interview_running instead of an illegal direct jump
-      expect(candidateWorkflow.advanceTo).toHaveBeenCalledWith(
+      expect(candidateWorkflow.advanceIfBehind).toHaveBeenCalledWith(
         "cand-456",
         "evaluation_processing",
         expect.any(String),

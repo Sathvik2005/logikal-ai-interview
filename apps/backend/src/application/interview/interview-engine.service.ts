@@ -318,9 +318,10 @@ Notes: ${cr.notes || ""}`;
       });
 
       // Update candidate workflow
-      // advanceTo walks interview_started -> interview_running -> evaluation_processing, so a candidate
-      // who answered without the intermediate state being set can still be closed out.
-      await this.candidateWorkflow.advanceTo(
+      // advanceIfBehind walks interview_started -> interview_running -> evaluation_processing for a candidate
+      // whose intermediate state was never set, and leaves one who is already further along (a second interview)
+      // alone, so closing the room can never fail before the evaluation is queued.
+      await this.candidateWorkflow.advanceIfBehind(
         interview.candidateId,
         "evaluation_processing",
         "Interview room closed. Enqueuing AI evaluation pipeline.",
