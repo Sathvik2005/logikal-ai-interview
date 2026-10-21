@@ -10,6 +10,7 @@ import {
   UseGuards,
   Inject,
   BadRequestException,
+  ParseUUIDPipe,
 } from "@nestjs/common";
 import { planSlots } from "../../application/interview/slot-planner";
 import { SupabaseAuthGuard } from "../guards/supabase-auth.guard";
@@ -370,7 +371,7 @@ export class InterviewsController {
   @Roles("candidate", "recruiter", "admin")
   @UseGuards(InterviewAccessGuard)
   @Get("session/:sessionId/turns")
-  async getTurns(@Param("sessionId") sessionId: string) {
+  async getTurns(@Param("sessionId", ParseUUIDPipe) sessionId: string) {
     return this.prisma.interviewTurn.findMany({
       where: { session_id: sessionId },
       orderBy: { started_at: "asc" },
@@ -381,7 +382,7 @@ export class InterviewsController {
   @UseGuards(InterviewAccessGuard)
   @Post("session/:sessionId/turn")
   async appendTurn(
-    @Param("sessionId") sessionId: string,
+    @Param("sessionId", ParseUUIDPipe) sessionId: string,
     @Body() body: { speaker: "candidate" | "persona" | "system"; text: string; audioPath?: string },
   ) {
     return this.engine.appendTurn(sessionId, body.speaker, body.text, body.audioPath);
@@ -390,7 +391,7 @@ export class InterviewsController {
   @Roles("candidate", "recruiter", "admin")
   @UseGuards(InterviewAccessGuard)
   @Post("session/:sessionId/next-question")
-  async getNextQuestion(@Param("sessionId") sessionId: string) {
+  async getNextQuestion(@Param("sessionId", ParseUUIDPipe) sessionId: string) {
     return this.engine.getNextQuestion(sessionId);
   }
 
@@ -398,7 +399,7 @@ export class InterviewsController {
   @UseGuards(InterviewAccessGuard)
   @Post("session/:sessionId/event")
   async logEvent(
-    @Param("sessionId") sessionId: string,
+    @Param("sessionId", ParseUUIDPipe) sessionId: string,
     @Body() body: { type: string; payload?: any },
   ) {
     await this.engine.recordEvent(sessionId, body.type, body.payload);
@@ -407,7 +408,10 @@ export class InterviewsController {
 
   @Post(":id/finalize-evaluation")
   @Roles("recruiter", "admin")
-  async finalizeEvaluation(@Param("id") id: string, @Body() body: { sessionId: string }) {
+  async finalizeEvaluation(
+    @Param("id", ParseUUIDPipe) id: string,
+    @Body() body: { sessionId: string },
+  ) {
     await this.queue.enqueue("finalize-evaluation", {
       interviewId: id,
       sessionId: body.sessionId,
@@ -523,7 +527,7 @@ export class InterviewsController {
   }
 
   @Get(":id/evaluation")
-  async getEvaluation(@Param("id") id: string) {
+  async getEvaluation(@Param("id", ParseUUIDPipe) id: string) {
     return this.prisma.interview.findUnique({
       where: { id },
       select: {
@@ -539,7 +543,7 @@ export class InterviewsController {
   }
 
   @Get(":id")
-  async getOne(@Param("id") id: string) {
+  async getOne(@Param("id", ParseUUIDPipe) id: string) {
     return this.prisma.interview.findUnique({
       where: { id },
       include: { candidate: true, job: true, template: true, persona: true },
@@ -549,7 +553,7 @@ export class InterviewsController {
   @Patch(":id/reschedule")
   @Roles("recruiter", "admin")
   async reschedule(
-    @Param("id") id: string,
+    @Param("id", ParseUUIDPipe) id: string,
     @Body() body: { scheduledAt: string; durationMinutes?: number; reason?: string },
     @Req() req: any,
   ) {
@@ -613,7 +617,11 @@ export class InterviewsController {
 
   @Patch(":id/cancel")
   @Roles("recruiter", "admin")
-  async cancel(@Param("id") id: string, @Body() body: { reason?: string }, @Req() req: any) {
+  async cancel(
+    @Param("id", ParseUUIDPipe) id: string,
+    @Body() body: { reason?: string },
+    @Req() req: any,
+  ) {
     const userId = req.user.userId;
     const existing = await this.prisma.interview.findUnique({
       where: { id },
@@ -656,7 +664,7 @@ export class InterviewsController {
   }
 
   @Get("monitor/:interviewId")
-  async getMonitorSession(@Param("interviewId") interviewId: string) {
+  async getMonitorSession(@Param("interviewId", ParseUUIDPipe) interviewId: string) {
     const iv = await this.prisma.interview.findUnique({
       where: { id: interviewId },
       include: {
@@ -739,7 +747,7 @@ export class InterviewsController {
 
   @Post("session/:sessionId/flag")
   async flagSessionEvent(
-    @Param("sessionId") sessionId: string,
+    @Param("sessionId", ParseUUIDPipe) sessionId: string,
     @Body() body: { note: string },
     @Req() req: any,
   ) {

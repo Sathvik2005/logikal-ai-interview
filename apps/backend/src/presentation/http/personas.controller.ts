@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Param, Body, Req, UseGuards, Inject } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Param,
+  Body,
+  Req,
+  UseGuards,
+  Inject,
+  ParseUUIDPipe,
+} from "@nestjs/common";
 import { SupabaseAuthGuard } from "../guards/supabase-auth.guard";
 import { Roles, RolesGuard } from "../guards/roles.guard";
 import { PrismaService } from "../../infrastructure/database/prisma.service";
@@ -27,7 +37,7 @@ export class PersonasController {
   }
 
   @Get(":id")
-  async getOne(@Param("id") id: string) {
+  async getOne(@Param("id", ParseUUIDPipe) id: string) {
     return this.prisma.persona.findUnique({
       where: { id },
       include: { versions: { orderBy: { version: "desc" } } },

@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Param, Body, UseGuards, Req, Inject } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Param,
+  Body,
+  UseGuards,
+  Req,
+  Inject,
+  ParseUUIDPipe,
+} from "@nestjs/common";
 import { SupabaseAuthGuard } from "../guards/supabase-auth.guard";
 import { Roles, RolesGuard } from "../guards/roles.guard";
 import { InterviewAccessGuard } from "../guards/interview-access.guard";
@@ -128,7 +138,7 @@ export class ProctoringController {
   }
 
   @Get("report-bundle/:interviewId")
-  async getReportBundle(@Param("interviewId") interviewId: string) {
+  async getReportBundle(@Param("interviewId", ParseUUIDPipe) interviewId: string) {
     const interview = await this.prisma.interview.findUnique({
       where: { id: interviewId },
       include: { candidate: true, persona: true },
