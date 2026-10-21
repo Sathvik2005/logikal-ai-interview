@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Patch, Param, Body, Query, UseGuards, Req } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Param,
+  Body,
+  Query,
+  UseGuards,
+  Req,
+  ParseUUIDPipe,
+} from "@nestjs/common";
 import { SupabaseAuthGuard } from "../guards/supabase-auth.guard";
 import { Roles, RolesGuard } from "../guards/roles.guard";
 import { PrismaService } from "../../infrastructure/database/prisma.service";
@@ -66,7 +77,7 @@ export class AdminController {
 
   @Get("organizations/:id")
   @Roles("admin")
-  async getOrganization(@Param("id") id: string) {
+  async getOrganization(@Param("id", ParseUUIDPipe) id: string) {
     const o = await this.prisma.organization.findUnique({
       where: { id },
       select: {
@@ -101,7 +112,7 @@ export class AdminController {
 
   @Patch("organizations/:id")
   @Roles("admin")
-  async updateOrganization(@Param("id") id: string, @Body() body: any) {
+  async updateOrganization(@Param("id", ParseUUIDPipe) id: string, @Body() body: any) {
     await this.prisma.organization.update({
       where: { id },
       data: {

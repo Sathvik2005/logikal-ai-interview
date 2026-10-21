@@ -14,6 +14,7 @@ import {
   ServiceUnavailableException,
   BadRequestException,
   ForbiddenException,
+  ParseUUIDPipe,
 } from "@nestjs/common";
 import { CANDIDATE_STATUSES, type CandidateStatus } from "../../domain/candidate/candidate.entity";
 import { FileInterceptor } from "@nestjs/platform-express";
@@ -84,7 +85,7 @@ export class CandidatesController {
   @Roles("recruiter", "admin")
   async notifyOutcome(
     @Req() req: any,
-    @Param("id") id: string,
+    @Param("id", ParseUUIDPipe) id: string,
     @Body() body: { message?: string },
   ) {
     return this.decisions.notifyOutcome(
@@ -112,7 +113,7 @@ export class CandidatesController {
 
   @Get(":id/decisions")
   @Roles("recruiter", "admin")
-  async decisionState(@Param("id") id: string) {
+  async decisionState(@Param("id", ParseUUIDPipe) id: string) {
     return this.decisions.state(id);
   }
 
@@ -121,7 +122,7 @@ export class CandidatesController {
   @Roles("recruiter", "admin")
   async decide(
     @Req() req: any,
-    @Param("id") id: string,
+    @Param("id", ParseUUIDPipe) id: string,
     @Body() body: { decision: Decision; note?: string },
   ) {
     return this.decisions.decide(id, body?.decision, body?.note, {
@@ -132,7 +133,7 @@ export class CandidatesController {
   }
 
   @Get(":id")
-  async getOne(@Param("id") id: string) {
+  async getOne(@Param("id", ParseUUIDPipe) id: string) {
     return this.prisma.candidate.findUnique({
       where: { id },
       include: {
@@ -168,7 +169,7 @@ export class CandidatesController {
 
   @Patch(":id")
   @Roles("recruiter", "admin")
-  async updateCandidate(@Param("id") id: string, @Body() body: any) {
+  async updateCandidate(@Param("id", ParseUUIDPipe) id: string, @Body() body: any) {
     const candidate = await this.prisma.candidate.findUnique({
       where: { id },
     });
@@ -201,7 +202,7 @@ export class CandidatesController {
   @Patch(":id/status")
   @Roles("recruiter", "admin")
   async updateStatus(
-    @Param("id") id: string,
+    @Param("id", ParseUUIDPipe) id: string,
     @Body() body: { status: CandidateStatus; reason?: string; advance?: boolean },
   ) {
     if (body?.status === "hiring_decision") {
@@ -242,7 +243,7 @@ export class CandidatesController {
   @UseInterceptors(FileInterceptor("file"))
   async uploadResume(
     @Req() req: any,
-    @Param("id") id: string,
+    @Param("id", ParseUUIDPipe) id: string,
     @UploadedFile() file: Express.Multer.File,
   ) {
     const orgId = req.user.orgId || "00000000-0000-0000-0000-000000000000";
@@ -251,7 +252,7 @@ export class CandidatesController {
   }
 
   @Get(":id/timeline")
-  async getTimeline(@Param("id") id: string) {
+  async getTimeline(@Param("id", ParseUUIDPipe) id: string) {
     return this.prisma.candidateTimeline.findMany({
       where: { candidate_id: id },
       orderBy: { created_at: "asc" },
@@ -260,7 +261,7 @@ export class CandidatesController {
 
   @Roles("candidate", "recruiter", "admin")
   @Get(":id/resume-url")
-  async getResumeUrl(@Req() req: any, @Param("id") id: string) {
+  async getResumeUrl(@Req() req: any, @Param("id", ParseUUIDPipe) id: string) {
     const candidate = await this.prisma.candidate.findUnique({
       where: { id },
     });
@@ -373,7 +374,7 @@ export class CandidatesController {
 
   @Post(":id/retry-resume")
   @Roles("recruiter", "admin")
-  async retryResume(@Param("id") id: string) {
+  async retryResume(@Param("id", ParseUUIDPipe) id: string) {
     await this.filePipeline.queueResumeParsing(id);
     return { message: "Candidate resume processing re-queued successfully." };
   }

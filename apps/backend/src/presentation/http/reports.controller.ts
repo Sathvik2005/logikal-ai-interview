@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, UseGuards, Req } from "@nestjs/common";
+import { Controller, Get, Param, Query, UseGuards, Req, ParseUUIDPipe } from "@nestjs/common";
 import { SupabaseAuthGuard } from "../guards/supabase-auth.guard";
 import { Roles, RolesGuard } from "../guards/roles.guard";
 import { PrismaService } from "../../infrastructure/database/prisma.service";
@@ -27,7 +27,7 @@ export class ReportsController {
   }
 
   @Get(":interviewId")
-  async getOne(@Param("interviewId") interviewId: string) {
+  async getOne(@Param("interviewId", ParseUUIDPipe) interviewId: string) {
     return this.prisma.interviewReport.findUnique({
       where: { interview_id: interviewId },
       include: {

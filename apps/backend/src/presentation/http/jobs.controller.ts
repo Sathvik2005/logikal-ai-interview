@@ -10,6 +10,7 @@ import {
   Req,
   Inject,
   ServiceUnavailableException,
+  ParseUUIDPipe,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import {
@@ -59,7 +60,7 @@ export class JobsController {
   }
 
   @Get(":id")
-  async getOne(@Param("id") id: string) {
+  async getOne(@Param("id", ParseUUIDPipe) id: string) {
     return this.prisma.jobDescription.findUnique({
       where: { id },
     });

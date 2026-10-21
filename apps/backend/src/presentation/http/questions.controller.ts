@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Delete, Param, Body, Query, UseGuards, Req } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Param,
+  Body,
+  Query,
+  UseGuards,
+  Req,
+  ParseUUIDPipe,
+} from "@nestjs/common";
 import { SupabaseAuthGuard } from "../guards/supabase-auth.guard";
 import { Roles, RolesGuard } from "../guards/roles.guard";
 import { PrismaService } from "../../infrastructure/database/prisma.service";
@@ -23,7 +34,7 @@ export class QuestionsController {
   }
 
   @Get(":id")
-  async getOne(@Param("id") id: string) {
+  async getOne(@Param("id", ParseUUIDPipe) id: string) {
     return this.prisma.question.findUnique({
       where: { id },
     });
@@ -87,7 +98,7 @@ export class QuestionsController {
 
   @Delete(":id")
   @Roles("recruiter", "admin")
-  async delete(@Param("id") id: string) {
+  async delete(@Param("id", ParseUUIDPipe) id: string) {
     await this.prisma.question.update({
       where: { id },
       data: { deleted_at: new Date() },
