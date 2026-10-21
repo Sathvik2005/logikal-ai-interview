@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import * as fs from "fs";
 import * as path from "path";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { WebSocket } from "ws";
 
 @Injectable()
 export class StorageService implements OnModuleInit {
@@ -31,6 +32,8 @@ export class StorageService implements OnModuleInit {
     if (hasSupabase && !forceLocal) {
       this.supabaseClient = createClient(supabaseUrl!, serviceRoleKey!, {
         auth: { persistSession: false },
+        // Node < 22 has no native WebSocket, which the realtime client requires at construction.
+        realtime: { transport: WebSocket as any },
       });
       this.isLocal = false;
       this.logger.log("Storage Service initialized with Supabase storage.");
